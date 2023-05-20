@@ -1,53 +1,48 @@
-<script>
-	import Header from './Header.svelte';
-	import './styles.css';
+<script lang="ts">
+	// Your selected Skeleton theme:
+	import '@skeletonlabs/skeleton/themes/theme-skeleton.css';
+
+	// This contains the bulk of Skeletons required styles:
+	// NOTE: this will be renamed skeleton.css in the v2.x release.
+	import '@skeletonlabs/skeleton/styles/skeleton.css';
+
+	// Finally, your application's global stylesheet (sometimes labeled 'app.css')
+	import '/src/app.postcss';
+
+	import { page } from '$app/stores';
+	import {AppShell, AppBar} from '@skeletonlabs/skeleton';
+	import PageTransition from '$lib/_components/Transition.svelte';
+
+
+	function scrollHandler(event: UIEvent & { currentTarget: EventTarget & HTMLDivElement; }) {
+		console.log(event.currentTarget.scrollTop);
+	}
+
 </script>
 
-<div class="app">
-	<Header />
-
-	<main>
-		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
-</div>
+<AppShell class="bg-surface-900 min-w-[20rem]" regionPage="relative" slotHeader="z-10 hidden md:block"
+slotSidebarLeft="w-0 md:w-60 min-h-full bg-transparent text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none" slotFooter="h-20 md:h-0 bg-surface-800 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-150 duration-800 animation motion-reduce:transition-none"> <!-- on:scroll={scrollHandler} -->
+	<svelte:fragment slot="header">
+		<AppBar>Skeleton</AppBar>
+	</svelte:fragment>
+	<svelte:fragment slot="sidebarLeft">
+		<!-- Hidden below Tailwind's large breakpoint -->
+		<div id="sidebar-left" class="hidden lg:block">Sidebar</div>
+	</svelte:fragment>
+	<div class="text-gray-300 min-h-full">
+		<PageTransition key={$page.url.pathname} duration={400}>
+			<slot />
+		</PageTransition>
+	</div>
+</AppShell>
 
 <style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
+	* {
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
 	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
+	*:focus {
+		outline: none;
 	}
 </style>
