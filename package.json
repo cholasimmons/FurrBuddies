@@ -35,7 +35,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@picocss/pico": "^1.5.10",
-		"appwrite": "^11.0.0"
+		"@fontsource/kanit": "^5.0.0",
+		"appwrite": "^11.0.0",
+		"iconify-icon": "^1.0.7"
 	}
 }

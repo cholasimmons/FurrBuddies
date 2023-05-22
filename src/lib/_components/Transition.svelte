@@ -2,20 +2,21 @@
     import { slide, fly, fade } from 'svelte/transition'
   
     export let key: string
+    // export let meta: string
     export let duration: number = 300
   </script>
   
   {#key key}
-    <div class="pt-20 md:pt-0"
-      in:fly={{ duration, delay: duration }}
-      out:fly={{ duration }}>
+    <div
+      in:fly={{ duration, delay: duration-50, x:-6 }}
+      out:fly={{ duration, x:6 }}>
       <slot />
     </div>
   {/key}
   
   <style>
     div {
-      position: absolute;
+      position: relative;
       inset: 0;
     }
   </style>

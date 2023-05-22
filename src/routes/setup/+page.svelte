@@ -3,5 +3,12 @@
 </script>
 
 <main>
-    <p>Page working</p>
+    <p>Setup page working</p>
 </main>
+
+<style>
+    main {
+        display: flex;
+        justify-content: center;
+    }
+</style>
