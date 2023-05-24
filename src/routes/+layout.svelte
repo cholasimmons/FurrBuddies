@@ -9,19 +9,42 @@
     // Finally, your application's global stylesheet (sometimes labeled 'app.css')
     import '../global.postcss';
 
-    import { page } from '$app/stores';
-    import {AppShell, AppBar} from '@skeletonlabs/skeleton';
+    import {AppShell, AppBar, Avatar, AppRail, AppRailTile, AppRailAnchor} from '@skeletonlabs/skeleton';
     import PageTransition from '$lib/_components/Transition.svelte';
-	import Footer from '../lib/_components/Footer.svelte';
 	import Sidebar from '$lib/_components/Sidebar.svelte';
 	import UserSVG from '$lib/_components/icons/UserSVG.svelte';
+	import toast, { Toaster } from 'svelte-french-toast';
+	import type { LayoutData } from './$types';
 	import { onMount } from 'svelte';
 	import { state } from '$lib/store';
-	import { Toast } from '@skeletonlabs/skeleton';
-	import "@fontsource/kanit";
-	import type { LayoutData } from './$types';
+	import { fade } from 'svelte/transition';
 
 	export let data: LayoutData;
+	let currentTile: any;
+
+	onMount(async ()=>{
+		try {
+			await state.checkLoggedIn();
+			toast.success('Welcome back '+splitNames()+'!', {duration:3000, style:'mb-[2rem]', position: 'bottom-center'});
+		} catch (error) {
+			console.warn('No signed in User.');
+			toast.error('Hello there stranger', {icon: 'wave', duration: 3600});
+			// console.log('Implement Toast notifications');   
+		}
+		
+	});
+
+	const splitNames = () => {
+		const fullname = $state.account?.name || 'Stranger'
+		const namesArray = fullname!.split(" "); // Split the sentence into an array of words
+
+		if (namesArray.length >= 1) {
+			if(namesArray[0]===('Mr'||'Mrs'||'Dr'||'Ms'||'Miss')){
+				return namesArray[1];
+			}
+			return namesArray[0]; // Get the first name
+		}
+	}
 
 
     /*function scrollHandler(event: any & { currentTarget: EventTarget & HTMLDivElement; }) {
@@ -30,27 +53,23 @@
 
 </script>
 
-<AppShell class="bg-surface-900 min-w-[20rem]" regionPage="relative" slotHeader="z-10 hidden md:block" 
-slotFooter="h-20 md:h-0 bg-surface-800 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-150 duration-800 animation motion-reduce:transition-none"
-slotSidebarLeft="w-0 md:w-[14rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
+<AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 px-3"
+slotFooter="h-20 md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
+slotSidebarLeft="w-0 md:w-[9rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
 	<svelte:fragment slot="header">
-		<AppBar>
+		<AppBar background="" shadow="">
 			<svelte:fragment slot="lead">
 				<div class="flex items-center">
-					<strong class="text-xl uppercase">Fur Buddies</strong>
+					<p class="text-2xl font-bold uppercase">Furr Buddies</p>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<button class="md:hidden btn btn-sm">
-					<span><svg viewBox="0 0 100 80" class="fill-token w-4 h-4">
-						<rect width="100" height="20" />
-						<rect y="30" width="100" height="20" />
-						<rect y="60" width="100" height="20" />
-					</svg></span>
-				</button>
-
-				<a class="hidden md:block" href="/user/profile">
-					<UserSVG/>
+				<a class="" href="/user/profile" in:fade="{{ duration: 300 }}">
+					{#if $state.account?.$id}
+						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="border-2" width="w-[3.2rem]" />
+					{:else}
+						<UserSVG/>
+					{/if}
 				</a>
 			</svelte:fragment>
 		</AppBar>
@@ -60,19 +79,43 @@ slotSidebarLeft="w-0 md:w-[14rem] h-full scroll-none text-gray-200 transition ea
 		<div id="sidebar-left" class="hidden md:block p-1">
 			<Sidebar/>
 		</div>
+<!--
+		<AppRail>
+			<svelte:fragment slot="lead">
+				<AppRailAnchor href="/" >(icon)</AppRailAnchor>
+			</svelte:fragment>
+
+			<AppRailTile bind:group={currentTile} name="tile-1" value={0}>
+				<svelte:fragment slot="lead">(icon)</svelte:fragment>
+				<span>Tile 1</span>
+			</AppRailTile>
+			<AppRailTile bind:group={currentTile} name="tile-2" value={1}>
+				<svelte:fragment slot="lead">(icon)</svelte:fragment>
+				<span>Tile 2</span>
+			</AppRailTile>
+			<AppRailTile bind:group={currentTile} name="tile-3" value={2}>
+				<svelte:fragment slot="lead">(icon)</svelte:fragment>
+				<span>Tile 3</span>
+			</AppRailTile>
+
+			<svelte:fragment slot="trail">
+				<AppRailAnchor href="/" target="_blank" title="Account">(icon)</AppRailAnchor>
+			</svelte:fragment>
+		</AppRail>
+-->
 	</svelte:fragment>
 
-	<div class="py-3 px-6 min-h-full">
+	<div class="px-6 min-h-full">
 		<PageTransition key="{data.pathname}">
 			<slot/>
 		</PageTransition>
 	</div>
 
 	<svelte:fragment slot="footer">
-		<Footer/>
+		<Sidebar/>
 	</svelte:fragment>
 </AppShell>
-<Toast/>
+<Toaster position="bottom-center" toastOptions="{{duration: 4000, style: 'bottom:5rem'}}"/>
 
 <style>
 	* {
