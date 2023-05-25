@@ -8,8 +8,6 @@
 </svelte:head>
 
 <main>
-	<h3 class="title">Mail</h3>
-
 		<dl class="mt-5 list-dl">
 			<div>
 				<span class="w-[2rem] h-[2rem]">💌</span>

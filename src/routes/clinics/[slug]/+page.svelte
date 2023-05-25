@@ -6,17 +6,20 @@
     export let data;
     let clinic: Clinic;
 
-    onMount(()=>{        
-        clinic = $clinicstate.find((clinic:Clinic)=>clinic.$id === data.id) as Clinic
+    onMount(async ()=>{        
+        clinic = await $clinicstate.find((clinic:Clinic)=>clinic.$id === data.id) as Clinic
+        console.debug(clinic)
     });
 </script>
 
+<!-- HTML head -->
 <svelte:head>
 	<title>{data.appName} | Clinic</title>
 	<meta name="description" content="View Clinic" />
 </svelte:head>
 
+<!-- HTML body -->
 <main>
-    <h3 class="title text-center">{clinic.name}</h3>
+    <h3 class="title text-center">{clinic?.name}</h3>
     <p>{ data.id }</p>
 </main>

@@ -4,8 +4,12 @@
 	import { fade } from "svelte/transition";
     import 'iconify-icon';
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
+	import { goto } from "$app/navigation";
+	import ClinicCard from "$lib/_components/ClinicCard.svelte";
 
     export let data;
+
+    // "isLoading" type of boolean
     let _loading: boolean = false;
 
     onMount(async ()=>{
@@ -20,35 +24,39 @@
     });
 </script>
 
+<!-- HTML head -->
 <svelte:head>
 	<title>{data.appName} | Clinics</title>
 	<meta name="description" content="A public list of available health specialists" />
 </svelte:head>
 
+<!-- HTML body -->
 <main>
-    <h3 class="title flex justify-between">Clinics <span hidden={!_loading} class="ml-3"><LoadingClock/></span></h3>
+    <h3 class="title flex justify-between items-center"><button hidden={!$clinicstate.length} on:click|preventDefault={()=>goto('/clinics/register')}  type="button" class="btn btn-sm variant-ghost-warning">
+        <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span><span>Own a Clinic?</span></button>{#if _loading}<LoadingClock/>{/if}
+    </h3>
+
 
     {#if !$clinicstate.length}
-    <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
-        <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>
-        {#if _loading}
-        <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm m-0 animate-pulse">Searching...</p>
-        {/if}
-    </section>
+        <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
+            <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>
+            {#if _loading}
+            <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm m-0 animate-pulse">Searching...</p>
+            {/if}
+        </section>
     {:else}
-    <div class="my-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        {#each $clinicstate as clinic, index}
-        <a href="/clinics/{clinic.$id}" class="card">
-            <div class="w-full h-[8rem] bg-[url('/images/vet.jpg')] bg-cover bg-center bg-no-repeat text-white"></div>
-            <div in:fade={{ duration:300, delay:(index+1)*100 }} class="px-4 py-3">{clinic.name}</div>
-        </a>        
-        {/each}
-    </div>
+        <div in:fade={{ duration: 300, delay:400 }} class="my-8 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+            {#each $clinicstate as clinic, index}
+            <a href="/clinics/{clinic.$id}" class="vetcard">
+                <ClinicCard clinicName={clinic.name}/>
+            </a>        
+            {/each}
+        </div>
     {/if}
 </main>
 
 <style>
-    .card {
+    .vetcard {
         background-color: rgba(71, 36, 112, 0.36);
     }
 </style>

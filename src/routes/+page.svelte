@@ -3,31 +3,47 @@
 	import { fade, fly, slide, type crossfade } from 'svelte/transition';
 
 	export let data;
+
+	const infocards = [
+		{name: 'Card One', value: 'Card One Value'},
+		{name: 'Card Two', value: 'Card Two Value'},
+		{name: 'Card Three', value: 'Card Three Value'},
+	]
 </script>
 
+<!-- HTML head -->
 <svelte:head>
 	<title>{data.appName}</title>
 	<meta name="description" content="{data.appName} Home" />
 </svelte:head>
 
+<!-- HTML body -->
 <main>
-	<div class="w-full h-[10rem] bg-pink-800 bg-[url('/images/hero.jpg')] bg-cover bg-top rounded-xl">
+
+	<!-- Carousel -->
+
+	<div class="w-full h-[12rem] bg-pink-800 bg-[url('/images/hero.jpg')] bg-cover bg-top rounded-xl">
 	</div>
 
-	<div class="mt-4 grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2">
-		<div class="card rounded-lg p-4">
-			1
+	<!--  -->
+
+	<div class="my-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3">
+		{#each infocards as infocard, index}
+		<div class="{index === 2 ? 'block sm:hidden lg:block' : ' '} card rounded-lg p-4 text-center">
+			{ index+1 }
 		</div>
-		<div class="card rounded-lg p-4">
-			2
-		</div>
+		{/each}
 	</div>
 
-	<div class="text-center">
+	<div class="text-left">
 		<p>Display nearest Clinics and most popular shops, putting into consideration the paid Clients</p>
 	</div>
 </main>
 
 
 <style>
+	.card {
+		background-color:darksalmon;
+		color: black;
+	}
 </style>

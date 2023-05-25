@@ -19,7 +19,7 @@ const createPets = () => {
       const response: any = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
       return set(response.documents);
     },
-    addPet: async (name: string, gender: Gender, breed: string) => {
+    addPet: async (name: string, gender: Gender, breed: string, photo: string) => {
       const user = Role.user(get(state).account!.$id);
       console.log('User: ',user);
       if(!user)return;
@@ -32,6 +32,7 @@ const createPets = () => {
           name,
           gender,
           breed,
+          photo
         },
         [
           Permission.read(user),
@@ -39,6 +40,9 @@ const createPets = () => {
           Permission.delete(user),
         ]
       );
+      // const petphoto = await sdk.storage.createFile(server.bucket_buddies,ID.unique(),photofile)
+      // document.getElementById('uploader').files[0]
+
       return update((n) => [pet, ...n]);
     },
     removePet: async (pet: Pet) => {

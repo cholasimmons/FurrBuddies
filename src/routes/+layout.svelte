@@ -21,22 +21,45 @@
 	import BackButton from '$lib/_components/icons/BackButton.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Shop from './shop/+page.svelte';
+	import BuddyCard from '$lib/_components/BuddyCard.svelte';
+	import RightPage from '$lib/_components/RightPage.svelte';
 
+	// "isLoading" type of boolean
 	export let data: LayoutData;
+
+	// Disregard
 	let currentTile: any;
+
+	// Routes to display in the AppBar via getRouteName() function
+	const routes: { [key: string]: string } = {
+		// '/': 'Home',
+		'/pets': 'My Buddies',
+		'/pets/add': 'Add a Buddy',
+		'/clinics': 'Clinics',
+		'/clinics/register': 'Register a Clinic',
+		'/mail': 'Mail',
+		'/shop': 'Shop',
+		'/setup': 'Setup',
+		'/contact': 'Contact',
+		'/auth/login': 'Login',
+		'/auth/register': 'Sign Up',
+		'/auth/pass-forgot': 'Forgotten Password',
+		'/auth/pass-reset': 'Password Reset',
+		'/user/profile': 'User Profile',
+	};
 
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
-			toast.success('Welcome back '+splitNames()+'!', {duration:3000, style:'mb-[2rem]', position: 'bottom-center'});
+			toast.success('Welcome back '+splitNames()+'!' );
 		} catch (error) {
-			console.warn('No signed in User.');
-			toast.error('Hello there stranger', {icon: 'wave', duration: 3600});
-			// console.log('Implement Toast notifications');   
+			// console.warn('No signed in User.');
+			toast.error('Hello there stranger', {icon: 'wave'});
 		}
-		
 	});
 
+	// Divides a full name object and retrieves the first name, for the toast greeting
 	const splitNames = () => {
 		const fullname = $state.account?.name || 'Stranger'
 		const namesArray = fullname!.split(" "); // Split the sentence into an array of words
@@ -49,6 +72,24 @@
 		}
 	}
 
+	// Function that returns name to display in AppBar, from routes list above
+	function getRouteName(route: string):string {
+		const routeKeys = Object.keys(routes);
+
+		// Check if the current route is an exact match
+		if (routes.hasOwnProperty(route)) {
+			return routes[route];
+		}
+
+		// Check if the current route is a child of a listed route
+		for (let i = 0; i < routeKeys.length; i++) {
+			if (route.startsWith(routeKeys[i])) {
+			return routes[routeKeys[i]];
+			}
+		}
+		return 'Furr Buddies';
+	}
+
 
     /*function scrollHandler(event: any & { currentTarget: EventTarget & HTMLDivElement; }) {
 		// console.log(event.currentTarget.scrollTop);
@@ -56,7 +97,7 @@
 
 </script>
 
-<AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 px-3 py-0"
+<AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 p-0 m-0" slotPageContent=""
 slotFooter="h-20 md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
 slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
 	<svelte:fragment slot="header">
@@ -68,7 +109,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 				</button>
 				{/if}
 			</svelte:fragment>
-				<p class="text-2xl font-bold uppercase">Furr Buddies</p>
+				<p class="text-2xl font-semibold uppercase">{ getRouteName($page.url.pathname) } </p>
 			<svelte:fragment slot="trail">
 				<a class="" href="/user/profile" in:fade="{{ duration: 300 }}">
 					{#if $state.account?.$id}
@@ -111,17 +152,25 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 -->
 	</svelte:fragment>
 
-	<div class="px-6 min-h-full">
-		<PageTransition key="{data.pathname}">
-			<slot/>
-		</PageTransition>
+	<div class="flex h-full">
+		<div class="px-6 min-h-full w-full xl:max-w">
+			<PageTransition key="{data.pathname}">
+				<slot/>
+			</PageTransition>
+		</div>
+		<div class="hidden p-4 min-h-full xl:block xl:w-[28rem] bg-gray-800 bg-opacity-10">
+			<RightPage/>
+			<!-- Possibility to add more views on larger screens -->
+		</div>
 	</div>
 
 	<svelte:fragment slot="footer">
 		<Sidebar/>
 	</svelte:fragment>
 </AppShell>
-<Toaster position="bottom-center" toastOptions="{{duration: 4000, style: 'bottom:5rem'}}"/>
+
+<!-- Buttery smooth and simple toast, from Svelte French Toast = https://svelte-french-toast.com/ -->
+<Toaster position="bottom-center" toastOptions="{{duration: 3600, style: 'position:relative; bottom:4rem'}}"/>
 
 <style>
 	* {

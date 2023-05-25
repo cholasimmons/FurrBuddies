@@ -1,15 +1,15 @@
 <script lang="ts">
 	import type { Pet } from "$lib/_models/pet-model";
 
-    export let pet: Pet;
+    export let petName: string;
     export let src: string = "";
 </script>
 
 <main>
     <div class="circle">
-        <img {src} alt={src ? pet.name : ''}>
+        <img {src} alt={src ? petName : ''}>
     </div>
-    <p>{pet.name}</p>
+    <p>{petName}</p>
 </main>
 
 <style>
@@ -19,6 +19,13 @@
         flex-direction: column;
         justify-content: start;
         align-items: center;
+    }
+    main div {
+        transition: scale 0.2s ease-in-out;
+    }
+    main:hover div{
+        scale: 108%;
+        
     }
     .circle{
         position: relative;

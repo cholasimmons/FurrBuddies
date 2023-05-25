@@ -9,16 +9,16 @@
     <a href="/" class="{$page.url.pathname === '/' ? 'chosen' : ''} order-3 md:order-none">
         <li><iconify-icon icon="mdi:home" class="home"></iconify-icon><span>Home</span></li>
     </a>
-    <a href="/pets" class="{$page.url.pathname.startsWith('/pets') ? 'chosen' : ''} order-1 md:order-none"><li><iconify-icon icon="mdi:paw"></iconify-icon><span>Buddies</span></li></a>
-    <a href="/clinics" class="{$page.url.pathname.startsWith('/clinics') ? 'chosen' : ''} order-2 md:order-none"><li><iconify-icon icon="tabler:building-hospital"></iconify-icon><span>Clinics</span></li></a>
-    <a href="/shop" class="{$page.url.pathname.startsWith('/shop') ? 'chosen' : ''} hidden md:block"><li><iconify-icon icon="tabler:shopping-cart"></iconify-icon><span>Shop</span></li></a>
-    <a href="/mail" class="{$page.url.pathname.startsWith('/mail') ? 'chosen' : ''} order-4 md:order-none"><li><iconify-icon icon="mdi:mail"></iconify-icon><span>Mail</span></li></a>
-    <a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon><span>Setup</span></li></a>
+    <a href="/pets" class="{$page.url.pathname.startsWith('/pets') ? 'chosen' : ''} order-1 md:order-none"><li><iconify-icon icon="mdi:paw"></iconify-icon>Buddies</li></a>
+    <a href="/clinics" class="{$page.url.pathname.startsWith('/clinics') ? 'chosen' : ''} order-2 md:order-none"><li><iconify-icon icon="tabler:building-hospital"></iconify-icon>Clinics</li></a>
+    <a href="/shop" class="xl:hidden {$page.url.pathname.startsWith('/shop') ? 'chosen' : ''} hidden md:block"><li><iconify-icon icon="tabler:shopping-cart"></iconify-icon>Shop</li></a>
+    <a href="/mail" class="{$page.url.pathname.startsWith('/mail') ? 'chosen' : ''} order-4 md:order-none"><li><iconify-icon icon="mdi:mail"></iconify-icon>Mail</li></a>
+    <a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon>Setup</li></a>
     <div class="hidden md:block">
         <hr class="w-20 mx-auto text-primary-500">
-        <a href="/auth/login"><li>Log In</li></a>
-        <a href="/auth/register"><li>Sign Up</li></a>
-        <a href="/auth/logout"><li>Sign Out</li></a>
+        <a href="/auth/login" class="{$page.url.pathname === '/auth/login' ? 'chosen' : ''}"><li>Log In</li></a>
+        <a href="/auth/register" class="{$page.url.pathname === '/auth/register' ? 'chosen' : ''}"><li>Sign Up</li></a>
+        <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen' : ''}"><li>Sign Out</li></a>
     </div>
     
 </ul>
@@ -36,9 +36,9 @@
         border-radius: 8px;
         position: relative;
         overflow: hidden;
-        
+        flex-grow: 1;
     }
-    ul > a.chosen li, ul > a.chosen li iconify-icon {
+    ul a.chosen li, ul a.chosen li iconify-icon {
         /*background-color: rgba(128, 128, 128,0.55);*/
         /* border-right: 4px solid rgb(255, 220, 48); */
         color: #ffdc30;
@@ -91,8 +91,6 @@
         ul a li iconify-icon {
             margin-right: 1rem;
         }
-
-
 
         ul a li, ul a li iconify-icon {
             color: white;

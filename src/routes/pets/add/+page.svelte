@@ -3,7 +3,9 @@
 	import { petstate } from "$lib/store";
 	import toast from "svelte-french-toast";
 
-    let pet = {name:'', breed:'',gender:Gender.UNSPECIFIED};
+    let emptypet = {name:'', breed:'',gender:Gender.UNSPECIFIED, photo: ''};
+    let pet = emptypet;
+    let photoFile: string;
     let _adding: boolean = false;
 
     const addBuddy = async ()=>{
@@ -12,7 +14,8 @@
         try {
             console.log('Male: ',Gender.MALE);
             
-            await petstate.addPet(pet.name, pet.gender, pet.breed='');
+            await petstate.addPet(pet.name, pet.gender, pet.breed, photoFile);
+            pet = emptypet
             toast.success('Added '+pet.name+' to the family!');            
         } catch (error: any) {
             // state.alert({ color: 'red', message: petName+' was not added. '+error.message})
@@ -22,7 +25,12 @@
         }        
     }
 
-    $: checkForm = pet.name !== "" && pet.breed !== "" && pet.gender !== undefined;
+    const handleFileUpload = (event: any) => {
+        const file = event.target.files[0];
+        photoFile = file;
+    };
+
+    $: checkForm = pet.name !== "";
 </script>
 
 <svelte:head>
@@ -43,6 +51,9 @@
         <div class="flex-grow flex flex-col max-w-lg justify-center">
 
             <form on:submit|preventDefault={addBuddy}>
+                <img src={photoFile} alt="">
+                <input type="file" id="uploader" accept="image/*" on:change={(e)=>handleFileUpload} />
+
                 <label class="block mt-6" for="name"> Name</label>
                 <input
                     id="name" placeholder="Pet Name"
@@ -51,21 +62,23 @@
                     bind:value="{pet.name}"
                 />
 
-                <label class="block mt-6" for="name"> Breed</label>
+                <label class="block mt-6" for="breed"> Breed</label>
                 <input
-                    id="name" placeholder="Breed"
+                    id="breed" placeholder="Breed"
                     class="w-full p-4 placeholder-gray-400 text-gray-700 bg-white text-lg border-0 border-b-2 border-gray-400 focus:ring-0 focus:border-gray-900"
                     type="text"
                     bind:value="{pet.breed}"
                 />
 
-                <label class="block mt-6" for="name"> Gender</label>
-                <input
-                    id="name" placeholder="Gender"
+                <label class="block mt-6" for="gender"> Gender</label>
+                <select
+                    id="gender" placeholder="Gender" bind:value="{pet.gender}"
                     class="w-full p-4 placeholder-gray-400 text-gray-700 bg-white text-lg border-0 border-b-2 border-gray-400 focus:ring-0 focus:border-gray-900"
-                    type="text"
-                    bind:value="{pet.gender}"
-                />
+                    >
+                    <option value="UNSPECIFIED">Unspecified</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                </select>
 
                 <div class="mt-6 flex justify-center">
                     <button
@@ -83,8 +96,5 @@
 <style>
     *:focus {
         outline: none;
-    }
-    form > div > input {
-        @apply bg-violet-900 bg-opacity-40 py-2 px-4 w-full rounded-md text-xl font-light;
     }
 </style>
