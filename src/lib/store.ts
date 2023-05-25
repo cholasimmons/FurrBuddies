@@ -1,4 +1,4 @@
-import { ID, type Models, Permission, Role } from 'appwrite';
+import { ID, type Models, Permission, Role, Query } from 'appwrite';
 import { get, writable } from 'svelte/store';
 import { sdk, server } from './appwrite';
 import type { Gender, Pet } from './_models/pet-model';
@@ -16,7 +16,7 @@ const createPets = () => {
   return {
     subscribe,
     fetch: async () => {
-      const response: any = await sdk.database.listDocuments(server.database, server.collection_pets);
+      const response: any = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
       return set(response.documents);
     },
     addPet: async (name: string, gender: Gender, breed: string) => {
@@ -80,60 +80,53 @@ const createClinics = () => {
       const response: any = await sdk.database.listDocuments(server.database, server.collection_clinics);
       return set(response.documents);
     },
-    /*
-    addPet: async (name: string, gender: GENDER, breed: string) => {
-      setLoading(true);
+    addClinic: async (name: string, city: string) => {
       const user = Role.user(get(state).account!.$id);
-      console.log('User: ',user);
+      // console.log('User: ',user);
       
-      const pet = await sdk.database.createDocument<Pet>(
+      const clinic = await sdk.database.createDocument<Clinic>(
         server.database,
-        server.collection_pets,
+        server.collection_clinics,
         ID.unique(),
         {
           name,
-          gender,
-          breed,
+          city,
         },
         [
-          Permission.read(user),
+          Permission.read('any'),
           Permission.update(user),
           Permission.delete(user),
         ]
       );
-      setLoading(false);
-      return update((n) => [pet, ...n]);
+      return update((n) => [clinic, ...n]);
     },
 
-    removePet: async (pet: Pet) => {
-      await sdk.database.deleteDocument(server.database, server.collection_pets, pet.$id);
-      return update((n) => n.filter((t) => t.$id !== pet.$id));
+    removeClinic: async (clinic: Clinic) => {
+      await sdk.database.deleteDocument(server.database, server.collection_clinics, clinic.$id);
+      return update((n) => n.filter((t) => t.$id !== clinic.$id));
     },
-    updatePet: async (pet: Pet) => { // Partial<Pet>
-      setLoading(true);
+    updateClinic: async (clinic: Clinic) => { // Partial<Clinic>
       const user = Role.user(get(state).account!.$id);
       await sdk.database.updateDocument(
         server.database,
-        server.collection_pets,
-        pet.$id,
-        pet,
+        server.collection_clinics,
+        clinic.$id,
+        clinic,
         [
-          Permission.read(user),
+          Permission.read('any'),
           Permission.update(user),
           Permission.delete(user),
         ]
       );
-      setLoading(false);
       return update((n) => {
-        const index = n.findIndex((t) => t.$id === pet.$id);
+        const index = n.findIndex((c) => c.$id === clinic.$id);
         n[index] = {
           ...n[index],
-          ...(<Pet>pet),
+          ...(<Clinic>clinic),
         };
         return n;
       });
     },
-    */
   };
 };
 

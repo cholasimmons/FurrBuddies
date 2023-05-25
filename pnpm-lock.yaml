@@ -13,8 +13,8 @@ dependencies:
 
 devDependencies:
   '@skeletonlabs/skeleton':
-    specifier: ^1.6.0
-    version: 1.6.0
+    specifier: ^1.6.2
+    version: 1.6.2
   '@sveltejs/adapter-auto':
     specifier: ^2.1.0
     version: 2.1.0(@sveltejs/kit@1.18.0)
@@ -401,8 +401,8 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
 
-  /@skeletonlabs/skeleton@1.6.0:
-    resolution: {integrity: sha512-Xfs6biNj3K9Q7ypg4jLghwn2dQA8Xg8V3Wn5mbg4RZupbneq1Qtb+FVTrVGkNshEYBXpfU+kPFcFQvfJB7MHEQ==}
+  /@skeletonlabs/skeleton@1.6.2:
+    resolution: {integrity: sha512-Xp+gCAgxEfzwa6lUzeFHhIiTzPe7wKAWZJzo0UnNJfgMCuJy4Txu2bDXz6ZCyu9+B6+i8lShFPxPuENqTfP14w==}
     dependencies:
       esm-env: 1.0.0
       svelte: 3.58.0
@@ -746,7 +746,7 @@ packages:
     dependencies:
       caniuse-lite: 1.0.30001489
       electron-to-chromium: 1.4.405
-      node-releases: 2.0.11
+      node-releases: 2.0.12
       update-browserslist-db: 1.0.11(browserslist@4.21.5)
     dev: true
 
@@ -1546,8 +1546,8 @@ packages:
       whatwg-url: 5.0.0
     dev: false
 
-  /node-releases@2.0.11:
-    resolution: {integrity: sha512-+M0PwXeU80kRohZ3aT4J/OnR+l9/KD2nVLNNoRgFtnf+umQVFdGBAO2N8+nCnEi0xlh/Wk3zOGC+vNNx+uM79Q==}
+  /node-releases@2.0.12:
+    resolution: {integrity: sha512-QzsYKWhXTWx8h1kIvqfnC++o0pEmpRQA/aenALsL2F4pqNVr7YzcdMlDij5WBnwftRbJCNJL/O7zdKaxKPHqgQ==}
     dev: true
 
   /normalize-path@3.0.0:

@@ -17,7 +17,10 @@
 	import type { LayoutData } from './$types';
 	import { onMount } from 'svelte';
 	import { state } from '$lib/store';
-	import { fade } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
+	import BackButton from '$lib/_components/icons/BackButton.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	export let data: LayoutData;
 	let currentTile: any;
@@ -53,20 +56,23 @@
 
 </script>
 
-<AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 px-3"
+<AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 px-3 py-0"
 slotFooter="h-20 md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
-slotSidebarLeft="w-0 md:w-[9rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
+slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
 	<svelte:fragment slot="header">
-		<AppBar background="" shadow="">
+		<AppBar background="">
 			<svelte:fragment slot="lead">
-				<div class="flex items-center">
-					<p class="text-2xl font-bold uppercase">Furr Buddies</p>
-				</div>
+				{#if $page.url.pathname.startsWith(('/pets/'||'/clinics/'||'/mail/'))}
+				<button in:slide={{ duration: 300, axis: 'x'}} out:slide={{ duration:200, axis: 'x' }} on:click={()=>{history.back()}}>
+					<BackButton />
+				</button>
+				{/if}
 			</svelte:fragment>
+				<p class="text-2xl font-bold uppercase">Furr Buddies</p>
 			<svelte:fragment slot="trail">
 				<a class="" href="/user/profile" in:fade="{{ duration: 300 }}">
 					{#if $state.account?.$id}
-						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="border-2" width="w-[3.2rem]" />
+						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="border-2" width="w-[3rem]" />
 					{:else}
 						<UserSVG/>
 					{/if}
@@ -76,7 +82,7 @@ slotSidebarLeft="w-0 md:w-[9rem] h-full scroll-none text-gray-200 transition eas
 	</svelte:fragment>
 	<svelte:fragment slot="sidebarLeft">
 		<!-- Hidden below Tailwind's medium breakpoint -->
-		<div id="sidebar-left" class="hidden md:block p-1">
+		<div id="sidebar-left" class="hidden md:block">
 			<Sidebar/>
 		</div>
 <!--

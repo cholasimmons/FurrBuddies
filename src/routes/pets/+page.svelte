@@ -8,51 +8,22 @@
     import { fade } from 'svelte/transition';
     import NewPetFormComponent from '$lib/_components/forms/NewPetFormComponent.svelte'
 	import toast from 'svelte-french-toast';
+	import BuddyCard from '$lib/_components/BuddyCard.svelte';
 
     export let data;
     let _loading: boolean = false;
-    let _adding: boolean = false;
 
     onMount(async ()=>{
         _loading = true;
         try {
+            // await state.checkLoggedIn();
             await petstate.fetch();
         } catch (error: any) {
             console.warn('Unable to fetch Pets. ',error.message);
         } finally {
             _loading=false
-            toast.loading('Don\'t forget to implement an FAB', {style: 'background-color: #313131; color: #ddd; padding: 6px 12px;'})
         }
     });
-
-    const addBuddy = (petName: string)=>{
-        _adding = true;
-        
-        try {
-            console.log('Male: ',Gender.MALE);
-            
-            petstate.addPet(petName, Gender.MALE,'Maltese X')
-                .then(()=>{
-                    toastStore.trigger(t);
-                    _adding=false});
-            const t: ToastSettings = {
-                message: 'Added '+petName||'NoName'+' to the list',
-                background: 'variant-filled-warning'
-                
-                /*action: {
-                    label: 'Greeting',
-                    response: () => alert('Hello, Skeleton')
-                }*/
-            };
-            
-        } catch (error: any) {
-            state.alert({ color: 'red', message: petName+' was not added. '+error.message})
-            console.warn('Unable to add pet. ',error.message);
-            
-        } finally {
-            _adding = false;
-        }        
-    }
 
     const modalComponentRegistry: Record<string, ModalComponent> = {
         // Custom Modal 1
@@ -71,8 +42,6 @@
         component: 'customModal1',
     };
     // modalStore.trigger(modal)
-    
-    
 </script>
 
 <svelte:head>
@@ -82,27 +51,31 @@
 
 <Modal components={modalComponentRegistry} />
 <main>
-    <h3 class="title">My Buddies</h3>
+    <h3 class="title flex justify-between items-center">My Buddies <button hidden={!$petstate.length} on:click|preventDefault={()=>goto('/pets/add')}  type="button" class="ml-4 btn btn-sm variant-ghost-warning">
+        <span class=" flex items-center"><iconify-icon icon="mdi:paw"></iconify-icon></span><span>Add Buddy</span></button></h3>
 
-    {#if !$petstate || _loading}
-    <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8">
-        <p class="text-xl opacity-70 m-0">No Buddies yet</p>
-        {#if !$petstate}
-            Button to add...
-        {:else}
+    {#if !$petstate.length }
+    <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
+        <p class="text-3xl opacity-70 m-0 mb-3">No Buddies yet</p>
+        {#if _loading}
             <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm m-0 animate-pulse">Searching for our furr buddies...</p>
+        {:else}
+        <!--button in:fade={{ duration: 300, delay: 200 }} hidden="{!$state.account?.$id}" on:click|preventDefault={()=>goto('/pets/add')} type="button" class="ml-4 btn rounded-xl variant-ghost-warning">
+            <span class=" flex items-center"><iconify-icon icon="mdi:paw"></iconify-icon></span><span>Add a Buddy</span></button-->
         {/if}
     </section>
     {:else}
-    <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 text-slate-800">
+    <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {#each $petstate as pet, index}
         <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress>
-            <div in:fade={{ duration:300, delay:(index+1)*50 }} class="rounded-xl overflow-hidden">
+            <BuddyCard {pet} src="/images/hero.jpg"/>
+            
+            <!--div in:fade={{ duration:300, delay:(index+1)*50 }} class="rounded-xl overflow-hidden">
                 <div class="w-full h-[7rem] bg-[url('/images/buddy.jpg')] bg-cover bg-center bg-no-repeat text-white"></div>
                 <p class="p-4">
                     {pet.name}
                 </p>
-            </div>
+            </div-->
         </a>
         {/each}
     </div>

@@ -3,17 +3,21 @@
     import { state } from "$lib/store";
 
     export let data;
+    let _loading: boolean = false;
     let email: string, password: string = "";
 
     const login = async () => {
         if (!checkForm) {
             return;
         }
+        _loading = true;
         try {
             await state.login(email, password);
             goto("/");
         } catch (error: any) {
             state.alert({ color: "red", message: error.message });
+        } finally {
+            _loading = false;
         }
     };
 
@@ -34,10 +38,9 @@
         </span>
     </p>
 
-    <section class="container flex">
-        <div class="flex-grow flex flex-col max-w-xl justify-center">
-            
-            
+    <section class="flex justify-center">
+        <div class="flex-grow flex flex-col max-w-lg justify-center">
+
             <form on:submit|preventDefault={login}>
                 <label class="block mt-6" for="email"> Email</label>
                 <input
@@ -56,10 +59,10 @@
     
                 <div class="mt-6 flex justify-center">
                     <button
-                        disabled="{!checkForm || $state._loading}"
+                        disabled="{!checkForm || _loading}"
                         type="submit"
                         class="mx-auto mt-4 py-4 px-16 font-light btn variant-filled rounded-lg text-white hover:text-gray-900 hover:bg-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
-                        {$state._loading ? 'Loading...' : 'Login'}
+                        {_loading ? 'Loading...' : 'Login'}
                     </button>
                 </div>
             </form>

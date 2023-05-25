@@ -1,6 +1,6 @@
 {
-	"name": "mypets",
-	"version": "0.0.1",
+	"name": "furrbuddies",
+	"version": "0.2.0",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -11,7 +11,7 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@skeletonlabs/skeleton": "^1.6.0",
+		"@skeletonlabs/skeleton": "^1.6.2",
 		"@sveltejs/adapter-auto": "^2.1.0",
 		"@sveltejs/kit": "^1.18.0",
 		"@types/cookie": "^0.5.1",

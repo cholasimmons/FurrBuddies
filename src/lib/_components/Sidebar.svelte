@@ -4,7 +4,8 @@
     import "iconify-icon";
 
 </script>
-<ul class="flex md:flex-col justify-evenly">
+
+<ul class="flex items-start md:flex-col justify-evenly">
     <a href="/" class="{$page.url.pathname === '/' ? 'chosen' : ''} order-3 md:order-none">
         <li><iconify-icon icon="mdi:home" class="home"></iconify-icon><span>Home</span></li>
     </a>
@@ -17,7 +18,7 @@
         <hr class="w-20 mx-auto text-primary-500">
         <a href="/auth/login"><li>Log In</li></a>
         <a href="/auth/register"><li>Sign Up</li></a>
-        <a href="/" on:click="{()=>{state.logout()}}"><li>Sign Out</li></a>
+        <a href="/auth/logout"><li>Sign Out</li></a>
     </div>
     
 </ul>
