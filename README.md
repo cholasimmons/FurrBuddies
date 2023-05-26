@@ -1,20 +1,34 @@
-# create-svelte
+# Furr Buddies
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+My Appwrite Hackathon entry, powered by [`Svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 
-## Creating a project
+## About this App
 
-If you're seeing this, you've probably already done this step. Congrats!
+Furr Buddies is a fully responsive app that focuses on pet owners. It helps manage your dogs, cats, birds, and basically any other pet you may have.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+Upon creating a new account and signing in, you can search for available Veterinarians in your area and browse their "home page" for contact details, location, working hours and other useful data.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+Once at the Clinic, the Vet can scan your Pet's ID from your phone and have temporal access to update your pet's vaccination information e.tc...
 
-## Developing
+### Additionally
+
+
+Also, Furr Buddies offers a marketplace for Vendors to sell any pet associated products right from this platform. I call it... `Shop`. 😎
+#
+# Technologies
+
+`Furr Buddies` is powered by [`Svelte`](https://svelte.dev), the web framework that I used as my foundation.
+
+[`Appwrite`](https://appwrite.io), the outstanding BaaS that made this such a breeze to achieve.
+
+[`SkeletonUI`](https://skeleton.dev) was hands down the best and most sensible UI framework to use.
+
+Another necessary mention here is `svelte-forms`, `svelte-french-toast` and the most obvious ofcourse... `Microsoft` for Windows, Terminal, and VScode, lol.
+#
+#### To be continued, please ignore the rest of this page
+#
+#
+## Installing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
