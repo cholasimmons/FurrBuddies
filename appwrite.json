@@ -1,0 +1,21 @@
+{
+    "projectId": "646a0d3e5e9219b01742",
+    "projectName": "Fur Buddies",
+    "functions": [
+        {
+            "$id": "6473a5ee59f31295c028",
+            "name": "DemoFunction",
+            "runtime": "node-16.0",
+            "path": "src/functions/DemoFunction",
+            "entrypoint": "src/index.ts",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

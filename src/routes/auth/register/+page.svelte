@@ -34,7 +34,7 @@
             _registering = true;
             await state.signup($femail.value, $fpassword.value, $fname.value);
             await state.login($femail.value, $fpassword.value);
-            $fname.value = $femail.value = $fpassword.value = "";
+            registrationForm.clear;
             goto("/");
         } catch (error: any) {
             // state.alert({ color: "red", message: error.message });
@@ -105,7 +105,7 @@
                     <button disabled={!$registrationForm.dirty} on:click={registrationForm.reset} type="reset">
                         Clear Form
                     </button>
-                    <button disabled="{!$registrationForm.valid || _registering}" type="submit">
+                    <button disabled={!$registrationForm.valid || _registering} type="submit">
                         {#if _registering}Registering{:else}Register{/if} 
                     </button>
                 </div>

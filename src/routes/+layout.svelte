@@ -55,17 +55,17 @@
 			toast.success('Welcome back '+splitNames()+'!' );
 		} catch (error) {
 			// console.warn('No signed in User.');
-			toast.error('Hello there stranger', {icon: 'wave'});
+			toast.error('Hello there stranger', {icon: '👋🏾'});
 		}
 	});
 
-	// Divides a full name object and retrieves the first name, for the toast greeting
+	// Divides a full name object and retrieves the first name, for the toast greeting, putting aside titles
 	const splitNames = () => {
 		const fullname = $state.account?.name || 'Stranger'
 		const namesArray = fullname!.split(" "); // Split the sentence into an array of words
 
 		if (namesArray.length >= 1) {
-			if(namesArray[0]===('Mr'||'Mrs'||'Dr'||'Ms'||'Miss')){
+			if(['Mr','Mrs','Dr','Ms','Miss','Sir'].includes(namesArray[0])){
 				return namesArray[1];
 			}
 			return namesArray[0]; // Get the first name
@@ -113,7 +113,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 			<svelte:fragment slot="trail">
 				<a class="" href="/user/profile" in:fade="{{ duration: 300 }}">
 					{#if $state.account?.$id}
-						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="border-2" width="w-[3rem]" />
+						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
 					{:else}
 						<UserSVG/>
 					{/if}

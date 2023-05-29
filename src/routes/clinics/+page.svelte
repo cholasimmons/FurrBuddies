@@ -45,9 +45,9 @@
             {/if}
         </section>
     {:else}
-        <div in:fade={{ duration: 300, delay:400 }} class="my-8 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+        <div in:fade={{ duration: 300, delay:400 }} class="my-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
             {#each $clinicstate as clinic, index}
-            <a href="/clinics/{clinic.$id}" class="vetcard">
+            <a href="/clinics/{clinic.$id}">
                 <ClinicCard clinicName={clinic.name}/>
             </a>        
             {/each}
@@ -56,7 +56,4 @@
 </main>
 
 <style>
-    .vetcard {
-        background-color: rgba(71, 36, 112, 0.36);
-    }
 </style>

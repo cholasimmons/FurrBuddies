@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-    import { state, petstate } from '$lib/store';
+    import { state, petstate, petbucketstate } from '$lib/store';
 	import { toastStore, type ToastSettings, type ModalSettings, type ModalComponent, Modal, modalStore } from '@skeletonlabs/skeleton';
     import 'iconify-icon';
 	import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import BuddyCard from '$lib/_components/BuddyCard.svelte';
+	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 
     export let data;
 
@@ -19,6 +20,7 @@
             // Check if User is logged in so we can fetch buddies
             await state.checkLoggedIn();
             await petstate.fetch();
+            // await petbucketstate.fetch();
         } catch (error: any) {
             console.warn('Unable to fetch Pets. ',error.message);
         } finally {
@@ -46,16 +48,18 @@
             <span class=" flex items-center"><iconify-icon icon="mdi:lock-open"></iconify-icon></span><span>Log In</span>
         </button>
         {/if}
+
+        {#if _loading}<LoadingClock/>{/if}
     </h3>
 
     <!-- Display Buddies if logged in and has buddies, otherwise prompted to log in-->
-    {#if !$petstate.length }
+    {#if !$petstate?.length }
     <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
         <p class="text-3xl opacity-70 m-0 mb-3">No Buddies yet</p>
         {#if !$state.account?.$id}
             <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm"><a href="/auth/login">Log In</a> and add some Furr Buddies!</p>
         {:else if _loading}            
-            <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm animate-pulse">Searching for our furr buddies...</p>
+            <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm animate-pulse">Searching...</p>
         {:else}
         <p in:fade={{ duration: 300, delay: 400 }} out:fade={{ duration:200 }} class="text-sm">Click <a href="/pets/add">Add Buddy</a> to add a new member to the family</p>
         <!--button in:fade={{ duration: 300, delay: 200 }} hidden="{!$state.account?.$id}" on:click|preventDefault={()=>goto('/pets/add')} type="button" class="ml-4 btn rounded-xl variant-ghost-warning">
@@ -63,17 +67,11 @@
         {/if}
     </section>
     {:else}
-    <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        {#each $petstate as pet, index}
+    <div in:fade={{ duration: 300, delay: 250 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+        {#each $petstate as pet}
         <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress>
-            <BuddyCard petName={pet.name} src="/images/hero.jpg"/>
-            
-            <!--div in:fade={{ duration:300, delay:(index+1)*50 }} class="rounded-xl overflow-hidden">
-                <div class="w-full h-[7rem] bg-[url('/images/buddy.jpg')] bg-cover bg-center bg-no-repeat text-white"></div>
-                <p class="p-4">
-                    {pet.name}
-                </p>
-            </div-->
+            <BuddyCard petName={pet.name} />
+            {$petbucketstate}
         </a>
         {/each}
     </div>

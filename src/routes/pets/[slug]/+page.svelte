@@ -6,8 +6,8 @@
     export let data;
     let buddy: Pet;
 
-    onMount(()=>{        
-        buddy = $petstate.find((pet:Pet)=>pet.$id === data.Id) as Pet
+    onMount(async ()=>{        
+        buddy = await $petstate.find((pet:Pet)=>pet.$id === data.Id) as Pet;
     });
 </script>
 
@@ -17,6 +17,6 @@
 </svelte:head>
 
 <main>
-    <h3 class="title text-center">{buddy.name}</h3>
+    <h3 class="title text-center">{buddy?.name || 'Name?'}</h3>
     <p>{ data.Id }</p>
 </main>

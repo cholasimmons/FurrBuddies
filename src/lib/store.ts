@@ -1,7 +1,7 @@
 import { ID, type Models, Permission, Role, Query } from 'appwrite';
 import { get, writable } from 'svelte/store';
 import { sdk, server } from './appwrite';
-import type { Gender, Pet } from './_models/pet-model';
+import type { Gender, Pet, Type } from './_models/pet-model';
 import type { Account } from './_models/appwrite-model';
 import type { Clinic } from './_models/clinic-model';
 
@@ -10,19 +10,26 @@ export type Alert = {
   message: string;
 };
 
+// PETS
+
 const createPets = () => {
-  const { subscribe, update, set } = writable<Pet[]>([]);
+  const { subscribe, update, set } = writable<Pet[]|null>([]);
 
   return {
     subscribe,
     fetch: async () => {
-      const response: any = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
-      return set(response.documents);
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID,'verified');
+      if(!role)return;
+  
+      const response = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
+      console.log(response.documents);
+      return set(response.documents as any);
     },
-    addPet: async (name: string, gender: Gender, breed: string, photo: string) => {
-      const user = Role.user(get(state).account!.$id);
-      console.log('User: ',user);
-      if(!user)return;
+    addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
 
       const pet = await sdk.database.createDocument<Pet>(
         server.database,
@@ -30,50 +37,57 @@ const createPets = () => {
         ID.unique(),
         {
           name,
+          type,
           gender,
           breed,
-          photo
+          ownerID: [userID]
         },
         [
-          Permission.read(user),
-          Permission.update(user),
-          Permission.delete(user),
+          Permission.read(role),
+          Permission.update(role),
+          Permission.delete(role),
         ]
       );
       // const petphoto = await sdk.storage.createFile(server.bucket_buddies,ID.unique(),photofile)
       // document.getElementById('uploader').files[0]
-
-      return update((n) => [pet, ...n]);
+      update((n) => [pet, ...n!]);
+      return pet;
     },
+
     removePet: async (pet: Pet) => {
       await sdk.database.deleteDocument(server.database, server.collection_pets, pet.$id);
-      return update((n) => n.filter((t) => t.$id !== pet.$id));
+      return update((n) => n!.filter((t) => t.$id !== pet.$id));
     },
-    updatePet: async (pet: Pet) => { // Partial<Pet>
-      const user = Role.user(get(state).account!.$id);
+    updatePet: async (pet: Pet, body: {[key:string]:any[]}) => { // Partial<Pet>
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
       await sdk.database.updateDocument(
         server.database,
         server.collection_pets,
         pet.$id,
-        pet,
+        body,
         [
-          Permission.read(user),
-          Permission.update(user),
-          Permission.delete(user),
+          Permission.read(role),
+          Permission.update(role),
+          Permission.delete(role),
         ]
       );
       return update((n) => {
-        const index = n.findIndex((t) => t.$id === pet.$id);
-        n[index] = {
-          ...n[index],
+        const index = n!.findIndex((t) => t.$id === pet.$id);
+        n![index] = {
+          ...n![index],
           ...(<Pet>pet),
         };
         return n;
       });
     },
+    clear: async () => {
+      return set(null);
+    },
   };
 };
 
+// VETS
 
 const createClinics = () => {
   const { subscribe, update, set } = writable<Clinic[]>([]);
@@ -134,6 +148,67 @@ const createClinics = () => {
   };
 };
 
+// STORAGE
+
+const createPetPhoto = () => {
+  const { subscribe, update, set } = writable([]);
+
+  return {
+    subscribe,
+    fetch: async () => {
+      const userId = get(state).account!.$id;
+      const role = Role.user(userId, 'verified');
+      if(!role)return;
+  
+      try {
+        const response: any = await sdk.storage.listFiles(server.bucket_buddies);
+        set(response.documents);
+      } catch (error) {
+        console.error('Failed to fetch pet photos:', error);
+      }
+    },
+    addPetPhoto: async (file: File) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
+
+      try {
+        const photoBucket = await sdk.storage.createFile(
+          server.bucket_buddies,
+          ID.unique(),
+          file,
+          [
+            Permission.read(role),
+            Permission.update(role),
+            Permission.delete(role),
+          ]
+        );
+        update((photos) => [...photos]);
+        return photoBucket;
+      } catch (error) {
+        console.error('Failed to add pet photo:', error);
+      }
+    },
+    getPreview: async (id: string) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
+
+      try {
+        const photoPreview = await sdk.storage.getFilePreview(
+          server.bucket_buddies,
+          id
+        );
+        update((photos) => [...photos]);
+        return photoPreview;
+      } catch (error) {
+        console.error('Failed to retrieve preview photo:', error);
+      }
+    }
+  }
+}
+
+// User Account state
 
 const createState = () => {
   const { subscribe, set, update } = writable({
@@ -171,6 +246,8 @@ const createState = () => {
       setLoading(true);
       await sdk.account.deleteSession('current');
       state.init();
+      petstate.clear();
+      // petbucketstate.clear();
       setLoading(false);
     },
     alert: async (alert: Alert) =>
@@ -185,5 +262,6 @@ const createState = () => {
 };
 
 export const petstate = createPets();
+export const petbucketstate = createPetPhoto();
 export const clinicstate = createClinics();
 export const state = createState();

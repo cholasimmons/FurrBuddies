@@ -12,7 +12,8 @@
     
     <div class="mt-5 flex justify-evenly">
         <button on:click={()=>goto('/auth/login')} class="text-success-400 btn variant-ghost-success">Log In</button>
-        <button on:click={()=>goto('auth/register')} class="text-primary-500 btn variant-ghost-warning">Sign Up</button>
+        <button on:click={()=>goto('/auth/register')} class="text-primary-400 btn variant-ghost-warning">Sign Up</button>
+        <button on:click={()=>goto('/auth/logout')} class="text-red-400 btn variant-ghost-error">Log Out</button>
     </div>
     
 </main>

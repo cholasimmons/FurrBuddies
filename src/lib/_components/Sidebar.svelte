@@ -15,10 +15,15 @@
     <a href="/mail" class="{$page.url.pathname.startsWith('/mail') ? 'chosen' : ''} order-4 md:order-none"><li><iconify-icon icon="mdi:mail"></iconify-icon>Mail</li></a>
     <a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon>Setup</li></a>
     <div class="hidden md:block">
-        <hr class="w-20 mx-auto text-primary-500">
-        <a href="/auth/login" class="{$page.url.pathname === '/auth/login' ? 'chosen' : ''}"><li>Log In</li></a>
-        <a href="/auth/register" class="{$page.url.pathname === '/auth/register' ? 'chosen' : ''}"><li>Sign Up</li></a>
-        <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen' : ''}"><li>Sign Out</li></a>
+        <hr class="mx-auto text-primary-500">
+        <span hidden="{ !$state.account?.$id}">
+            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen' : ''}"><li>Account</li></a>
+            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen' : ''}"><li>Sign Out</li></a>
+        </span>
+        <span hidden="{ $state.account?.$id !== (null||undefined)}">
+            <a href="/auth/login" class="{$page.url.pathname === '/auth/login' ? 'chosen' : ''}"><li>Log In</li></a>
+            <a href="/auth/register" class="{$page.url.pathname === '/auth/register' ? 'chosen' : ''}"><li>Sign Up</li></a>
+        </span>
     </div>
     
 </ul>
