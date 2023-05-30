@@ -90,7 +90,6 @@
 		return 'Furr Buddies';
 	}
 
-
     /*function scrollHandler(event: any & { currentTarget: EventTarget & HTMLDivElement; }) {
 		// console.log(event.currentTarget.scrollTop);
 	}*/
@@ -111,11 +110,13 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 			</svelte:fragment>
 				<p class="text-2xl font-semibold uppercase">{ getRouteName($page.url.pathname) } </p>
 			<svelte:fragment slot="trail">
-				<a class="" href="/user/profile" in:fade="{{ duration: 300 }}">
-					{#if $state.account?.$id}
-						<Avatar src="/images/user.jpg" initials="{splitNames()}" background="bg-transparent" border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
-					{:else}
+				<a class="" href="/user/profile">
+					{#if $state.account?.$id === undefined}
 						<UserSVG/>
+					{:else}
+					<span in:fade={{ duration: 400 }}>
+						<Avatar src="/images/user.jpg" initials="{splitNames()}" border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
+					</span>
 					{/if}
 				</a>
 			</svelte:fragment>

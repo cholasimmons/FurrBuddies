@@ -20,11 +20,11 @@
             // Check if User is logged in so we can fetch buddies
             await state.checkLoggedIn();
             await petstate.fetch();
-            // await petbucketstate.fetch();
+            await petbucketstate.fetch();
         } catch (error: any) {
             console.warn('Unable to fetch Pets. ',error.message);
         } finally {
-            _loading=false
+            _loading=false;
         }
     });
 </script>
@@ -70,8 +70,7 @@
     <div in:fade={{ duration: 300, delay: 250 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {#each $petstate as pet}
         <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress>
-            <BuddyCard petName={pet.name} />
-            {$petbucketstate}
+            <BuddyCard petName={pet.name} photoID={pet.photoID} />
         </a>
         {/each}
     </div>

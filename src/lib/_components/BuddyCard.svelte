@@ -1,15 +1,24 @@
 <script lang="ts">
 	import type { Pet } from "$lib/_models/pet-model";
+	import { petbucketstate } from "$lib/store";
+    import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
 
     export let petName: string;
-    export let src: string = "";
+    export let photoID: string[] = [];
+    let imageURL: any;
+
+    onMount(async ()=>{
+        const file = await petbucketstate.getPreview(photoID[0]);
+        imageURL = file?.href || '';
+    });
 </script>
 
 <main>
     <div class="circle">
-        <img {src} alt={src ? petName : ''}>
+        <img src={imageURL} alt='' in:fade={{ duration: 300 }}>
     </div>
-    <p>{petName}</p>
+    <p class="text-lg md:text-2xl text-white">{petName}</p>
 </main>
 
 <style>
@@ -21,34 +30,43 @@
         align-items: center;
     }
     main div {
-        transition: scale 0.2s ease-in-out;
+        transition: scale 0.4s ease-in-out;
+        text-align: center;position: relative;
     }
-    main:hover div{
-        scale: 108%;
+    main:hover div, main:hover div img{
+        scale: 103%;
         
     }
     .circle{
         position: relative;
-        width: 75%;
-        padding-bottom: 70%; /* Maintain 1:1 aspect ratio */
+        width: 80%;
+        padding-bottom:76%; /* Maintain 1:1 aspect ratio */
         border-radius: 50%;
-        border: #b8a 4px solid;
+        border: #b8a 5px solid;
         overflow: hidden;
-        background-color: burlywood;
     }
     .circle > img {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 100%;
-        height: 100%;
+        width: 102%;
+        height: 102%;
         object-fit: cover;
+        transition: scale 0.3s ease-in-out;
     }
-    p{
-        color: white;
-        font-size: 1.3rem;
-        font-weight: 300;
-        
+
+    .circle::before {
+        content: '?';
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        color: #b8a;
+    }
+    @keyframes drawLine {
+        from { width: 0%; }
+        to { width: calc(100% + 4px); }
     }
 </style>

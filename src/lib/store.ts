@@ -23,7 +23,6 @@ const createPets = () => {
       if(!role)return;
   
       const response = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
-      console.log(response.documents);
       return set(response.documents as any);
     },
     addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
@@ -158,11 +157,13 @@ const createPetPhoto = () => {
     fetch: async () => {
       const userId = get(state).account!.$id;
       const role = Role.user(userId, 'verified');
-      if(!role)return;
+      if(!role){console.warn('User not verified');return;}
   
       try {
         const response: any = await sdk.storage.listFiles(server.bucket_buddies);
-        set(response.documents);
+        // console.log('Bucket ', response);
+        
+        set(response.files);
       } catch (error) {
         console.error('Failed to fetch pet photos:', error);
       }
@@ -183,8 +184,7 @@ const createPetPhoto = () => {
             Permission.delete(role),
           ]
         );
-        update((photos) => [...photos]);
-        return photoBucket;
+        return update((photos) => [...photos]);
       } catch (error) {
         console.error('Failed to add pet photo:', error);
       }
@@ -197,9 +197,9 @@ const createPetPhoto = () => {
       try {
         const photoPreview = await sdk.storage.getFilePreview(
           server.bucket_buddies,
-          id
+          id, 320, undefined, undefined, 78
         );
-        update((photos) => [...photos]);
+        // console.log('Bucket response: ',photoPreview);
         return photoPreview;
       } catch (error) {
         console.error('Failed to retrieve preview photo:', error);
@@ -213,12 +213,16 @@ const createPetPhoto = () => {
 const createState = () => {
   const { subscribe, set, update } = writable({
     account: null as Account|null,
-    alert: null as Alert|null,
+    // alert: null as Alert|null,
+    // prefs: null as Models.Preferences|null,
     _loading: false
   });
 
   const setLoading = (isLoading: boolean)=>{
     update(state => ({...state, _loading: isLoading}));
+  }
+  const setPrefs = (pref:{key:string,value:any}[])=>{
+    update(state => ({...state, prefs:pref}));
   }
 
   return {
@@ -239,7 +243,9 @@ const createState = () => {
       setLoading(true);
       await sdk.account.createEmailSession(email, password);
       const user = await sdk.account.get();
+      console.log(user);
       state.init(user);
+      // setPrefs(await ...sdk.account.getPrefs());
       setLoading(false);
     },
     logout: async () => {
@@ -247,16 +253,18 @@ const createState = () => {
       await sdk.account.deleteSession('current');
       state.init();
       petstate.clear();
-      // petbucketstate.clear();
+      // setPrefs([]);
       setLoading(false);
     },
+    /*
     alert: async (alert: Alert) =>
       update((n) => {
         n.alert = alert;
         return n;
       }),
+    */
     init: async (account: any = null) => {
-      return set({ account, alert: null, _loading: false });
+      return set({ account,_loading: false });
     },
   };
 };
