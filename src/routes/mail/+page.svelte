@@ -7,7 +7,7 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 
-<main>
+<main class="px-{data.padding}">
 		<dl class="mt-5 list-dl">
 			<div>
 				<span class="w-[2rem] h-[2rem]">💌</span>

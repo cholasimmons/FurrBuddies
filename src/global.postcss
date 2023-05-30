@@ -20,10 +20,9 @@
 
 
 html, body {
-	@apply h-full overflow-hidden font-light scrollbar-hide;
+	@apply h-full overflow-hidden font-light scrollbar-hide text-[1rem];
 	@apply bg-gradient-to-tr from-purple-900 to-pink-800 min-w-[20rem];
 	outline: none;
-	font-size: 1rem;
 	font-weight: 400
 	/*@apply bg-surface-50-900-token;*/
 }
@@ -50,18 +49,55 @@ p {
 	--theme-font-family-base: 'Grandstander', sans-serif;
     --theme-font-family-heading: 'Grandstander', sans-serif;
 }
-
-
-form input {
+*:focus {
+	outline: none
+}
+form input, form select {
+	width: 100%;
+	padding: 0.8rem;
+	
 	border-radius: 0.6rem;
 	background-color: rgba(255, 255, 255, 0.2);
 	color: white;
 	font-size: 1.2rem;
-	outline: none
+	border: 3px transparent solid;
+	transition: border 0.2s ease-in;
+}
+form select option {
+text-align: center;
+color: darkslateblue;
 }
 
 form label {
 	opacity: 0.75
+}
+form button[type="submit"] {
+	padding: 1rem 3rem;
+	font-size: 1.2rem;
+	background-color:darksalmon;
+	border-radius: 6px;
+	color:white
+}
+form button[type="submit"]:hover {
+	color:gray;
+	background-color: rgba(210, 200, 190);
+}
+form button[type="submit"]:disabled {
+	color: darkslateblue;
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+form button[type="reset"] {
+	padding: 1rem 3rem 1rem 0;
+	font-size: 1.2rem;
+	background-color:none;
+	color:lightsalmon
+}
+form button[type="reset"]:hover {
+	color:lightcyan
+}
+input.invalid {
+	border: 3px red solid;
 }
 
 

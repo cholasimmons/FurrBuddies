@@ -97,12 +97,12 @@
 </script>
 
 <AppShell class="min-w-[18rem]" regionPage="relative" slotHeader="z-10 p-0 m-0" slotPageContent=""
-slotFooter="h-20 md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
+slotFooter="h-1rem md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
 slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
 	<svelte:fragment slot="header">
 		<AppBar background="">
 			<svelte:fragment slot="lead">
-				{#if $page.url.pathname.startsWith(('/pets/'||'/clinics/'||'/mail/'))}
+				{#if ['/pets/', '/clinics/', '/mail/'].some(path => $page.url.pathname.startsWith(path))}
 				<button in:slide={{ duration: 300, axis: 'x'}} out:slide={{ duration:200, axis: 'x' }} on:click={()=>{history.back()}}>
 					<BackButton />
 				</button>
@@ -154,7 +154,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 	</svelte:fragment>
 
 	<div class="flex h-full">
-		<div class="px-6 min-h-full w-full xl:max-w">
+		<div class="min-h-full w-full xl:max-w">
 			<PageTransition key="{data.pathname}">
 				<slot/>
 			</PageTransition>

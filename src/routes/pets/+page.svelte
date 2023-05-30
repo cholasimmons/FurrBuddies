@@ -36,7 +36,7 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
     <!-- Display "Add Buddy" if User is logged in, otherwise prompted to log in -->
     <h3 class="title flex justify-between items-center">
         {#if $state.account?.$id}

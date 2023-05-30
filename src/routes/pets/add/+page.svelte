@@ -1,12 +1,10 @@
 <script lang="ts">
-	import LoadingCircle from "$lib/_components/icons/Loading_Circle.svelte";
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
 import { Gender, Type, type Pet } from "$lib/_models/pet-model";
 	import { petbucketstate, petstate } from "$lib/store";
 	import { field, form } from "svelte-forms";
 	import { email, min, pattern, required } from "svelte-forms/validators";
 	import toast from "svelte-french-toast";
-	import { debug } from "svelte/internal";
 	import { fly } from "svelte/transition";
 
     // get global app name

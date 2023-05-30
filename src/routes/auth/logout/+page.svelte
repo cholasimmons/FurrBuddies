@@ -6,11 +6,12 @@
 
     onMount(async ()=>{
         try {
-            console.log('attempting sign out');
-            
             await state.logout();
-            goto('/');
+            history.back();
+            // Return User to previous page upon successful logout
+            // goto('/');
         } catch (error) {
+            console.warn('Unable to log out from server');
             
         }
         

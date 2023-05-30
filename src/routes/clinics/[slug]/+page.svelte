@@ -19,7 +19,7 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
     <h3 class="title text-center">{clinic?.name}</h3>
     <p>{ data.id }</p>
 </main>

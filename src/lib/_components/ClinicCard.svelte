@@ -12,8 +12,8 @@
         <header class="card-header p-0">
             <div class="w-full h-[10rem] bg-[url('/images/vet.jpg')] bg-cover bg-center bg-no-repeat text-white"></div>
         </header>
-        <section class="p-4">
-            <p class="p-0 m-0">{clinicName}</p>
+        <section class="px-6 py-4">
+            <p class="p-0 m-0 text-lg">{clinicName}</p>
             <small>{Role.user($state.account?.$id || '0') ? clinicLocation : ''}</small>
         </section>
         <footer class="card-footer">

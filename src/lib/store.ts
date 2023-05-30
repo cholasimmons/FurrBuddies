@@ -98,24 +98,25 @@ const createClinics = () => {
       return set(response.documents);
     },
     addClinic: async (name: string, city: string) => {
-      const user = Role.user(get(state).account!.$id);
-      // console.log('User: ',user);
+      const userId = get(state).account!.$id;
+      const role = Role.user(userId);
       
-      const clinic = await sdk.database.createDocument<Clinic>(
+      const application = await sdk.database.createDocument<Clinic>(
         server.database,
         server.collection_clinics,
         ID.unique(),
         {
           name,
           city,
+          userId
         },
         [
           Permission.read('any'),
-          Permission.update(user),
-          Permission.delete(user),
+          Permission.update(role),
+          Permission.delete(role),
         ]
       );
-      return update((n) => [clinic, ...n]);
+      return update((n) => [application, ...n]);
     },
 
     removeClinic: async (clinic: Clinic) => {
@@ -214,17 +215,12 @@ const createState = () => {
   const { subscribe, set, update } = writable({
     account: null as Account|null,
     // alert: null as Alert|null,
-    // prefs: null as Models.Preferences|null,
     _loading: false
   });
 
   const setLoading = (isLoading: boolean)=>{
     update(state => ({...state, _loading: isLoading}));
   }
-  const setPrefs = (pref:{key:string,value:any}[])=>{
-    update(state => ({...state, prefs:pref}));
-  }
-
   return {
     subscribe,
     checkLoggedIn: async () => {

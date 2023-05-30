@@ -5,7 +5,7 @@
 
 </script>
 
-<ul class="flex items-start md:flex-col justify-evenly">
+<ul class="">
     <a href="/" class="{$page.url.pathname === '/' ? 'chosen' : ''} order-3 md:order-none">
         <li><iconify-icon icon="mdi:home" class="home"></iconify-icon><span>Home</span></li>
     </a>
@@ -29,54 +29,48 @@
 </ul>
 
 <style>
-    ul {
-        margin-top: 0;
-    }
-    ul a li, ul button li {
-        display: flex;
-        align-items: center;
-        font-size: 1rem;
-        font-weight: 500;
-        padding: 1rem 1.2rem;
-        border-radius: 8px;
-        position: relative;
-        overflow: hidden;
-        flex-grow: 1;
-    }
     ul a.chosen li, ul a.chosen li iconify-icon {
         /*background-color: rgba(128, 128, 128,0.55);*/
         /* border-right: 4px solid rgb(255, 220, 48); */
         color: #ffdc30;
         opacity: 1;
-        font-weight: 500;
+        font-weight: 400;
     }
-
 
     /* Small screens only */
     @media (max-width: 768px) {
-        ul a:hover li iconify-icon {
-            transform: translateY(-6px);
-            color: white
+        ul {
+            font-size: 1rem;
+            margin: 0;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
         }
-        ul a:hover li {
-            color: white;
-            opacity: 1;
-        }
-
         ul a li {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             font-weight: 300;
             transition: transform 0.3s ease;
             color: white;
             opacity: 0.6;
+            row-gap: 4px;
         }
 
+        ul a:hover li {
+            color: white;
+            opacity: 1;
+        }
         ul a li iconify-icon {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             transition: transform 0.3s ease;
+        }
+        ul a:hover li iconify-icon {
+            transform: translateY(-6px);
+            color: white;
         }
     }
 
@@ -103,6 +97,17 @@
             font-size: 1rem;
             transition: opacity 0.5s ease;
             transition: transform 0.3s ease;
+        }
+        ul a li, ul button li {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 400;
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            flex-grow: 1;
         }
     }
 </style>

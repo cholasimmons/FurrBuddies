@@ -10,7 +10,7 @@ export async function load({ params }) {
 		console.log('Logged in');
 		
 	} catch (error) {
-		history.back();
+		//history.back();
 	}
 	
 	const Id = params.slug;

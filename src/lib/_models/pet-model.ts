@@ -5,6 +5,7 @@ export type Pet = {
     type: Type;
     breed?: string;
     gender?: Gender;
+    dob?: Date;
     ownerID: string[];
     photoID?: string[];
   } & Models.Document;

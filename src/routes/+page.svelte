@@ -18,7 +18,7 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
 
 	<!-- Carousel -->
 

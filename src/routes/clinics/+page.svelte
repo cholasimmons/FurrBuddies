@@ -31,7 +31,7 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
     <h3 class="title flex justify-between items-center"><button hidden={!$clinicstate.length} on:click|preventDefault={()=>goto('/clinics/register')}  type="button" class="btn btn-sm variant-ghost-warning">
         <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span><span>Own a Clinic?</span></button>{#if _loading}<LoadingClock/>{/if}
     </h3>
