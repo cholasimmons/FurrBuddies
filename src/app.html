@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
 		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=0" />
-		<!--link rel="stylesheet" href="lib/css/pico.min.css" /-->
 		<base href="/"/>
+		<link rel="preload" href="%sveltekit.assets%/fonts/Grandstander/Grandstander-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin />
 		%sveltekit.head%
 	</head>
-	<body>
+	<body data-theme="hamlindigo">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

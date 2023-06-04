@@ -9,7 +9,11 @@ const config = {
 		require('path').join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
 	],
 	theme: {
-		extend: {}
+		extend: {
+			shadow: {
+				'3xl': '0 1rem 1rem rgba(0, 0, 0, 0.25)',
+			}
+		}
 	},
 
 	plugins: [

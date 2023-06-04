@@ -36,7 +36,6 @@
         <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span><span>Own a Clinic?</span></button>{#if _loading}<LoadingClock/>{/if}
     </h3>
 
-
     {#if !$clinicstate.length}
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
             <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>

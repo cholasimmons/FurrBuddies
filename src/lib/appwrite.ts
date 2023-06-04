@@ -1,4 +1,4 @@
-import { Client as Appwrite, Databases, Account, Storage } from 'appwrite';
+import { Client as Appwrite, Databases, Account, Storage, Avatars } from 'appwrite';
 
 const server = {
   endpoint: import.meta.env.VITE_APP_ENDPOINT.toString(),
@@ -16,7 +16,8 @@ const client = new Appwrite();
 const account = new Account(client);
 const database = new Databases(client);
 const storage = new Storage(client);
+const avatars = new Avatars(client);
 client.setEndpoint(server.endpoint).setProject(server.project);
 
-const sdk = { account, database, storage };
+const sdk = { account, database, storage, avatars };
 export { sdk, server };

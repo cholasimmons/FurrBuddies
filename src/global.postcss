@@ -1,29 +1,14 @@
 @font-face {
-	font-family: 'NewTegomin';
-	src: url('/fonts/NewTegomin/NewTegomin-Regular.ttf') format('truetype');
-	font-weight: 400;
-}
-@font-face {
-	font-family: 'Grandstander';
-	src: url('/fonts/Grandstander/Grandstander-Italic-VariableFont_wght.ttf') format('truetype-variations');
-	font-weight: 100 900;
-	font-style: 'italic';
-}
-@font-face {
 	font-family: 'Grandstander';
 	src: url('/fonts/Grandstander/Grandstander-VariableFont_wght.ttf') format('truetype-variations');
 	font-weight: 100 900;
 	font-stretch: 25% 125%;
 }
-
-
-
-
 html, body {
-	@apply h-full overflow-hidden font-light scrollbar-hide text-[1rem];
-	@apply bg-gradient-to-tr from-purple-900 to-pink-800 min-w-[20rem];
+	@apply bg-surface-50-900-token h-full overflow-hidden font-light md:font-medium text-black dark:text-white hide-scrollbar scrollbar-hide text-[1rem];
+	@apply bg-gradient-to-tr from-purple-400 to-pink-200 dark:from-purple-950 dark:to-pink-800 ;
 	outline: none;
-	font-weight: 400
+	line-height: 2rem;
 	/*@apply bg-surface-50-900-token;*/
 }
 .scrollbar-hide::-webkit-scrollbar {
@@ -52,57 +37,59 @@ p {
 *:focus {
 	outline: none
 }
-form input, form select {
+form input, form select, .form input, .form select {
+	@apply bg-black bg-opacity-20 dark:text-white text-black;
 	width: 100%;
-	padding: 0.8rem;
+	padding: 1rem 1.4rem;
 	
 	border-radius: 0.6rem;
-	background-color: rgba(255, 255, 255, 0.2);
-	color: white;
-	font-size: 1.2rem;
+	
+	font-size: 1.1rem;
 	border: 3px transparent solid;
 	transition: border 0.2s ease-in;
 }
-form select option {
-text-align: center;
-color: darkslateblue;
+form select option, .form select option {
+	text-align: center;
+	padding: 1rem
+}
+form select::after {
+  content: '\25BC';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
-form label {
+form label, .form label {
 	opacity: 0.75
 }
-form button[type="submit"] {
+form div button[type="submit"] {
 	padding: 1rem 3rem;
 	font-size: 1.2rem;
-	background-color:darksalmon;
 	border-radius: 6px;
-	color:white
 }
-form button[type="submit"]:hover {
+/*form button[type="submit"]:hover {
 	color:gray;
 	background-color: rgba(210, 200, 190);
-}
-form button[type="submit"]:disabled {
-	color: darkslateblue;
+}*/
+form div button[type="submit"]:disabled {
+	/* color: darkslateblue;*/
 	opacity: 0.5;
 	cursor: not-allowed;
 }
-form button[type="reset"] {
+form div button[type="reset"] {
 	padding: 1rem 3rem 1rem 0;
 	font-size: 1.2rem;
-	background-color:none;
-	color:lightsalmon
+	/* background-color:none;
+	 color:lightsalmon*/
 }
 form button[type="reset"]:hover {
-	color:lightcyan
+	/* color:lightcyan */
 }
 input.invalid {
 	border: 3px red solid;
 }
-
-
-
-
 
 /*
 	background-image:

@@ -19,8 +19,13 @@
         try {
             // Check if User is logged in so we can fetch buddies
             await state.checkLoggedIn();
+
+            // Must be logged in so fetch buddies
             await petstate.fetch();
+            
+            // Must be logged in so fetch buddy photos
             await petbucketstate.fetch();
+
         } catch (error: any) {
             console.warn('Unable to fetch Pets. ',error.message);
         } finally {
@@ -37,6 +42,7 @@
 
 <!-- HTML body -->
 <main class="px-{data.padding}">
+
     <!-- Display "Add Buddy" if User is logged in, otherwise prompted to log in -->
     <h3 class="title flex justify-between items-center">
         {#if $state.account?.$id}
@@ -52,7 +58,8 @@
         {#if _loading}<LoadingClock/>{/if}
     </h3>
 
-    <!-- Display Buddies if logged in and has buddies, otherwise prompted to log in-->
+    <!-- Display Buddies if User is logged in and has buddies, otherwise no Buddies shown-->
+
     {#if !$petstate?.length }
     <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
         <p class="text-3xl opacity-70 m-0 mb-3">No Buddies yet</p>
@@ -67,9 +74,10 @@
         {/if}
     </section>
     {:else}
-    <div in:fade={{ duration: 300, delay: 250 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        {#each $petstate as pet}
-        <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress>
+    <!-- Display each available buddy -->
+    <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6">
+        {#each $petstate as pet, i}
+        <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
             <BuddyCard petName={pet.name} photoID={pet.photoID} />
         </a>
         {/each}

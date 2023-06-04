@@ -6,11 +6,13 @@
 
     export let petName: string;
     export let photoID: string[] = [];
-    let imageURL: any;
+    let imageURL: string = '';
 
     onMount(async ()=>{
-        const file = await petbucketstate.getPreview(photoID[0]);
-        imageURL = file?.href || '';
+        if(photoID.length > 0){
+            const file: URL|undefined = await petbucketstate.getPreview(photoID[0]);
+            imageURL = file?.href || '';
+        }
     });
 </script>
 
@@ -64,9 +66,5 @@
         transform: translate(-50%, -50%);
         font-size: 3rem;
         color: #b8a;
-    }
-    @keyframes drawLine {
-        from { width: 0%; }
-        to { width: calc(100% + 4px); }
     }
 </style>

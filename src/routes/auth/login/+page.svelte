@@ -32,10 +32,10 @@
         _authenticating = true;
         try {
             await state.login($femail.value, $fpassword.value);
-            goto("/");
+            history.back();
         } catch (error: any) {
             // state.alert({ color: "red", message: error.message });
-            toast.error(error.message, { className: 'text-red-500'})
+            toast.error(error.message)
         } finally {
             _authenticating = false;
         }
@@ -50,7 +50,7 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
     <!--h3 class="title text-center">Login</h3-->
     <p class="mt-0 text-center">
         Don't have an account yet?
@@ -89,7 +89,7 @@
                     <button disabled={!$loginForm.dirty} on:click={loginForm.reset} type="reset">
                         Clear Form
                     </button>
-                    <button disabled="{!$loginForm.valid || _authenticating}" type="submit">
+                    <button disabled={ !($loginForm.valid && $femail.value) || _authenticating} class="btn variant-filled-warning" type="submit">
                         {#if _authenticating}Logging In{:else}Log In{/if} 
                     </button>
                 </div>
@@ -104,52 +104,3 @@
         </div>
     </section>
 </main>
-
-<style>
-* {
-    outline: none
-}
-form input {
-	width: 100%;
-    padding: 1.2rem;
-
-	border-radius: 0.6rem;
-	background-color: rgba(255, 255, 255, 0.2);
-	color: white;
-	font-size: 1.2rem;
-    border: 3px transparent solid;
-    transition: border 0.2s ease-in;
-}
-
-form label {
-	opacity: 0.75
-}
-form button[type="submit"] {
-    padding: 1rem 3rem;
-    font-size: 1.2rem;
-    background-color:darksalmon;
-    border-radius: 6px;
-    color:white
-}
-form button[type="submit"]:hover {
-    color:gray;
-    background-color: rgba(210, 200, 190);
-}
-form button[type="submit"]:disabled {
-    color: darkslateblue;
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-form button[type="reset"] {
-    padding: 1rem 3rem 1rem 0;
-    font-size: 1.2rem;
-    background-color:none;
-    color:lightsalmon
-}
-form button[type="reset"]:hover {
-    color:lightcyan
-}
-input.invalid {
-    border: 3px red solid;
-}
-</style>

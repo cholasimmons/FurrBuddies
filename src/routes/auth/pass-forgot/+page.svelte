@@ -41,10 +41,9 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
     <h3 class="title text-center">Forgotten Password</h3>
-    <p class="mt-0 text-center">
-        Enter your email address for a password reset link</p>
+    <p class="mt-0 text-center">Enter your email address for a password reset link</p>
 
     <section class="flex justify-center">
         <div class="flex-grow flex flex-col max-w-lg justify-center">
@@ -57,7 +56,9 @@
                 <input id="email" type="text" class:invalid={!$femail.valid} placeholder="yourname@email.add"
                     bind:value="{$femail.value}"/>
                 <p class="text-gray-300 text-right">&nbsp;
-                    {#if !$femail.valid && $femail.value}<span in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }}>This is not a valid email address.</span>{/if}</p>
+                    {#if !$femail.valid && $femail.value}
+                        <span in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }}>This is not a valid email address.</span>
+                    {/if}</p>
 
             <!-- Form Buttons (Clear Form & Submit) -->
 

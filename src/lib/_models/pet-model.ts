@@ -1,6 +1,6 @@
 import type { Models } from "appwrite/types/models";
 
-export type Pet = {
+export type IPet = {
     name: string;
     type: Type;
     breed?: string;

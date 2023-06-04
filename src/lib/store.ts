@@ -4,6 +4,7 @@ import { sdk, server } from './appwrite';
 import type { Gender, Pet, Type } from './_models/pet-model';
 import type { Account } from './_models/appwrite-model';
 import type { Clinic } from './_models/clinic-model';
+import { splitNames } from './_utilities/split-names';
 
 export type Alert = {
   color: string;
@@ -22,7 +23,10 @@ const createPets = () => {
       const role = Role.user(userID,'verified');
       if(!role)return;
   
-      const response = await sdk.database.listDocuments(server.database, server.collection_pets, [Query.orderDesc('')]);
+      const response = await sdk.database.listDocuments(server.database, server.collection_pets,
+        [ Query.orderDesc('')
+        ]
+      );
       return set(response.documents as any);
     },
     addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
@@ -148,7 +152,7 @@ const createClinics = () => {
   };
 };
 
-// STORAGE
+// PHOTO STORAGE
 
 const createPetPhoto = () => {
   const { subscribe, update, set } = writable([]);
@@ -185,9 +189,11 @@ const createPetPhoto = () => {
             Permission.delete(role),
           ]
         );
-        return update((photos) => [...photos]);
+        update((photos) => [...photos]);
+        return photoBucket;
       } catch (error) {
         console.error('Failed to add pet photo:', error);
+        return null;
       }
     },
     getPreview: async (id: string) => {
@@ -225,22 +231,27 @@ const createState = () => {
     subscribe,
     checkLoggedIn: async () => {
       setLoading(true);
-      const account = await sdk.account.get();
-      state.init(account);
-      setLoading(false);
+        const account:any = await sdk.account.get();
+        // console.log('account',account);
+        state.init(account);
+        setLoading(false);
+        return account;
   },
     signup: async (email: string, password: string, name: string) => {
       setLoading(true);
+      state.init();
+      petstate.clear();
       const result = await sdk.account.create('unique()', email, password, name);
       setLoading(false);
       return result;
     },
     login: async (email: string, password: string) => {
       setLoading(true);
+      state.init();
+      petstate.clear();
       await sdk.account.createEmailSession(email, password);
-      const user = await sdk.account.get();
-      console.log(user);
-      state.init(user);
+      const session = await sdk.account.get();
+      state.init(session);
       // setPrefs(await ...sdk.account.getPrefs());
       setLoading(false);
     },
@@ -252,6 +263,15 @@ const createState = () => {
       // setPrefs([]);
       setLoading(false);
     },
+    updateUserPrefs: async (prefs: Models.Preferences) => {
+      setLoading(true);
+      const prfs = await sdk.account.getPrefs();
+      await sdk.account.updatePrefs({...prfs, ...prefs});
+      setLoading(false);
+    },
+    getUserPrefs(){
+      return sdk.account.getPrefs();
+    },
     /*
     alert: async (alert: Alert) =>
       update((n) => {
@@ -259,6 +279,10 @@ const createState = () => {
         return n;
       }),
     */
+    getInitials(){
+      const userName = get(state).account?.name;
+      return sdk.avatars.getInitials(splitNames(userName??''));
+    },
     init: async (account: any = null) => {
       return set({ account,_loading: false });
     },
