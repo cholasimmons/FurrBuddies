@@ -19,7 +19,7 @@
 		<dl class="mt-5 list-dl">
 			{#each dummyMail as mail}
 			<a href="/mail/{mail.id}">
-				<div>
+				<div class="bg-surface-500 bg-opacity-30 hover:bg-surface-hover-token">
 					<span class="w-[2rem] h-[2rem]">💌</span>
 					<span class="flex-auto">
 						<dt class="font-light">{mail.title}</dt>
@@ -37,13 +37,9 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: start;
-		background-color: rgb(110, 20, 80);
+		justify-content: flex-start;
 		margin-bottom: 0.6rem;
 		padding: 0.8rem 1rem;
-	}
-	dl.list-dl > a > div:hover {
-		background-color: rgb(126, 36, 96);
 	}
 
 	dl.list-dl > a > div dt {

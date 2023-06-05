@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config}*/
 const config = {
 	// 1. Apply the dark mode class setting:
-	darkMode: 'class',
+	darkMode: 'media',
 
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',

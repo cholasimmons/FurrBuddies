@@ -1,0 +1,23 @@
+{
+    "name": "Furr Buddies",
+    "short_name": "Buddies",
+    "icons": [
+        {
+            "src": "favicon.png",
+            "type": "image/png",
+            "sizes": "128x128"
+        },
+        {
+            "src": "simmons.png",
+            "type": "image/png",
+            "sizes": "256x256"
+        }
+    ],
+    "id": "/",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#3E4EBB",
+    "theme_color": "#2F3BA2",
+    "description": "A cross-platform app to help Pet Owners better manage their Furr Buddies"
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Pet } from "$lib/_models/pet-model";
+	import type { IPet } from "$lib/_models/pet-model";
 	import { petbucketstate } from "$lib/store";
     import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
@@ -20,7 +20,7 @@
     <div class="circle">
         <img src={imageURL} alt='' in:fade={{ duration: 300 }}>
     </div>
-    <p class="text-lg md:text-2xl text-white">{petName}</p>
+    <p class="text-lg md:text-2xl ">{petName}</p>
 </main>
 
 <style>

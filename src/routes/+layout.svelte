@@ -1,4 +1,5 @@
 <script lang="ts">
+
     // Your selected Skeleton theme:
 	import '@skeletonlabs/skeleton/themes/theme-sahara.css';
 
@@ -26,7 +27,7 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import type { LayoutData } from './$types';
 	import { onMount } from 'svelte';
-	import { state } from '$lib/store';
+	import { state, userbucketstate } from '$lib/store';
 	import { fade, slide } from 'svelte/transition';
 	import BackButton from '$lib/_components/icons/BackButton.svelte';
 	import { page } from '$app/stores';
@@ -36,6 +37,9 @@
 
 	// "isLoading" type of boolean
 	export let data: LayoutData;
+
+	// User avatar
+	let imageURL: string = '';
 
 	// Routes to display in the AppBar via getRouteName() function
 	const routes: { [key: string]: string } = {
@@ -55,9 +59,12 @@
 		'/user/profile': 'User Profile',
 	};
 
+
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
+			const file: URL|undefined = await userbucketstate.getPreview($state.account!.prefs.photoID);
+			imageURL = file?.href ?? '';
 			toast.success('Welcome back '+splitNames($state.account?.name || 'Stranger')+'!' );
 		} catch (error) {
 			// console.warn('No signed in User.');
@@ -107,7 +114,7 @@
 
 <AppShell class="min-w-[16rem]" regionPage="relative" slotHeader="z-20 p-0 m-0" slotPageContent=""
 slotFooter="h-1rem md:h-0 w-full transition ease-in-out translate-y-0 md:translate-y-20 delay-100 duration-800 animation motion-reduce:transition-none"
-slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
+slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -translate-x-60 md:translate-x-1 delay-150 duration-800 motion-reduce:transition-none">
 	<svelte:fragment slot="header">
 
 		<!-- Skeleton UI Appbar -->
@@ -127,7 +134,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none text-gray-200 transition ea
 						<UserSVG/>
 					{:else}
 					<span in:fade={{ duration: 400 }}>
-						<Avatar src="/images/user.jpg" initials="{splitNames($state.account?.name || 'Stranger')}" border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
+					<Avatar src={ imageURL }  border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
 					</span>
 					{/if}
 				</button>

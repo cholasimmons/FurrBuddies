@@ -65,7 +65,7 @@
 				<div class="w-full h-[14rem] relative">
 					<img src={image} alt='' class="w-full h-full object-cover object-center">
 					{#if title}
-						<div class="absolute bottom-0 py-2 px-6 bg-black bg-opacity-70 min-w-1/3">
+						<div class="absolute bottom-0 py-2 px-6 bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100 bg-opacity-80 min-w-1/3">
 							<h2 class="m-0 font-medium">{title}</h2>
 							<p class="m-0 text-sm">{story}</p>
 						</div>
@@ -99,8 +99,8 @@
 			<!-- Signed in User -->
 			<div class="my-7 grid grid-cols-3 gap-6 col-gap-3">
 				{#each dashboardItems as item, index}
-					<div class="flex items-center justify-center text-center">
-						<button on:click={()=>console.info('Button tapped')} class="btn rounded-lg shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] w-[6rem] h-[6rem] flex flex-col items-center justify-center gap-2">
+					<div class="flex items-center justify-center text-center rounded-lg shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none w-[6rem] h-[6rem] transition-shadow">
+						<button on:click={()=>console.info('Button tapped')} class="btn  flex flex-col items-center justify-center gap-2">
 							<iconify-icon icon={item.icon || ''} class=" text-4xl"></iconify-icon>
 							{ item.value }
 						</button>

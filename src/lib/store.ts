@@ -1,9 +1,9 @@
 import { ID, type Models, Permission, Role, Query } from 'appwrite';
 import { get, writable } from 'svelte/store';
 import { sdk, server } from './appwrite';
-import type { Gender, Pet, Type } from './_models/pet-model';
+import type { Gender, IPet, Type } from './_models/pet-model';
 import type { Account } from './_models/appwrite-model';
-import type { Clinic } from './_models/clinic-model';
+import type { IClinic } from './_models/clinic-model';
 import { splitNames } from './_utilities/split-names';
 
 export type Alert = {
@@ -14,7 +14,7 @@ export type Alert = {
 // PETS
 
 const createPets = () => {
-  const { subscribe, update, set } = writable<Pet[]|null>([]);
+  const { subscribe, update, set } = writable<IPet[]|null>([]);
 
   return {
     subscribe,
@@ -34,7 +34,7 @@ const createPets = () => {
       const role = Role.user(userID);
       if(!role)return;
 
-      const pet = await sdk.database.createDocument<Pet>(
+      const pet = await sdk.database.createDocument<IPet>(
         server.database,
         server.collection_pets,
         ID.unique(),
@@ -57,11 +57,11 @@ const createPets = () => {
       return pet;
     },
 
-    removePet: async (pet: Pet) => {
+    removePet: async (pet: IPet) => {
       await sdk.database.deleteDocument(server.database, server.collection_pets, pet.$id);
       return update((n) => n!.filter((t) => t.$id !== pet.$id));
     },
-    updatePet: async (pet: Pet, body: {[key:string]:any[]}) => { // Partial<Pet>
+    updatePet: async (pet: IPet, body: {[key:string]:any[]}) => { // Partial<Pet>
       const userID = get(state).account!.$id;
       const role = Role.user(userID);
       await sdk.database.updateDocument(
@@ -79,7 +79,7 @@ const createPets = () => {
         const index = n!.findIndex((t) => t.$id === pet.$id);
         n![index] = {
           ...n![index],
-          ...(<Pet>pet),
+          ...(<IPet>pet),
         };
         return n;
       });
@@ -93,7 +93,7 @@ const createPets = () => {
 // VETS
 
 const createClinics = () => {
-  const { subscribe, update, set } = writable<Clinic[]>([]);
+  const { subscribe, update, set } = writable<IClinic[]>([]);
 
   return {
     subscribe,
@@ -105,7 +105,7 @@ const createClinics = () => {
       const userId = get(state).account!.$id;
       const role = Role.user(userId);
       
-      const application = await sdk.database.createDocument<Clinic>(
+      const application = await sdk.database.createDocument<IClinic>(
         server.database,
         server.collection_clinics,
         ID.unique(),
@@ -123,11 +123,11 @@ const createClinics = () => {
       return update((n) => [application, ...n]);
     },
 
-    removeClinic: async (clinic: Clinic) => {
+    removeClinic: async (clinic: IClinic) => {
       await sdk.database.deleteDocument(server.database, server.collection_clinics, clinic.$id);
       return update((n) => n.filter((t) => t.$id !== clinic.$id));
     },
-    updateClinic: async (clinic: Clinic) => { // Partial<Clinic>
+    updateClinic: async (clinic: IClinic) => { // Partial<Clinic>
       const user = Role.user(get(state).account!.$id);
       await sdk.database.updateDocument(
         server.database,
@@ -144,7 +144,7 @@ const createClinics = () => {
         const index = n.findIndex((c) => c.$id === clinic.$id);
         n[index] = {
           ...n[index],
-          ...(<Clinic>clinic),
+          ...(<IClinic>clinic),
         };
         return n;
       });
@@ -152,7 +152,7 @@ const createClinics = () => {
   };
 };
 
-// PHOTO STORAGE
+// PET PHOTO STORAGE
 
 const createPetPhoto = () => {
   const { subscribe, update, set } = writable([]);
@@ -215,6 +215,57 @@ const createPetPhoto = () => {
   }
 }
 
+// USER PHOTO STORAGE
+
+const createUserPhoto = () => {
+  const { subscribe, update, set } = writable([]);
+
+  return {
+    subscribe,
+    addUserPhoto: async (file: File) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      const ministryRole = Role.team('646a5196a6a52ef2256d');
+      const anyRole = Role.any();
+      if(!role)return;
+
+      try {
+        const photoBucket = await sdk.storage.createFile(
+          server.bucket_users,
+          ID.unique(),
+          file,
+          [
+            Permission.read('any'),
+            Permission.update(role),
+            Permission.delete(role)
+          ]
+        );
+        update((photo) =>[...photo]);
+        return photoBucket;
+      } catch (error) {
+        console.error('Failed to add user photo:', error);
+        return null;
+      }
+    },
+    getPreview: async (id: string) => {
+      const userID = get(state).account?.$id ?? '';
+      const role = Role.user(userID);
+      if(!role)return;
+
+      try {
+        const photoPreview = await sdk.storage.getFilePreview(
+          server.bucket_users,
+          id, 256, undefined, 'center', 80
+        );
+        // console.log('Bucket response: ',photoPreview);
+        return photoPreview;
+      } catch (error) {
+        console.error('Failed to retrieve preview photo:', error);
+      }
+    }
+  }
+}
+
 // User Account state
 
 const createState = () => {
@@ -266,12 +317,14 @@ const createState = () => {
     updateUserPrefs: async (prefs: Models.Preferences) => {
       setLoading(true);
       const prfs = await sdk.account.getPrefs();
+      console.log('Current User Prefs: ',prfs);
+      console.log('New User Prefs: ',prefs);
       await sdk.account.updatePrefs({...prfs, ...prefs});
       setLoading(false);
     },
-    getUserPrefs(){
-      return sdk.account.getPrefs();
-    },
+    getUserPrefs: async ()=> await sdk.account.getPrefs(),
+    
+    
     /*
     alert: async (alert: Alert) =>
       update((n) => {
@@ -280,7 +333,7 @@ const createState = () => {
       }),
     */
     getInitials(){
-      const userName = get(state).account?.name;
+      const userName = get(state).account?.name??'';
       return sdk.avatars.getInitials(splitNames(userName??''));
     },
     init: async (account: any = null) => {
@@ -291,5 +344,6 @@ const createState = () => {
 
 export const petstate = createPets();
 export const petbucketstate = createPetPhoto();
+export const userbucketstate = createUserPhoto();
 export const clinicstate = createClinics();
 export const state = createState();

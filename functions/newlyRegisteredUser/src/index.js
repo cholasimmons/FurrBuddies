@@ -15,13 +15,14 @@ const sdk = require("node-appwrite");
 */
 
 module.exports = async function (req, res) {
+
   const client = new sdk.Client();
 
   // You can remove services you don't use
   // const account = new sdk.Account(client);
   // const avatars = new sdk.Avatars(client);
   // const database = new sdk.Databases(client);
-  const functions = new sdk.Functions(client);
+  // const functions = new sdk.Functions(client);
   // const health = new sdk.Health(client);
   // const locale = new sdk.Locale(client);
   // const storage = new sdk.Storage(client);
@@ -41,6 +42,7 @@ module.exports = async function (req, res) {
       .setSelfSigned(true);
   }
 
+console.log(req.variables.SECRET);
   // Get the user ID from the function data
   const userId = JSON.parse(process.env.APPWRITE_FUNCTION_DATA).userId;
 
@@ -50,7 +52,7 @@ module.exports = async function (req, res) {
     let { email, name } = user;
 
     // Create the activation URL
-    let activationUrl = `https://[HOSTNAME_OR_IP]/activate?userId=${userId}`;
+    let activationUrl = `https://[HOSTNAME_OR_IP]/auth/activate?userId=${userId}`;
 
     // Create the email subject and body
     let subject = 'Activate your Furr Buddies account';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
-    import { Gender, Type, type Pet } from "$lib/_models/pet-model";
+    import { Gender, Type, type IPet } from "$lib/_models/pet-model";
 	import { petbucketstate, petstate } from "$lib/store";
 	import { field, form } from "svelte-forms";
 	import { email, min, pattern, required } from "svelte-forms/validators";
@@ -52,7 +52,7 @@
                 _photoSuccess = true;
                 _uploadingPhoto = false
             }
-            toast.success('Added '+$fname.value+' to the family!',{icon: _photoSuccess ? '📸' : ''});   
+            toast.success('Added '+$fname.value+' to the family!',{icon: _photoSuccess ? '📸' : ''});
             addPetForm.clear();  
         } catch (error: any) {
             // state.alert({ color: 'red', message: petName+' was not added. '+error.message})
@@ -68,8 +68,6 @@
         photoFile = event.target.files[0];
         console.log('Event onchanged: ', photoFile);
     };
-
-    $: image = photoFile;
 </script>
 
 <!-- HTML head -->

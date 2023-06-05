@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import ProfileEditForm from "$lib/_components/forms/ProfileEditForm.svelte";
-	import { state } from "$lib/store";
+	import { state, userbucketstate } from "$lib/store";
 	import { modalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
 	import { Permission, Role } from "appwrite";
 	import { onMount } from "svelte";
@@ -9,17 +9,23 @@
 
     export let data;
     let initials: string|null = null;
+    let imageURL: string|undefined = '';
+    let file: URL|undefined;
 
-    onMount(()=>{
+    onMount(async ()=>{
         try {
             // state.checkLoggedIn();
             const init: URL = state.getInitials();
+            file = await userbucketstate.getPreview($state.account?.prefs.photoID );
+			
             initials = init.href;
         } catch (error) {
             console.log('Not logged in.',error);
             
         }
     });
+
+    $: imageURL = file?.href ?? '';
 
     function managePhoto(): void {
         console.log('btn pressed');
@@ -31,7 +37,7 @@
             // Pass a reference to your custom component
             ref: ProfileEditForm,
             // Add the component properties as key/value pairs
-            // props: { background: 'bg-red-500' },
+            props: { name: $state.account?.name },
             // Provide a template literal for the default component slot
             slot: '<p>Skeleton</p>'
         };
@@ -61,8 +67,9 @@
 <!-- HTML body -->
 <main class="text-center  px-{data.padding}">
     <section class="mx-auto w-full mt-3 max-w-xl">
-        <div hidden={!$state.account} in:fade={{ duration: 300 }} class="mx-auto rounded-full circle shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] flex flex-col items-center justify-center gap-2">
-            <img on:click={managePhoto} on:keypress src={ initials} alt=''>
+        <div hidden={!$state.account} in:fade={{ duration: 300 }} class="flex justify-center">
+            <img on:click={managePhoto} on:keypress src={ imageURL ?? initials } alt='' class="w-32 h-32 rounded-full object-cover border-2 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110">
+            <!--button class="btn  bg-surface-400 w-8 h-8 "><iconify-icon icon="mdi:cancel"></iconify-icon></button-->
         </div>
         
         <h3 class="title text-center mt-6 p-0 flex items-center justify-center gap-2 -mr-4">{$state.account?.name || 'Welcome Guest'}

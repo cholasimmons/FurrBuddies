@@ -5,7 +5,7 @@
 
 </script>
 
-<ul class="text-600">
+<ul class="">
     <a href="/" class="{$page.url.pathname === '/' ? 'chosen' : ''} order-3 md:order-none">
         <li><iconify-icon icon="mdi:home" class="home"></iconify-icon><span>Home</span></li>
     </a>
@@ -32,7 +32,7 @@
     ul a.chosen li, ul a.chosen li iconify-icon {
         /*background-color: rgba(128, 128, 128,0.55);*/
         /* border-right: 4px solid rgb(255, 220, 48); */
-        @apply text-yellow-500;
+        @apply text-white dark:text-yellow-500;
         opacity: 1;
         font-weight: 400;
     }
@@ -55,7 +55,7 @@
             align-items: center;
             font-weight: 300;
             transition: transform 0.3s ease;
-            opacity: 0.6;
+            opacity: 0.7;
             row-gap: 4px;
         }
 
@@ -87,7 +87,7 @@
         }
 
         ul a li, ul a li iconify-icon {
-            opacity: 0.6;
+            opacity: 0.7;
             font-size: 1rem;
             transition: opacity 0.5s ease;
             transition: transform 0.3s ease;
