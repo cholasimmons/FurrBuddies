@@ -4,7 +4,7 @@ import { sdk, server } from './appwrite';
 import type { Gender, IPet, Type } from './_models/pet-model';
 import type { Account } from './_models/appwrite-model';
 import type { IClinic } from './_models/clinic-model';
-import { splitNames } from './_utilities/split-names';
+import { removePrefix, getFirstName } from './_utilities/split-names';
 
 export type Alert = {
   color: string;
@@ -283,7 +283,6 @@ const createState = () => {
     checkLoggedIn: async () => {
       setLoading(true);
         const account:any = await sdk.account.get();
-        // console.log('account',account);
         state.init(account);
         setLoading(false);
         return account;
@@ -333,8 +332,8 @@ const createState = () => {
       }),
     */
     getInitials(){
-      const userName = get(state).account?.name??'';
-      return sdk.avatars.getInitials(splitNames(userName??''));
+      const userName = get(state).account?.name;
+      return sdk.avatars.getInitials(removePrefix(userName??''));
     },
     init: async (account: any = null) => {
       return set({ account,_loading: false });

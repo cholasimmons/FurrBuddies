@@ -2,6 +2,7 @@
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
     import { Gender, Type, type IPet } from "$lib/_models/pet-model";
 	import { petbucketstate, petstate } from "$lib/store";
+	import { Avatar } from "@skeletonlabs/skeleton";
 	import { field, form } from "svelte-forms";
 	import { email, min, pattern, required } from "svelte-forms/validators";
 	import toast from "svelte-french-toast";
@@ -42,31 +43,44 @@
             // If an image was selected, upload it too
             if(photoFile)
             {
-                console.log('Image provided. ',photoFile);
-                
                 _uploadingPhoto = true;
                 const response:any = await petbucketstate.addPetPhoto(photoFile);
-                console.log('Response after uploading image.',response);
                 
                 await petstate.updatePet(petDoc, {"photoID": [response.$id]});
                 _photoSuccess = true;
                 _uploadingPhoto = false
             }
             toast.success('Added '+$fname.value+' to the family!',{icon: _photoSuccess ? '📸' : ''});
-            addPetForm.clear();  
+            addPetForm.clear();
+            _adding = false;
+            _uploadingPhoto = false;
         } catch (error: any) {
             // state.alert({ color: 'red', message: petName+' was not added. '+error.message})
             console.warn('Unable to add '+$fname.value+'. ',error.message);
-        } finally {
             _adding = false;
             _uploadingPhoto = false;
-        }        
+        }
+    }
+
+    // Function that creates preview of selected image
+    function previewImage() {
+        if (photoFile) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview!.innerHTML = `<img src="${e.target!.result}" alt="" class="object-fit object-cover object-center" />`;
+            };
+
+            reader.readAsDataURL(photoFile);
+        }
     }
 
     // Function to get photo from form, ready for Appwrite bucket
     function handleFileUpload(event: any) {
         photoFile = event.target.files[0];
-        console.log('Event onchanged: ', photoFile);
+        // console.log('Event onchanged: ', photoFile);
+        previewImage();
     };
 </script>
 
@@ -90,8 +104,11 @@
 
                 <!-- Pet Photo -->
 
-                <!--img src={ image?.name ||''} alt=""/-->
-                <input type="file" id="uploader" bind:value={$ffile.value} accept="image/*" on:change={handleFileUpload} />
+                <div on:click={()=>document.getElementById('uploader')?.click()} on:keypress id="imagePreview"
+                    class="w-28 h-28 bg-surface-400 bg-opacity-30 rounded-full flex justify-center items-center overflow-hidden mx-auto transition-transform hover:scale-110">
+                    <iconify-icon icon="mdi:image" class="text-2xl"></iconify-icon>
+                </div>
+                <input type="file" id="uploader" bind:value={$ffile.value} style="display:none" accept="image/*" on:change={handleFileUpload} />
 
                 <!-- Pet Name -->
 
@@ -101,7 +118,7 @@
                     class:invalid="{!$fname.valid}"
                     bind:value={$fname.value}/>
                     {#if !$fname.valid}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right">What do you call your Buddy?</p>
+                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-surface-800 dark:text-surface-300 text-right">What do you call your Buddy?</p>
                     {/if}
 
 
@@ -151,7 +168,7 @@
                         Clear Form
                     </button>
                     <span class="flex items-center justify-center gap-4">{#if _uploadingPhoto}<LoadingClock />{/if}
-                    <button disabled={ _adding || !$addPetForm.valid } class="btn variant-filled-warning" type="submit">
+                    <button disabled={ _adding || !$addPetForm.valid || $fname.value.length < 2 } class="btn variant-filled-warning" type="submit">
                         {#if _uploadingPhoto}Adding...{:else if _adding}Uploading Photo{:else}Add{/if}
                     </button>
                     </span>

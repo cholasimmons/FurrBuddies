@@ -19,9 +19,9 @@
 		<dl class="mt-5 list-dl">
 			{#each dummyMail as mail}
 			<a href="/mail/{mail.id}">
-				<div class="bg-surface-500 bg-opacity-30 hover:bg-surface-hover-token">
+				<div class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token">
 					<span class="w-[2rem] h-[2rem]">💌</span>
-					<span class="flex-auto">
+					<span class="flex-auto  overflow-clip">
 						<dt class="font-light">{mail.title}</dt>
 						<dd class="font-medium">{mail.message}</dd>
 					</span>

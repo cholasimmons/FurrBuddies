@@ -6,5 +6,6 @@ export interface Account {
     phone?: string;
     passwordUpdate?: boolean;
     prefs?: any;
-    roles?: string[];
+    status: boolean;
+    // roles?: string[];
 }

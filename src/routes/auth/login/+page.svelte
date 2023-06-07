@@ -54,7 +54,7 @@
     <!--h3 class="title text-center">Login</h3-->
     <p class="mt-0 text-center">
         Don't have an account yet?
-        <span class="text-primary-500">
+        <span class="text-surface-600 font-bold">
             <a href="/auth/register"> Sign Up </a>
         </span>
     </p>
@@ -71,7 +71,7 @@
                 <input id="email" type="text" class:invalid={!$femail.valid} placeholder="yourname@email.add"
                     bind:value="{$femail.value}"/>
                     {#if !$femail.valid && $femail.value}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right">This is not a valid email address.</p>
+                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-surface-800 dark:text-surface-300 text-right">This is not a valid email address.</p>
                     {/if}
 
             <!-- User Password-->
@@ -80,7 +80,7 @@
                 <input id="password" type="password" class:invalid={!$fpassword.valid} placeholder="passWORD"
                     bind:value="{$fpassword.value}" />
                     {#if !$fpassword.valid && $fpassword}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right">Minimum 6 alphanumeric characters, one uppercase letter.</p>
+                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-surface-800 dark:text-surface-300 text-right">Minimum 6 alphanumeric characters, one uppercase letter.</p>
                     {/if}
     
             <!-- Form Buttons (Clear Form & Submit) -->

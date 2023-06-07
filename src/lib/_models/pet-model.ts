@@ -10,11 +10,13 @@ export type IPet = {
     photoID?: string[];
   } & Models.Document;
 
-  export enum Gender {
-    UNSPECIFIED="UNSPECIFIED",
-    MALE="MALE",
-    FEMALE="FEMALE",
-  }
+
+	export enum Gender {
+		UNSPECIFIED = "UNSPECIFIED",
+		MALE = "MALE",
+		FEMALE = "FEMALE",
+		Gender = "Gender"
+	}
   export enum Type {
     DOG="DOG",
     CAT="CAT",

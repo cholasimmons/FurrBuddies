@@ -76,13 +76,15 @@
 		<small class="mb-4 p-0 opacity-50">App Version: 0.2.0</small>
 	</div>
 
-	<hr class="grid-col-1 mb-6">
+	<hr class="mb-6">
 
 	<!-- Configuration section -->
-	<section>
+	<section class="flex justify-center">
 
-		<!-- Theme-->
-		<div>
+		<p>N/A</p>
+
+		<!-- Theme (Moved to Appbar) -->
+		<!--div>
 			<span>Theme:</span>
 			<span class="form">
 				<select on:change={changedTheme} name="theme" value={isThemeLight ? 'light' : 'dark'} id="theme" placeholder="Choose Mode">
@@ -91,7 +93,7 @@
 					<option value="dark">Dark</option>
 				</select>
 			</span>
-		</div>
+		</div-->
 
 		<!-- Text Scale-->
 		<!--div class="col-span-2 grid grid-cols-2 mx-auto">
@@ -123,20 +125,5 @@
 </main>
 
 <style>
-	section div {
-		margin: 1rem auto;
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		font-size: 1.1rem;
-		align-items: center;
-	}
-	.form select {
-		width: auto;
-	}
-	section div > span:nth-child(1) {
-		@apply dark:text-white text-black opacity-60 text-right pr-1 text-base;
-	}
-	section div > span:nth-child(2) {
-		@apply text-left pl-1;
-	}
+
 </style>

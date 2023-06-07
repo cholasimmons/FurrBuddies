@@ -10,13 +10,14 @@
     // Finally, your application's global stylesheet (sometimes labeled 'app.css')
     import '../global.postcss';
 
-    import {AppShell, AppBar, Avatar } from '@skeletonlabs/skeleton';
+    import {AppShell, AppBar, Avatar, LightSwitch } from '@skeletonlabs/skeleton';
 	import { storePopup, popup, Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent, PopupSettings } from '@skeletonlabs/skeleton';
 
 	// Theme features
 	import { setInitialClassState } from '@skeletonlabs/skeleton';
 	// import { autoModeWatcher } from '@skeletonlabs/skeleton';
+	import { modeOsPrefers, modeUserPrefers, modeCurrent } from '@skeletonlabs/skeleton';
 
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
@@ -33,13 +34,16 @@
 	import { page } from '$app/stores';
 	import RightPage from '$lib/_components/RightPage.svelte';
 	import { goto } from '$app/navigation';
-	import { splitNames } from '$lib/_utilities/split-names';
+	import { getFirstName } from '$lib/_utilities/split-names';
 
 	// "isLoading" type of boolean
 	export let data: LayoutData;
 
 	// User avatar
 	let imageURL: string = '';
+	let file: URL|undefined;
+	let initialsRAW: URL;
+	let initials: string;
 
 	// Routes to display in the AppBar via getRouteName() function
 	const routes: { [key: string]: string } = {
@@ -63,17 +67,20 @@
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
-			const file: URL|undefined = await userbucketstate.getPreview($state.account!.prefs.photoID);
-			imageURL = file?.href ?? '';
-			toast.success('Welcome back '+splitNames($state.account?.name || 'Stranger')+'!' );
+			// if($state.account?.status === false)return
+			initialsRAW = state.getInitials();
+			initials = initialsRAW.href;
+			file = await userbucketstate.getPreview($state.account!.prefs.photoID);
+			
+			toast.success('Welcome back '+getFirstName($state.account?.name || 'Stranger')+'!' );
 		} catch (error) {
 			// console.warn('No signed in User.');
 			toast.error('Hello there Stranger', {icon: '👋🏾'});
+		} finally {
+			modeUserPrefers.set($state.account?.prefs.theme === 'dark' ? true : false);
+			modeCurrent.set(true);
 		}
 	});
-
-	// Divides a full name object and retrieves the first name, for the toast greeting, putting aside titles
-	splitNames($state.account?.name || 'Stranger')
 
 	// Function that returns name to display in AppBar, from routes list above
 	function getRouteName(route: string):string {
@@ -99,15 +106,18 @@
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	const popupCloseQuery: PopupSettings = {
-		event: 'click',
+		event: 'hover',
 		target: 'popupCloseQuery',
 		closeQuery: '#will-close'
 	};
+
+	$: imageURL = file?.href ?? '';
+	$: userAccount = $state.account;
 	
 </script>
 
 <!-- Dark Mode feature -->
-<svelte:head>{@html `<script>(${setInitialClassState.toString()})();</script>`}</svelte:head>
+<!--svelte:head>{@html `<script>(${setInitialClassState.toString()})();</script>`}</svelte:head-->
 <!--svelte:head>{@html `<script>${autoModeWatcher.toString()} autoModeWatcher();</script>`}</svelte:head-->
 
 <Modal/>
@@ -129,13 +139,12 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 			</svelte:fragment>
 				<p class="text-2xl font-semibold uppercase">{ getRouteName($page.url.pathname) } </p>
 			<svelte:fragment slot="trail">
+				<LightSwitch/>
 				<button use:popup={popupCloseQuery} on:keypress>
-					{#if $state.account?.$id === undefined}
+					{#if !userAccount}
 						<UserSVG/>
 					{:else}
-					<span in:fade={{ duration: 400 }}>
-					<Avatar src={ imageURL }  border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
-					</span>
+						<Avatar  initials={ initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
 					{/if}
 				</button>
 			</svelte:fragment>
@@ -144,9 +153,9 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 
 			<div class="surface-card p-4 max-w-sm -ml-4" data-popup="popupCloseQuery">
 				<div class="grid grid-cols-1 gap-3 text-right z-50" id="userMenu">
-					{#if !$state.account}<button class="bg-gray-100 hover:bg-green-300 hover:rotate-3 btn" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
+					{#if !userAccount}<button class="bg-gray-100 hover:bg-green-300 hover:rotate-3 btn" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
 					<button class="bg-gray-100 hover:bg-orange-200 hover:-rotate-3 btn" on:click={()=>goto('/auth/register')} id="will-close"><iconify-icon icon="mdi:edit"></iconify-icon> Sign Up</button>{/if}
-					{#if $state.account !== null}<button class="bg-gray-100 hover:bg-green-300 hover:-rotate-3 btn" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
+					{#if userAccount !== null}<button class="bg-gray-100 hover:bg-green-300 hover:-rotate-3 btn" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
 					<!--button class="bg-gray-100 hover:bg-red-400 hover:rotate-3 btn" on:click={()=>goto('/auth/logout')} id="will-close"><iconify-icon icon="mdi:lock"></iconify-icon> Log Out</button>
 					<button class="bg-gray-100 hover:bg-indigo-400 hover:-rotate-3 btn" on:click={()=>goto('/help/bugs')} id="will-close"><iconify-icon icon="mdi:bug"></iconify-icon> Report a Bug</button-->
 					{/if}

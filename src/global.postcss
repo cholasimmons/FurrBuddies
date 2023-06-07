@@ -5,11 +5,18 @@
 	font-stretch: 25% 125%;
 }
 html, body {
-	@apply bg-surface-50-900-token h-full overflow-hidden font-light md:font-medium text-black dark:text-white scrollbar-hide text-[1rem];
-	@apply bg-gradient-to-tr from-purple-400 to-pink-200 dark:from-purple-950 dark:to-pink-800 ;
+	@apply h-full overflow-hidden font-normal md:font-medium scrollbar-hide text-[1rem];
+	@apply bg-gradient-to-tr from-red-300 to-pink-100 dark:from-purple-950 dark:to-pink-800 ;
 	outline: none;
 	line-height: 2rem;
+	select: none;
 	/*@apply bg-surface-50-900-token;*/
+}
+button:active {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	-webkit-tap-highlight-color: transparent;
 }
 .scrollbar-hide::-webkit-scrollbar {
 	display: none;
@@ -25,11 +32,11 @@ h3.title {
     margin-bottom: 1rem;
 }
 p {
-	margin: 0.8rem 0;
-	font-weight: 200
+	margin: 0.7rem 0;
+	font-weight: 200;
 }
 :root {
-	--theme-rounded-base: 12px;
+	--theme-rounded-base: 10px;
 	--theme-rounded-container: 4px;
 	--theme-font-family-base: 'Grandstander', sans-serif;
     --theme-font-family-heading: 'Grandstander', sans-serif;
@@ -38,7 +45,7 @@ p {
 	outline: none
 }
 form input, form select, .form input, .form select {
-	@apply bg-black bg-opacity-20 dark:text-white text-black;
+	@apply bg-orange-400 bg-opacity-20;
 	width: 100%;
 	padding: 0.7rem 1.4rem;
 	
@@ -54,6 +61,9 @@ form select {
 form select option, .form select option {
 	text-align: center;
 	padding: 1rem;
+	height:1rem;
+	margin: 12px;
+	font-size: 1.3rem
 }
 form select::after {
   content: '\25BC';
@@ -65,19 +75,14 @@ form select::after {
 }
 
 form label, .form label {
-	opacity: 0.75
+	opacity: 0.75;
 }
 form div button[type="submit"] {
 	padding: 1rem 3rem;
 	font-size: 1.2rem;
 	border-radius: 6px;
 }
-/*form button[type="submit"]:hover {
-	color:gray;
-	background-color: rgba(210, 200, 190);
-}*/
 form div button[type="submit"]:disabled {
-	/* color: darkslateblue;*/
 	opacity: 0.5;
 	cursor: not-allowed;
 }
