@@ -17,10 +17,10 @@
 </script>
 
 <main>
-    <div class="circle">
+    <div class="circle border-4 border-surface-500">
         <img src={imageURL} alt='' in:fade={{ duration: 300 }}>
     </div>
-    <p class="text-lg md:text-2xl ">{petName}</p>
+    <p class="text-lg md:text-xl font-medium">{petName}</p>
 </main>
 
 <style>
@@ -28,7 +28,7 @@
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: start;
+        justify-content: flex-start;
         align-items: center;
     }
     main div {
@@ -44,7 +44,6 @@
         width: 80%;
         padding-bottom:76%; /* Maintain 1:1 aspect ratio */
         border-radius: 50%;
-        border: #b8a 5px solid;
         overflow: hidden;
     }
     .circle > img {

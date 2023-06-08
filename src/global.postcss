@@ -5,12 +5,21 @@
 	font-stretch: 25% 125%;
 }
 html, body {
-	@apply h-full overflow-hidden font-normal md:font-medium scrollbar-hide text-[1rem];
-	@apply bg-gradient-to-tr from-red-300 to-pink-100 dark:from-purple-950 dark:to-pink-800 ;
+	@apply h-full overflow-hidden font-normal md:font-medium scrollbar-hide text-[1rem] ;
+	@apply bg-gradient-to-tr from-red-300 to-pink-100 dark:from-purple-950 dark:to-pink-800 text-slate-800;
 	outline: none;
 	line-height: 2rem;
-	select: none;
+	user-select: none;
+	background-image: url('/images/paws.webp'); /* <a href="https://www.freepik.com/free-vector/cute-colorful-kitten-pow-pattern-design_2709577.htm#query=paw%20print&position=3&from_view=keyword&track=ais">Image by starline</a> on Freepik */
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
 	/*@apply bg-surface-50-900-token;*/
+	-webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+}
+a {
+	@apply text-primary-800 dark:text-primary-300;
 }
 button:active {
 	-webkit-appearance: none;
@@ -32,8 +41,9 @@ h3.title {
     margin-bottom: 1rem;
 }
 p {
-	margin: 0.7rem 0;
-	font-weight: 200;
+	margin: 0.6rem 0;
+	font-weight: 300;
+	line-height: 1.7rem
 }
 :root {
 	--theme-rounded-base: 10px;

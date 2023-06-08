@@ -16,13 +16,21 @@
     <a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon>Setup</li></a>
     <div class="hidden md:block">
         <hr class="mx-auto ">
-        <span hidden="{ !$state.account?.$id}">
-            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen' : ''}"><li>Account</li></a>
-            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen' : ''}"><li>Sign Out</li></a>
+        <!-- If User isn't logged in -->
+        <span hidden={ !$state.account}>
+            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
+            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a>
         </span>
-        <span hidden="{ $state.account?.$id !== (null||undefined)}">
+
+        <!-- If User is successfully logged in -->
+        <span hidden={ $state.account !== null }>
             <a href="/auth/login" class="{$page.url.pathname === '/auth/login' ? 'chosen' : ''}"><li>Log In</li></a>
             <a href="/auth/register" class="{$page.url.pathname === '/auth/register' ? 'chosen' : ''}"><li>Sign Up</li></a>
+        </span>
+
+        <!-- Always show this regardless... -->
+        <span>
+            <a href="/about" class="{$page.url.pathname === '/about' ? 'chosen' : ''}"><li>About</li></a>
         </span>
     </div>
     
@@ -32,7 +40,7 @@
     ul a.chosen li, ul a.chosen li iconify-icon {
         /*background-color: rgba(128, 128, 128,0.55);*/
         /* border-right: 4px solid rgb(255, 220, 48); */
-        @apply text-white dark:text-yellow-500;
+        /* @apply text-white dark:text-yellow-500; */
         opacity: 1;
         font-weight: 400;
     }
@@ -42,21 +50,21 @@
         ul {
             font-size: 0.9rem;
             margin: 0;
-            padding: 1.4rem;
+            padding: 1.4rem 1.4rem 0.5rem 1.4rem;
             display: flex;
             flex-direction: row;
             align-items: flex-end;
-            justify-content: space-between;
+            justify-content:space-between
         }
         ul a li {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: flex-end;
             align-items: center;
             font-weight: 300;
             transition: transform 0.3s ease;
-            opacity: 0.7;
-            row-gap: 4px;
+            opacity: 0.45;
+            row-gap: 2px;
         }
 
         ul a:hover li {
@@ -77,6 +85,7 @@
             transform: translateX(8px);
             opacity: 1;
         }
+        /* Just the icon */
         ul a:hover li iconify-icon {
             transform: translateX(-8px);
             opacity: 1;
@@ -86,22 +95,24 @@
             margin-right: 1rem;
         }
 
-        ul a li, ul a li iconify-icon {
-            opacity: 0.7;
-            font-size: 1rem;
+        ul a li iconify-icon {
+            opacity: 0.6;
+            font-size: 1.2rem;
             transition: opacity 0.5s ease;
             transition: transform 0.3s ease;
         }
         ul a li, ul button li {
             display: flex;
             align-items: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 400;
             padding: 1rem 1.2rem;
             border-radius: 8px;
             position: relative;
             overflow: hidden;
             flex-grow: 1;
+            transition: opacity 0.5s ease;
+            transition: transform 0.3s ease;
         }
     }
 </style>

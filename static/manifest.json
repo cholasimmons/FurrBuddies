@@ -14,10 +14,14 @@
         }
     ],
     "id": "/",
-    "start_url": "/",
+    "start_url": "/splash",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#3E4EBB",
-    "theme_color": "#2F3BA2",
-    "description": "A cross-platform app to help Pet Owners better manage their Furr Buddies"
+    "background_color": "#4A0A60",
+    "theme_color": "#9C174E",
+    "splash": {
+        "text": "Furr Buddies",
+        "font": "Grandstander"
+    },
+    "description": "A cross-platform app to help Pet Owners manage their Furr Buddies"
 }
