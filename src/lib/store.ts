@@ -28,10 +28,27 @@ const createPets = () => {
       if(!role)return;
   
       const response = await sdk.database.listDocuments(server.database, server.collection_pets,
-        [ Query.orderDesc('')
+        [ Query.orderDesc(''), Query.select(['name','photoID'])
         ]
       );
       return set({ pets: response.documents as any});
+    },
+    viewPet: async (id: string) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID,'verified');
+      if(!role)return;
+  
+      const pet = await sdk.database.getDocument(server.database, server.collection_pets, id);
+
+      update((state) => ({
+        pets: state.pets.map((p) => {
+          if (p.$id === pet.$id){
+            return { ...p, ...pet };
+          }
+          
+          return p;
+        })
+      }))
     },
     addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
       const userID = get(state).account!.$id;
@@ -50,9 +67,7 @@ const createPets = () => {
           ownerID: [userID]
         },
         [
-          Permission.read(role),
-          Permission.update(role),
-          Permission.delete(role),
+          Permission.read(role), Permission.update(role), Permission.delete(role),
         ]
       );
       // const petphoto = await sdk.storage.createFile(server.bucket_buddies,ID.unique(),photofile)
@@ -334,6 +349,7 @@ const createState = () => {
       setLoading(true);
       state.init();
       petstate.init();
+      mail.clear();
       await sdk.account.createEmailSession(email, password);
       const session = await sdk.account.get();
       state.init(session);
@@ -345,7 +361,7 @@ const createState = () => {
       await sdk.account.deleteSession('current');
       state.init();
       petstate.init();
-      // setPrefs([]);
+      mail.clear();
       setLoading(false);
     },
     updateUserPrefs: async (prefs: Models.Preferences) => {
