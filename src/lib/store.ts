@@ -5,6 +5,8 @@ import type { Gender, IPet, Type } from './_models/pet-model';
 import type { Account } from './_models/appwrite-model';
 import type { IClinic } from './_models/clinic-model';
 import { removePrefix, getFirstName } from './_utilities/split-names';
+import type { IAd } from './_models/ad-model';
+import type { IMail } from './_models/mail-model';
 
 export type Alert = {
   color: string;
@@ -14,7 +16,9 @@ export type Alert = {
 // PETS
 
 const createPets = () => {
-  const { subscribe, update, set } = writable<IPet[]|null>([]);
+  const { subscribe, update, set } = writable({
+    pets: [] as IPet[]
+  });
 
   return {
     subscribe,
@@ -27,7 +31,7 @@ const createPets = () => {
         [ Query.orderDesc('')
         ]
       );
-      return set(response.documents as any);
+      return set({ pets: response.documents as any});
     },
     addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
       const userID = get(state).account!.$id;
@@ -53,40 +57,49 @@ const createPets = () => {
       );
       // const petphoto = await sdk.storage.createFile(server.bucket_buddies,ID.unique(),photofile)
       // document.getElementById('uploader').files[0]
-      update((n) => [pet, ...n!]);
+      update((state) => ({
+        pets: [pet, ...state.pets]
+      }));
       return pet;
     },
 
     removePet: async (pet: IPet) => {
       await sdk.database.deleteDocument(server.database, server.collection_pets, pet.$id);
-      return update((n) => n!.filter((t) => t.$id !== pet.$id));
+      
+      update((state) => ({
+        pets: state.pets.filter((t) => t.$id !== pet.$id),
+      }));
     },
+  
     updatePet: async (pet: IPet, body: {[key:string]:any[]}) => { // Partial<Pet>
       const userID = get(state).account!.$id;
       const role = Role.user(userID);
+
       await sdk.database.updateDocument(
         server.database,
         server.collection_pets,
         pet.$id,
         body,
         [
-          Permission.read(role),
-          Permission.update(role),
-          Permission.delete(role),
+          Permission.read(role), Permission.update(role), Permission.delete(role),
         ]
       );
-      return update((n) => {
-        const index = n!.findIndex((t) => t.$id === pet.$id);
-        n![index] = {
-          ...n![index],
-          ...(<IPet>pet),
-        };
-        return n;
+      
+      update((state) => {
+        const updatedPets = state.pets.map((p) => {
+          if (p.$id === pet.$id){
+            return { ...p, ...pet };
+          }
+          
+          return p;
       });
+
+      return { pets: updatedPets };
+    });
     },
-    clear: async () => {
-      return set(null);
-    },
+    init: async (pets: IPet[] = []) => {
+      return set({ pets:[] });
+    }
   };
 };
 
@@ -162,11 +175,12 @@ const createPetPhoto = () => {
     fetch: async () => {
       const userId = get(state).account!.$id;
       const role = Role.user(userId, 'verified');
-      if(!role){console.warn('User not verified');return;}
+
+      if(!role){console.warn('User not verified');throw new Error("Cannot fetch photos. User not verified");}
   
       try {
         const response: any = await sdk.storage.listFiles(server.bucket_buddies);
-        // console.log('Bucket ', response);
+        console.log('Bucket ', response);
         
         set(response.files);
       } catch (error) {
@@ -204,10 +218,25 @@ const createPetPhoto = () => {
       try {
         const photoPreview = await sdk.storage.getFilePreview(
           server.bucket_buddies,
-          id, 320, undefined, undefined, 78
+          id, 320, undefined, 'center', 75
         );
         // console.log('Bucket response: ',photoPreview);
         return photoPreview;
+      } catch (error) {
+        console.error('Failed to retrieve preview photo:', error);
+      }
+    },
+    getFile: async (id: string) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
+
+      try {
+        const photo = await sdk.storage.getFileView(
+          server.bucket_buddies, id
+        );
+        // console.log('Bucket "getFile" response: ',photo);
+        return photo;
       } catch (error) {
         console.error('Failed to retrieve preview photo:', error);
       }
@@ -218,7 +247,9 @@ const createPetPhoto = () => {
 // USER PHOTO STORAGE
 
 const createUserPhoto = () => {
-  const { subscribe, update, set } = writable([]);
+  const { subscribe, update, set } = writable({
+    userPhoto: null as URL|null
+  });
 
   return {
     subscribe,
@@ -240,8 +271,8 @@ const createUserPhoto = () => {
             Permission.delete(role)
           ]
         );
-        update((photo) =>[...photo]);
-        return photoBucket;
+        userbucketstate.getPreview(photoBucket.$id);
+        // return photoBucket;
       } catch (error) {
         console.error('Failed to add user photo:', error);
         return null;
@@ -258,10 +289,14 @@ const createUserPhoto = () => {
           id, 256, undefined, 'center', 80
         );
         // console.log('Bucket response: ',photoPreview);
-        return photoPreview;
+        set({ userPhoto: photoPreview});
+        // return photoPreview;
       } catch (error) {
         console.error('Failed to retrieve preview photo:', error);
       }
+    },
+    clearPhoto: () => {
+      set({ userPhoto: null })
     }
   }
 }
@@ -290,7 +325,7 @@ const createState = () => {
     signup: async (email: string, password: string, name: string) => {
       setLoading(true);
       state.init();
-      petstate.clear();
+      petstate.init();
       const result = await sdk.account.create('unique()', email, password, name);
       setLoading(false);
       return result;
@@ -298,7 +333,7 @@ const createState = () => {
     login: async (email: string, password: string) => {
       setLoading(true);
       state.init();
-      petstate.clear();
+      petstate.init();
       await sdk.account.createEmailSession(email, password);
       const session = await sdk.account.get();
       state.init(session);
@@ -309,7 +344,7 @@ const createState = () => {
       setLoading(true);
       await sdk.account.deleteSession('current');
       state.init();
-      petstate.clear();
+      petstate.init();
       // setPrefs([]);
       setLoading(false);
     },
@@ -341,8 +376,109 @@ const createState = () => {
   };
 };
 
+// Ads
+
+const createAdsState = () => {
+  const { subscribe, update, set } = writable<IAd[]>([]);
+
+  return {
+    subscribe,
+    fetch: async () => {
+      const verifiedUser = get(state).account?.emailVerification;
+
+      const response: any = await sdk.database.listDocuments(server.database, server.collection_ads, [ Query.limit(10), Query.equal('is_active', true)]);
+      console.log('Ads: ',response.documents);
+      
+      return set(response.documents);
+    },
+  }
+}
+
+// MAIL
+
+const createMailState = () => {
+  const { subscribe, update, set } = writable<IMail[]>([]);
+
+  return {
+    subscribe,
+    fetch: async () => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID,'verified');
+      if(!role)return;
+  
+      const response = await sdk.database.listDocuments(server.database, server.collection_mail,
+        [ Query.orderDesc(''), Query.select(['title','message','$createdAt'])
+        ]
+      );
+      return set(response.documents as any);
+    },
+    openMessage: async (id: string) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID,'verified');
+      if(!role)return;
+  
+      const response: any = await sdk.database.listDocuments(server.database, server.collection_mail,
+        [ Query.orderDesc(''), Query.select([id])
+        ]
+      );
+      return update((m) => ([response.documents, ...m]));
+    },
+    sendMessage: async (title:string|undefined = undefined, message: string, toId: string, isRead: boolean = false) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
+
+      const msg = await sdk.database.createDocument<IMail>(
+        server.database,
+        server.collection_mail,
+        ID.unique(),
+        {
+          title,
+          message,
+          toId,
+          fromId: userID,
+          ownerID: [userID],
+          isRead
+        },
+        [
+          Permission.read(role),
+          Permission.read(toId),
+          Permission.update(role),
+          Permission.update(toId),
+        ]
+      );
+      update((m) => ([msg, ...m]
+      ));
+      return msg;
+    },
+
+    isRead: async (message: IMail) => {
+      const userID = get(state).account!.$id;
+      const role = Role.user(userID);
+      if(!role)return;
+
+      const msg:any = await sdk.database.updateDocument(
+        server.database,
+        server.collection_mail,
+        message.$id,
+        {isRead: true},
+        [
+          Permission.read(role), Permission.update(role)
+        ]
+      );
+      
+      update((m) => ([msg, ...m]));
+    },
+    clear: async () => {
+      return set([]);
+    }
+  };
+};
+
 export const petstate = createPets();
 export const petbucketstate = createPetPhoto();
 export const userbucketstate = createUserPhoto();
 export const clinicstate = createClinics();
 export const state = createState();
+export const ads = createAdsState();
+export const mail = createMailState();

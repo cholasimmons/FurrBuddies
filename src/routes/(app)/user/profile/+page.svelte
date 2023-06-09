@@ -19,7 +19,7 @@
             await state.checkLoggedIn();
 
             if($state.account?.prefs.photoID)
-                file = await userbucketstate.getPreview( $state.account!.prefs.photoID );
+                userbucketstate.getPreview( $state.account!.prefs.photoID );
         } catch (error) {
             console.log('Not logged in.',error);
         }
@@ -84,7 +84,7 @@
             });
     }
 
-$: imageURL = file?.href; 
+$: imageURL = $userbucketstate.userPhoto?.href ?? ''; 
 $: userAccount = $state.account;
 $: initials = state.getInitials().href;
     

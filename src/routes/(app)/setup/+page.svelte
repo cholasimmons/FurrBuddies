@@ -118,8 +118,8 @@
 
 	<div class="flex justify-evenly items-center">
 
-		<a href="mailto:info@simmons.studio?subject=Furr Buddies | Report a bug" class="btn variant-filled-tertiary"><iconify-icon icon="mdi:bug" class="mr-3"></iconify-icon>Report a Bug</a>
-		<a href="mailto:info@simmons.studio?subject=Furr Buddies | App suggestions" class="btn variant-soft-success"><iconify-icon icon="mdi:mail" class="mr-3"></iconify-icon>Suggestions</a>
+		<a href="mailto:info@simmons.studio?subject=Furr Buddies | Report a bug" class="btn variant-soft-success"><iconify-icon icon="mdi:bug" class="mr-3"></iconify-icon>Report a Bug</a>
+		<a href="mailto:info@simmons.studio?subject=Furr Buddies | App suggestions" class="btn variant-filled-tertiary"><iconify-icon icon="mdi:mail" class="mr-3"></iconify-icon>Suggestions</a>
 	</div>
 	
 

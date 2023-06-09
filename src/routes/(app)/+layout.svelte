@@ -38,10 +38,11 @@
 
 	// "isLoading" type of boolean
 	export let data: LayoutData;
+	export const ssr = false;
 
 	// User avatar
 	let imageURL: string = '';
-	let file: URL|undefined;
+	// let file: URL|undefined;
 	let initialsRAW: URL;
 	let initials: string;
 
@@ -70,7 +71,7 @@
 			// if($state.account?.status === false)return
 			initialsRAW = state.getInitials();
 			initials = initialsRAW.href;
-			file = await userbucketstate.getPreview($state.account!.prefs.photoID);
+			await userbucketstate.getPreview($state.account!.prefs.photoID);
 			
 			toast.success('Welcome back '+getFirstName($state.account?.name || 'Stranger')+'!' );
 		} catch (error) {
@@ -111,7 +112,7 @@
 		closeQuery: '#will-close'
 	};
 
-	$: imageURL = file?.href ?? '';
+	$: imageURL = $userbucketstate.userPhoto?.href ?? '';
 	$: userAccount = $state.account;
 	
 </script>
@@ -144,7 +145,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 					{#if !userAccount}
 						<UserSVG/>
 					{:else}
-						<Avatar  initials={ initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
+						<Avatar src={ imageURL }  initials={ initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
 					{/if}
 				</button>
 			</svelte:fragment>

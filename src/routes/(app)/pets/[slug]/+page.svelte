@@ -3,33 +3,54 @@
 	import { petbucketstate, petstate, state } from '$lib/store.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-    import { Table, tableMapperValues, modalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+    import { Table, tableMapperValues, modalStore, type ModalSettings, type ModalComponent } from '@skeletonlabs/skeleton';
     import type {  TableSource } from '@skeletonlabs/skeleton';
 	import { toast } from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
 	import RichToast from '$lib/_components/RichToast.svelte';
 	import { calculateAge } from '$lib/_utilities/calculate-age.js';
+    import ImageViewComponent from '$lib/_components/ImageViewComponent.svelte';
 
     export let data;
-    let buddy: IPet;
+    let bud: IPet;
     let imageURL: string = '';
 
     //Loaders
-    let _finding = false;
+    let _finding: boolean = true;
 
-    onMount(async ()=>{    
-        _finding = true;    
-        buddy = await $petstate?.find((pet:IPet)=>pet.$id === data.Id) as IPet;
-        if(buddy.photoID!.length > 0){
-            const file: URL|undefined = await petbucketstate.getPreview(buddy.photoID![0]);
-            imageURL = file?.href || '';
+    onMount(async ()=>{
+        bud = $petstate.pets.find((pet:IPet)=>pet.$id === data.Id) as IPet;
+        if(bud.photoID!.length > 0){
+            try {
+                const file: URL|undefined = await petbucketstate.getPreview(bud.photoID![0]);
+                imageURL = file?.href ?? '';
+                _finding = false;
+            } catch (error) {
+                console.log('Could not retrieve preview. ',error);
+                _finding = false;       
+            }
         }
-        _finding = false;
+        
     });
 
-    // View, Edit, Remove Buddy image
-    function managePhoto(): void {
-        console.log('btn pressed');
+    // View Buddy image
+    function viewPhoto(): void {
+        const modalComponent: ModalComponent = {
+            // Pass a reference to your custom component
+            ref: ImageViewComponent,
+            // Add the component properties as key/value pairs
+            props: {ids: bud.photoID, name: bud.name},
+            // Provide a template literal for the default component slot
+            // slot: undefined
+        };
+        const viewImage: ModalSettings = {
+            type: 'component',
+            // Pass the component directly:
+            component: modalComponent,
+        };
+    
+        if(imageURL === '')return;
+        modalStore.trigger(viewImage);
     }
 
     const sourceData = [
@@ -63,7 +84,7 @@
         // Prompt Modal to confirm decision to delete Buddy, with an added layer of security
         const promptModal: ModalSettings = {
             type: 'prompt',
-            title: 'Remove '+buddy.name+'?',
+            title: 'Remove '+bud.name+'?',
             body: 'Enter your Buddy\'s name below.',
             // Populates the input value and attributes
             value: '',
@@ -71,17 +92,18 @@
             // Returns the updated response value
             response: async (r: string) => {
                 // Verify input name and pet's name are the same, then delete pet
-                if(r !== buddy.name)return;
-                await petstate.removePet(buddy);
+                if(r !== bud.name)return;
+                await petstate.removePet(bud);
                 goto('/pets');
-                toast.success(buddy.name+' was removed.')
+                toast.success(bud.name+' was removed.')
             },
         };
         modalStore.trigger(promptModal);
         
         // Implement a countdown toast to allow User to change their mind
     }
-        
+
+    $: buddy = bud;
 </script>
 
 <!-- HTML head -->
@@ -94,16 +116,16 @@
 <main>
     <div class="w-full flex justify-center items-center py-6 relative bg-primary-300 bg-opacity-10">
         <div class="w-40 h-40 bg-red-300 rounded-full overflow-hidden">
-        <img on:click={managePhoto} on:keypress src={imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
+        <img on:click={viewPhoto} on:keypress src={imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
         </div>
     </div>
 
     <!-- Buddy's Profile -->
     <section class="text-lg xl:text-2xl mt-6 text-center px-{data.padding}">
         <h2 class="title p-0 flex justify-center gap-2 text-4xl">{buddy?.name || ''} {#if _finding}<iconify-icon icon="line-md:loading-alt-loop"></iconify-icon>{/if}</h2>
-        { #if buddy?.dob }<p class="m-0 text-500">
+        { #if bud?.dob }<p class="m-0 text-500">
             <iconify-icon icon="mdi:calendar" type="date" class="mr-2 opacity-60"></iconify-icon>
-            <small title={ 'Born: '+buddy?.dob.toString() }>{ calculateAge(buddy?.dob) } </small></p>
+            <small title={ 'Born: '+bud?.dob.toString() }>{ calculateAge(bud?.dob) } </small></p>
         {/if}
         
         <hr class="my-6">
@@ -125,8 +147,8 @@
     <hr class="my-6">
 
     <section class="surface-300 flex justify-evenly py-12 px-{data.padding}">
-        <button class="btn variant-ghost-success hover:bg-green-700" on:click={editBuddy}>Edit {buddy?.name || 'Buddy'}</button>
-        <button class="btn variant-ghost-warning hover:bg-red-600" on:click={removeBuddy}>Delete {buddy?.name || 'Buddy'}</button>
+        <button class="btn variant-ghost-success hover:bg-green-700" on:click={editBuddy}>Edit {bud?.name || 'Buddy'}</button>
+        <button class="btn variant-ghost-warning hover:bg-red-600" on:click={removeBuddy}>Delete {bud?.name || 'Buddy'}</button>
     </section>
 
 </main>

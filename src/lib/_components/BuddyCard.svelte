@@ -5,20 +5,26 @@
 	import { fade } from "svelte/transition";
 
     export let petName: string;
-    export let photoID: string[] = [];
+    export let photoID: string;
+    
+    let _loading: boolean = true;
     let imageURL: string = '';
 
     onMount(async ()=>{
-        if(photoID.length > 0){
-            const file: URL|undefined = await petbucketstate.getPreview(photoID[0]);
-            imageURL = file?.href || '';
-        }
+        if(!photoID) return;
+
+        _loading = true;
+
+        const file: URL|undefined = await petbucketstate.getPreview(photoID);
+        imageURL = file?.href ?? '';
+
+        _loading = false;
     });
 </script>
 
 <main>
     <div class="circle border-4 border-surface-500">
-        <img src={imageURL} alt='' in:fade={{ duration: 300 }}>
+        <img src={ _loading ? '/icons/clock.svg' : imageURL} alt='' in:fade={{ duration: 300 }}>
     </div>
     <p class="text-lg md:text-xl font-medium">{petName}</p>
 </main>

@@ -8,6 +8,8 @@
 
    // Finally, your application's global stylesheet (sometimes labeled 'app.css')
    import '../../global.postcss';
+   
+   export const ssr = false;
 </script>
 
 

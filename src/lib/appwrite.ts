@@ -6,6 +6,7 @@ const server = {
   collection_pets: import.meta.env.VITE_APP_COLLECTION_PETS.toString(),
   collection_clinics: import.meta.env.VITE_APP_COLLECTION_CLINICS.toString(),
   collection_mail: import.meta.env.VITE_APP_COLLECTION_MAIL.toString(),
+  collection_ads: import.meta.env.VITE_APP_COLLECTION_CAROUSEL.toString(),
   database: import.meta.env.VITE_APP_DATABASE_ID.toString(),
   bucket_buddies: import.meta.env.VITE_APP_BUCKET_PETS.toString(),
   bucket_clinics: import.meta.env.VITE_APP_BUCKET_VETS.toString(),

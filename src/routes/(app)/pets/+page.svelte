@@ -24,6 +24,7 @@
             // Must be logged in so fetch buddy photos
             await petbucketstate.fetch();
             _loading=false;
+            
         } catch (error: any) {
             console.warn('Unable to fetch Pets. ',error.message);
             _loading=false;
@@ -31,6 +32,7 @@
     });
 
     $: account = $state.account;
+    $: pets = $petstate.pets;
 </script>
 
 <!-- HTML head -->
@@ -68,7 +70,7 @@
 
     <!-- Display Buddies if User is logged in and has buddies, otherwise no Buddies shown-->
 
-    {#if !$petstate?.length }
+    {#if !pets?.length }
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
             <p class="text-3xl opacity-70 m-0 mb-3">No Buddies yet</p>
             {#if !account?.$id}
@@ -84,10 +86,10 @@
     {:else}
         <!-- Display each available buddy -->
         <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
-            {#each $petstate as pet, i}
-            <a href="/pets/{pet.$id}" on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
-                <BuddyCard petName={pet.name} photoID={pet.photoID} />
-            </a>
+            {#each pets as pet, i}
+                <span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
+                    <BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />
+                </span>
             {/each}
         </div>
     {/if}
