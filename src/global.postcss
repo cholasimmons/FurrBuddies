@@ -5,7 +5,7 @@
 	font-stretch: 25% 125%;
 }
 html, body {
-	@apply h-full overflow-hidden font-normal md:font-medium scrollbar-hide text-[1rem] ;
+	@apply h-full overflow-hidden font-light md:font-medium scrollbar-hide text-[0.92rem] ;
 	@apply bg-gradient-to-tr from-red-300 to-pink-100 dark:from-purple-950 dark:to-pink-800 text-slate-800;
 	outline: none;
 	line-height: 2rem;
@@ -19,7 +19,7 @@ html, body {
     tap-highlight-color: transparent;
 }
 a {
-	@apply text-primary-800 dark:text-primary-300;
+	@apply text-primary-800 dark:text-primary-200;
 }
 button:active {
 	-webkit-appearance: none;
@@ -35,8 +35,8 @@ button:active {
 	-ms-overflow-style: none;  /* IE and Edge */
 	scrollbar-width: none;  /* Firefox */
 }
-h3.title {
-    font-size: 1.5rem;
+.title {
+    font-size: 1.3rem;
     font-weight: 200;
     margin-bottom: 1rem;
 }
@@ -55,9 +55,9 @@ p {
 	outline: none
 }
 form input, form select, .form input, .form select {
-	@apply bg-orange-400 bg-opacity-20;
+	@apply bg-surface-300 bg-opacity-70 dark:bg-opacity-30  ;
 	width: 100%;
-	padding: 0.7rem 1.4rem;
+	padding: 0.5rem 1.2rem;
 	
 	border-radius: 0.6rem;
 	
@@ -66,20 +66,21 @@ form input, form select, .form input, .form select {
 	transition: border 0.2s ease-in;
 }
 form select {
-	padding: 1.1rem 0;
+	padding: 1rem;
+	text-align: center;
 }
 form select option, .form select option {
 	text-align: center;
 	padding: 1rem;
-	height:1rem;
 	margin: 12px;
-	font-size: 1.3rem
+	font-size: 1.2rem;
+	color: black
 }
 form select::after {
   content: '\25BC';
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 24px;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -88,7 +89,7 @@ form label, .form label {
 	opacity: 0.75;
 }
 form div button[type="submit"] {
-	padding: 1rem 3rem;
+	padding: 0.7rem 2rem;
 	font-size: 1.2rem;
 	border-radius: 6px;
 }

@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Clinic } from '$lib/_models/clinic-model';
-	import { clinicstate } from '$lib/store';
+	import type { IClinic } from '$lib/_models/clinic-model';
+	import { clinicstate } from '$lib/_stores/auth_store.js';
 	import { onMount } from 'svelte';
 
     export let data;
-    let clinic: Clinic;
+    let clinic: IClinic;
 
     onMount(async ()=>{        
-        clinic = await $clinicstate.find((clinic:Clinic)=>clinic.$id === data.id) as Clinic
+        clinic = await $clinicstate.find((clinic:IClinic)=>clinic.$id === data.id) as IClinic
         console.debug(clinic)
     });
 </script>

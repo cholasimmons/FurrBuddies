@@ -13,7 +13,7 @@
 </script>
 
 
-<main class="h-full w-full bg-gradient-to-tr from-red-300 to-pink-100 dark:from-purple-950 dark:to-pink-800 text-slate-800">
+<main class="h-full w-full bg-gradient-to-tr from-[#313A50] to-[#6376A3] text-slate-100">
    <slot/>
 </main>
 

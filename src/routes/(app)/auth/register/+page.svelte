@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-    import { state } from "$lib/store";
+    import { state } from "$lib/_stores/auth_store.js";
 	import toast from "svelte-french-toast";
 	import { fly } from "svelte/transition";
     import { form, field } from 'svelte-forms';
-    import { required, email, pattern } from 'svelte-forms/validators';
+    import { required, email, pattern, min } from 'svelte-forms/validators';
 
     export let data;
 
@@ -19,11 +19,16 @@
     // and allows (or not) the use of any non-alphanumeric characters
     const regExPattern3 = /^(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*()-_+=~`[\]{}|\\:;"'<>,.?/]{6,}$/;
 
+    // RegEx pattern for the phoneNumber input field
+    const phoneRegEx = /^(\d{1,12})?$/;
+
     // svelte-forms form and validation = https://chainlist.github.io/svelte-forms/
-    const fname = field('name', '', [required()]);
+    const fname = field('name', '', [required(),min(1)]);
+    const fphone = field('phoneNumber', '', [pattern(phoneRegEx)]);
+    const fgender = field('gender', undefined, []);
     const femail = field('email', '', [required(), email()]);
     const fpassword = field('password', '', [required(), pattern(regExPattern3)]);
-    const registrationForm = form(fname,femail,fpassword);
+    const registrationForm = form(fname,fphone,fgender,femail,fpassword);
 
     // Sign Up with Appwrite :)
     const signup = async () => {
@@ -33,16 +38,30 @@
         try {
             _registering = true;
             await state.signup($femail.value, $fpassword.value, $fname.value);
-            await state.login($femail.value, $fpassword.value);
-            registrationForm.clear;
-            goto("/");
+            await submitPrefs(parseInt($fphone.value),$fgender.value);
+            toast.success("Your account has been created.");
+            registrationForm.reset;
+            _registering = false;
+            goto("/", {replaceState: true});
+            toast.custom('Verification link sent to your email', {icon: '📨'})
         } catch (error: any) {
-            // state.alert({ color: "red", message: error.message });
             toast.error(error.message, { style: "red" });
-        } finally {
             _registering = false;
         }
     };
+
+    async function submitPrefs(phoneNumber: number|undefined, gender: string|undefined) {
+        await state.updateUserPrefs({'phoneNumber': phoneNumber, 'gender': gender})
+    }
+
+    // Sanitize numeric input in form, phone number
+    function validateNumericInput(event:any) {
+        // console.log(event.target.value);
+        
+        const value = event.target.value;
+        const numericValue = value.replace(/\D/g, '').slice(0, 12);
+        fphone.set(numericValue);
+    }
 
 </script>
 
@@ -53,9 +72,9 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding} pb-24">
     <!--h3 class="title text-center">Sign Up</h3-->
-    <p class="mt-0 text-center">
+    <p class="mt-0 text-center text-sm">
         Already registered ?
         <span class="text-primary-500">
             <a href="/auth/login"> Log In </a>
@@ -65,13 +84,13 @@
     <section class="flex justify-center">
         <div class="flex-grow flex flex-col max-w-lg justify-center">
             
-            <form on:submit|preventDefault="{signup}">
+            <form on:submit|preventDefault={signup}>
                 
             <!-- User Names-->
 
-                <label class="block mt-6" for="name"> Full Name</label>
+                <label class="block mt-6" for="fullname"> Full Name</label>
                 <!-- svelte-ignore a11y-autofocus -->
-                <input id="name" type="text" autofocus class:invalid={!$fname.valid} placeholder="Chola Simmons"
+                <input id="fullname" type="text" autofocus class:invalid={!$fname.valid} placeholder="Chola Simmons"
                     bind:value="{$fname.value}" />
                     <!-- I use the red border notification above, instead of the below text -->
                     <!--
@@ -83,7 +102,7 @@
             <!-- User Email-->
 
                 <label class="block mt-6" for="email"> Email</label>
-                <input id="email" type="text" class:invalid={!$femail.valid} placeholder="yourname@email.add"
+                <input id="email" type="text" inputmode="email" class:invalid={!$femail.valid} placeholder="yourname@email.add"
                     bind:value="{$femail.value}"/>
                     {#if !$femail.valid && $femail.value}
                         <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right">This is not a valid email address.</p>
@@ -92,12 +111,32 @@
             <!-- User Password-->
 
                 <label class="block mt-6" for="password"> Password</label>
-                <input id="password" type="password" class:invalid={!$fpassword.valid} placeholder="passWORD"
+                <input id="password" type="password" inputmode="text" class:invalid={!$fpassword.valid} placeholder="passWORD"
                     bind:value="{$fpassword.value}" />
                     {#if !$fpassword.valid && $fpassword}
                         <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right"
                         >Minimum 6 characters, at least one uppercase letter.</p>
                     {/if}
+
+            <!-- Optional -->
+                <hr>
+
+            <!-- User Phone Number (Optional) -->
+
+                <label class="block mt-6" for="phoneNumber"> Phone Number</label>
+                <!-- svelte-ignore a11y-autofocus -->
+                <input id="phoneNumber" type="tel" on:input={validateNumericInput} bind:value="{$fphone.value}"
+                    inputmode="tel" class:invalid={!$fphone.valid} placeholder="Optional"/>
+
+            <!-- User Gender (Optional) -->
+
+                <label class="block mt-6" for="gender"> Gender</label>
+                <!-- svelte-ignore a11y-autofocus -->
+                <select id="gender" bind:value="{$fgender.value}" class:invalid={!$fphone.valid} placeholder="Optional">
+                    <option value={null}>Undisclosed</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
 
             <!-- Form Buttons (Clear Form & Submit) -->
 
@@ -105,7 +144,7 @@
                     <button disabled={!$registrationForm.dirty} on:click={registrationForm.reset} type="reset">
                         Clear Form
                     </button>
-                    <button disabled={!$registrationForm.valid || _registering} type="submit">
+                    <button disabled={!$registrationForm.valid || _registering || $fname.value.length < 1} class="btn variant-filled-warning" type="submit">
                         {#if _registering}Registering{:else}Register{/if} 
                     </button>
                 </div>
@@ -113,52 +152,3 @@
         </div>
     </section>
 </main>
-
-<style>
-* {
-    outline: none
-}
-form input {
-	width: 100%;
-    padding: 1.2rem 1.6rem;
-
-	border-radius: 0.6rem;
-	background-color: rgba(255, 255, 255, 0.2);
-	color: white;
-	font-size: 1.2rem;
-    border: 3px transparent solid;
-    transition: border 0.2s ease-in;
-}
-
-form label {
-	opacity: 0.75
-}
-form button[type="submit"] {
-    padding: 1rem 3rem;
-    font-size: 1.2rem;
-    background-color:darksalmon;
-    border-radius: 6px;
-    color:white
-}
-form button[type="submit"]:hover {
-    color:gray;
-    background-color: rgba(210, 200, 190);
-}
-form button[type="submit"]:disabled {
-    color: darkslateblue;
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-form button[type="reset"] {
-    padding: 1rem 3rem 1rem 0;
-    font-size: 1.2rem;
-    background-color:none;
-    color:lightsalmon
-}
-form button[type="reset"]:hover {
-    color:lightcyan
-}
-input.invalid {
-    border: 3px red solid;
-}
-</style>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { IMail } from '$lib/_models/mail-model.js';
-	import { state } from '$lib/store.js';
+	import { state } from '$lib/_stores/auth_store.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
     import { modalStore, type ModalSettings } from '@skeletonlabs/skeleton';

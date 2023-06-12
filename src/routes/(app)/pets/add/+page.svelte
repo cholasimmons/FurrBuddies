@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
     import { Gender, Type, type IPet } from "$lib/_models/pet-model";
-	import { petbucketstate, petstate } from "$lib/store";
+	import { petbucketstate, petstate } from "$lib/_stores/auth_store.js";
 	import { Avatar } from "@skeletonlabs/skeleton";
 	import { field, form } from "svelte-forms";
 	import { email, min, pattern, required } from "svelte-forms/validators";
@@ -35,7 +36,7 @@
         try {
             // Add valid form details to Appwrite collection
             const petDoc:any = await petstate.addPet($fname.value,$ftype.value,$fgender.value,$fbreed.value);
-            console.log('Returned after adding pet to appwrite: ',petDoc);
+            // console.log('Returned after adding pet to appwrite: ',petDoc);
             
             // a small variable to notify us with an emoji in the toast, if a photo was uploaded too
             let _photoSuccess: boolean = false;
@@ -50,10 +51,11 @@
                 _photoSuccess = true;
                 _uploadingPhoto = false
             }
-            toast.success('Added '+$fname.value+' to the family!',{icon: _photoSuccess ? '📸' : ''});
+
+            toast.success('Added ' + $fname.value + ' to the family!', {icon: _photoSuccess ? '📸' : ''});
             addPetForm.clear();
             _adding = false;
-            _uploadingPhoto = false;
+            goto('/pets');
         } catch (error: any) {
             // state.alert({ color: 'red', message: petName+' was not added. '+error.message})
             console.warn('Unable to add '+$fname.value+'. ',error.message);
@@ -69,7 +71,7 @@
 
             reader.onload = function(e) {
                 const imagePreview = document.getElementById('imagePreview');
-                imagePreview!.innerHTML = `<img src="${e.target!.result}" alt="" class="object-fit object-cover object-center" />`;
+                imagePreview!.innerHTML = `<img src="${e.target!.result}" alt="" class="w-28 h-28 object-fit object-cover object-center" />`;
             };
 
             reader.readAsDataURL(photoFile);

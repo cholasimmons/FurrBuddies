@@ -17,10 +17,11 @@ export const getFirstName = (fullname: string) => {
 export const removePrefix = (fullname: string) => {
     const namesArray = fullname.split(" "); // Split the names into an array of words
 
-    if (namesArray.length > 0) {
+    if (namesArray.length > 1) {
         if(dictionary.includes(namesArray[0])){
             const newArray = namesArray.slice(0,1);
-            return newArray.join(' ');
+            const names = newArray.join(' ');
+            return names.trim();
         }
         return fullname; // Return original full names
     }

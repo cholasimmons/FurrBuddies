@@ -10,14 +10,13 @@
     // Finally, your application's global stylesheet (sometimes labeled 'app.css')
     import '../../global.postcss';
 
-    import {AppShell, AppBar, Avatar, LightSwitch } from '@skeletonlabs/skeleton';
+    import {AppShell, AppBar, Avatar, LightSwitch, setModeUserPrefers, setModeCurrent, modeCurrent, getModeUserPrefers } from '@skeletonlabs/skeleton';
 	import { storePopup, popup, Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent, PopupSettings } from '@skeletonlabs/skeleton';
 
 	// Theme features
 	// import { setInitialClassState } from '@skeletonlabs/skeleton';
 	// import { autoModeWatcher } from '@skeletonlabs/skeleton';
-	import { modeOsPrefers, modeUserPrefers, modeCurrent } from '@skeletonlabs/skeleton';
 
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
@@ -28,22 +27,20 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import type { LayoutData } from './auth/$types';
 	import { onMount } from 'svelte';
-	import { state, userbucketstate } from '$lib/store';
+	import { state, userbucketstate } from '$lib/_stores/auth_store';
 	import { fade, slide } from 'svelte/transition';
 	import BackButton from '$lib/_components/icons/BackButton.svelte';
 	import { page } from '$app/stores';
 	import RightPage from '$lib/_components/RightPage.svelte';
 	import { goto } from '$app/navigation';
-	import { getFirstName } from '$lib/_utilities/split-names';
+	import { getFirstName, removePrefix } from '$lib/_utilities/split-names';
+	import { appSettings } from '$lib/_stores/settings_store';
 
 	// "isLoading" type of boolean
 	export let data: LayoutData;
-	export const ssr = false;
 
 	// User avatar
 	let imageURL: string = '';
-	// let file: URL|undefined;
-	let initialsRAW: URL;
 	let initials: string;
 
 	// Routes to display in the AppBar via getRouteName() function below
@@ -64,22 +61,24 @@
 		'/user/profile': 'User Profile',
 	};
 
-
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
-			// if($state.account?.status === false)return
-			initialsRAW = state.getInitials();
-			initials = initialsRAW.href;
-			await userbucketstate.getPreview($state.account!.prefs.photoID);
 			
 			toast.success('Welcome back '+getFirstName($state.account?.name || 'Stranger')+'!' );
+
+			// Personalize App
+			setModeUserPrefers($state.account?.prefs.lightMode ?? $appSettings.lightMode);
+			setModeCurrent($state.account?.prefs.lightMode ?? $appSettings.lightMode);
+			setModeCurrent($modeCurrent); 
+			
+			// state.updateUserPrefs({'lightMode':$modeCurrent})
+			// Demo of User Prefs as settings
+			// appSettings.setSettings('showCarousel', $state.account?.prefs.showCarousel ?? $appSettings.showCarousel)
 		} catch (error) {
 			// console.warn('No signed in User.');
 			toast.error('Hello there Stranger', {icon: '👋🏾'});
-		} finally {
-			modeUserPrefers.set($state.account?.prefs.theme === 'dark' ? true : false);
-			modeCurrent.set(true);
+			modeCurrent.set($appSettings.lightMode ? true : false);
 		}
 	});
 
@@ -101,10 +100,7 @@
 		return data.appName;
 	}
 
-    /*function scrollHandler(event: any & { currentTarget: EventTarget & HTMLDivElement; }) {
-		// console.log(event.currentTarget.scrollTop);
-	}*/
-
+	// Dropdown menu from the avatar icon
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	const popupCloseQuery: PopupSettings = {
 		event: 'click',
@@ -112,8 +108,14 @@
 		closeQuery: '#will-close'
 	};
 
+	function debug(e:any) {
+		console.log(e);
+	}
+
 	$: imageURL = $userbucketstate.userPhoto?.href ?? '';
 	$: userAccount = $state.account;
+	$: initials = $state.initials ?? '';
+	$: { state.updateUserPrefs({'lightMode': $modeCurrent}); }
 	
 </script>
 
@@ -145,7 +147,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 					{#if !userAccount}
 						<UserSVG/>
 					{:else}
-						<Avatar src={ imageURL }  initials={ initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-[3rem]" />
+						<Avatar src={ imageURL ? imageURL : initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[3px] border-red-500'}" width="w-[3rem]" title={ getFirstName(userAccount.name ?? '')} />
 					{/if}
 				</button>
 			</svelte:fragment>
@@ -155,12 +157,12 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 			<div class="surface-card p-4 max-w-sm -ml-4" data-popup="popupCloseQuery">
 				<div class="grid grid-cols-1 gap-3 text-right z-50" id="userMenu">
 					{#if !userAccount}
-						<button class="bg-gray-100 hover:bg-green-300 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
+						<button class="bg-surface-100 hover:bg-green-300 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
 						<button class="bg-gray-100 hover:bg-orange-200 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/register')} id="will-close"><iconify-icon icon="mdi:edit"></iconify-icon> Sign Up</button>
 					{:else if userAccount}
-						<button class="bg-gray-100 hover:bg-green-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
-						<!--button class="bg-gray-100 hover:bg-red-400 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/auth/logout')} id="will-close"><iconify-icon icon="mdi:lock"></iconify-icon> Log Out</button>
-						<button class="bg-gray-100 hover:bg-indigo-400 hover:rotate-3 btn btn-lg" on:click={()=>goto('/help/bugs')} id="will-close"><iconify-icon icon="mdi:bug"></iconify-icon> Report a Bug</button-->
+						<button class="bg-surface-100 hover:bg-green-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
+						<button class="bg-gray-100 hover:bg-red-400 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/auth/logout')} id="will-close"><iconify-icon icon="mdi:lock"></iconify-icon> Log Out</button>
+						<button class="bg-gray-100 hover:bg-indigo-400 hover:rotate-3 btn btn-lg" on:click={()=>goto('/help/bugs')} id="will-close"><iconify-icon icon="mdi:bug"></iconify-icon> Report a Bug</button>
 					{/if}
 						<button class="bg-gray-100 hover:bg-pink-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/about')} id="will-close"><iconify-icon icon="mdi:about"></iconify-icon> About</button>
 					

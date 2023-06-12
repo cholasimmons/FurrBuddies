@@ -1,7 +1,7 @@
 // layout-service.ts
 
 import { writable } from 'svelte/store';
-import { state } from '$lib/store';
+import { state } from '$lib/_stores/auth_store';
 import type { Models } from 'appwrite/types/models';
 import { onMount } from 'svelte';
 

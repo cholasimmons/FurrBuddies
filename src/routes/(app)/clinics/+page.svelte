@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { clinicstate, state } from "$lib/store";
+	import { clinicstate, state } from "$lib/_stores/auth_store.js";
 	import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
     import 'iconify-icon';
@@ -12,6 +12,9 @@
     // "isLoading" type of boolean
     let _loading: boolean = false;
 
+    // Layout data
+    let isGrid: boolean = true;
+
     onMount(async ()=>{
         _loading = true;
         try {
@@ -22,6 +25,9 @@
             _loading = false;
         }
     });
+
+    $:clinics = $clinicstate;
+    $:account = $state.account;
 </script>
 
 <!-- HTML head -->
@@ -32,26 +38,39 @@
 
 <!-- HTML body -->
 <main class="px-{data.padding}">
+
     <h3 class="title flex justify-between items-center">
-        <button hidden={!$clinicstate.length} on:click|preventDefault={()=>goto('/clinics/register')} type="button" class="btn btn-sm bg-gradient-to-br variant-gradient-secondary-tertiary shadow-[0_4px_4px_rgba(0,0,0,0.2)] hover:shadow-none">
-            <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span>
-            <span>Own a Clinic?</span>
-        </button>
-        {#if _loading}<LoadingClock/>{/if}
+        <!-- Left Panel -->
+        <div class="flex items-center gap-2">
+            <button in:fade={{ duration:100, delay:100}} hidden={!clinics.length} on:click|preventDefault={()=>goto('/clinics/register')} type="button" class="btn btn-sm variant-filled-secondary">
+                <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span>
+                <span>Own a Clinic?</span>
+            </button>
+            {#if _loading}<span in:fade={{duration:800}} out:fade={{duration:800}}><LoadingClock /></span>{/if}
+        </div>
+
+        <!-- Right Panel -->
+        <div class="flex items-center gap-2 ">
+            <button class="btn-icon" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
+            <button class="btn-icon" type="button" on:click={()=>isGrid = !isGrid}><iconify-icon icon="mdi:{isGrid ? 'grid' : 'format-list-bulleted-square'}"></iconify-icon></button>
+        </div>
     </h3>
 
-    {#if !$clinicstate.length}
+    {#if !clinics.length}
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
-            <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>
+            
             {#if _loading}
-            <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm m-0 animate-pulse">Searching...</p>
+                <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class=" m-0 animate-pulse">Searching...</p>
+            {:else}
+                <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>
             {/if}
+
         </section>
     {:else}
-        <div in:fade={{ duration: 300, delay:400 }} class="my-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {#each $clinicstate as clinic, index}
+        <div in:fade={{ duration: 300, delay:300 }} class="my-8 {isGrid ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3' : 'flex flex-col'} gap-4">
+            {#each clinics as clinic, index}
             <a href="/clinics/{clinic.$id}">
-                <ClinicCard clinicName={clinic.name}/>
+                <ClinicCard clinicName={clinic.name} layout={isGrid}/>
             </a>        
             {/each}
         </div>

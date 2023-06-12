@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-    import { state } from "$lib/store";
+    import { state } from "$lib/_stores/auth_store.js";
     import { form, field } from 'svelte-forms';
     import { required, email, pattern } from 'svelte-forms/validators';
 	import toast from "svelte-french-toast";
@@ -32,11 +32,12 @@
         _authenticating = true;
         try {
             await state.login($femail.value, $fpassword.value);
-            history.back();
+            goto('/');
             _authenticating = false;
         } catch (error: any) {
             // state.alert({ color: "red", message: error.message });
-            toast.error(error.message)
+            toast.error(error.message);
+            console.log(error.message);
             _authenticating = false;
         }
     };
@@ -51,8 +52,8 @@
 
 <!-- HTML body -->
 <main class="px-{data.padding}">
-    <!--h3 class="title text-center">Login</h3-->
-    <p class="mt-0 text-center">
+
+    <p class="mt-0 text-center text-sm">
         Don't have an account yet?
         <span class="text-surface-600 font-bold">
             <a href="/auth/register"> Sign Up </a>
@@ -86,16 +87,16 @@
             <!-- Form Buttons (Clear Form & Submit) -->
 
                 <div class="mt-6 flex justify-between items-center">
-                    <button disabled={!$loginForm.dirty} on:click={loginForm.reset} type="reset">
-                        Clear Form
+                    <button disabled={!$loginForm.dirty} on:click={loginForm.reset} type="reset" class="btn btn-sm text-base">
+                        Reset
                     </button>
-                    <button disabled={ !($loginForm.valid && $femail.value) || _authenticating} class="btn variant-filled-warning" type="submit">
+                    <button disabled={ !($loginForm.valid && $femail.value) || _authenticating} class="btn btn-sm variant-filled-warning" type="submit">
                         {#if _authenticating}Logging In{:else}Log In{/if} 
                     </button>
                 </div>
             </form>
 
-            <p class="mt-8 text-center">
+            <p class="mt-8 text-center text-sm">
                 Can't remember your password?
                 <span class="text-primary-500">
                     <a href="/auth/pass-forgot"> Reset Password </a>

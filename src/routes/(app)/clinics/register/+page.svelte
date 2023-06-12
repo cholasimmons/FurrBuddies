@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 	import { emailValidator } from '$lib/_utilities/validators';
-	import { clinicstate, state } from '$lib/store.js';
+	import { clinicstate, state } from '$lib/_stores/auth_store.js';
 	import { modalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { field, form } from 'svelte-forms';
 	import { required } from 'svelte-forms/validators';
@@ -54,6 +54,8 @@
         */
     };
 
+    $:account = $state.account;
+
 </script>
 
 <!-- HTML head -->
@@ -64,7 +66,7 @@
 
 <!-- HTML body -->
 <main class="px-{data.padding}">
-    {#if $state.account?.$id && $state.account?.emailVerification}
+    {#if account && account?.emailVerification}
         <p class="mt-0 text-center">
             Please fill in the form
         </p>
@@ -118,12 +120,15 @@
         </div>
         </section>
     {:else}
-        <section class="h-full flex flex-col items-center justify-center">
-            <h3 class="title">You need to be signed in to a verified account<br>to be able to register a new Clinic</h3>
+        <section class="h-full flex flex-col items-center justify-center mt-6">
+            <iconify-icon icon="mdi:lock" class="text-2xl"></iconify-icon>
+            <p class="text-lg">You need to be signed in and verified before you can proceed</p>
 
-            <button on:click={()=>goto('/auth/login')} class="my-6 btn variant-filled w-[10rem]">
-                Log In
-            </button>
+            {#if !account }
+                <button on:click={()=>goto('/auth/login')} class="my-6 btn shadow-xl hover:shadow-none w-[10rem]">
+                    Log In
+                </button>
+            {/if}
         </section>
     {/if}
 </main>

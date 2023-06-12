@@ -2,12 +2,15 @@
 	import Carousel from 'svelte-carousel';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { ads, clinicstate, petstate, state } from '$lib/store';
+	import { ads, clinicstate, petstate, state } from '$lib/_stores/auth_store.js';
 	import { onMount } from 'svelte';
 	import { fade, fly, slide, type crossfade } from 'svelte/transition';
 	import { Gender, Type } from '$lib/_models/pet-model.js';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 	import BuddyCard from '$lib/_components/BuddyCard.svelte';
+	import { getFirstName } from '$lib/_utilities/split-names';
+	import { appSettings } from '$lib/_stores/settings_store.js';
+	import { cubicInOut } from 'svelte/easing';
 
 	export let data;
 
@@ -15,10 +18,18 @@
 	let _loadingVets: boolean = true;
 	let _loadingPets: boolean = true;
 
+	// Activation Email Loader
+	let _sending: boolean = false;
+	let _sent: boolean = false;
+
 	onMount(async ()=>{
 		ads.fetch();
 		try {
 			await state.checkLoggedIn();
+
+			if($state.account?.prefs.showCarousel){
+				ads.fetch();
+			}
 
 			await petstate.fetch();
 			_loadingPets = false;
@@ -50,6 +61,14 @@
 		return petCount;
 	}
 
+	// Resend email with verification link
+    async function resendActivationEmail() {
+        _sending = true;
+        await state.sendVerificationEmail();
+        _sent = true;
+        _sending = false;
+    }
+
 	const dashboardItems = [
 		{name: 'Dog', value: countAnimalTypes(Type.DOG), icon: 'mdi:dog', title: 'Your available Dog\'s'},
 		{name: 'Cat', value: countAnimalTypes(Type.CAT), icon: 'mdi:cat', title: 'Your available Cat\'s'},
@@ -78,11 +97,11 @@
 </svelte:head>
 
 <!-- HTML body -->
-<main>
+<main class="px-{data.padding}">
 
 	<!-- Carousel -->	
 
-	{#if browser && carousel.length>0}
+	{#if browser && carousel.length>0 && $appSettings.showCarousel }
 		<!-- Carousel containing information/ads from the server -->
 		<div class="max-w-xl mx-auto max-h-[14rem] rounded-2xl overflow-hidden">
 		<Carousel autoplay autoplayDuration={4400} pauseOnFocus={false} dots={false} arrows={false} swiping={true}>
@@ -101,11 +120,10 @@
 			{/each}
 		</Carousel>
 		</div>
-	{:else}
+	{:else if $appSettings.showLandingImage}
 		<!-- If no carousel items, display default static welcome image -->
-
 		<div class=" mx-auto w-full max-h-[12rem] rounded-2xl overflow-hidden">
-			<img src="images/Welcome.webp" alt="Welcome" class="w-full h-[12rem] object-cover object-center">
+			<img src={ $appSettings.landingImage } alt="Welcome" class="w-full h-[12rem] object-cover object-center">
 		</div>
 	{/if}
 
@@ -116,21 +134,28 @@
 
 		{#if !account || !account.emailVerification}
 			<div in:fade={{ duration:300 }} out:fade={{ duration: 150 }} class="my-8 w-full flex flex-col items-center justify-center">
-				<h3 class="w-full title text-center">A new account awaits you</h3>
+				<h3 class="w-full title text-center">{ !account ? 'A' : 'Your' } new account awaits you { !account?.emailVerification ? getFirstName(account?.name??'') : '' }</h3>
 				{#if account?.emailVerification === false}
-					<button on:click={()=>goto('/auth/verify')} class="btn btn-sm variant-gradient-primary-secondary w-[10rem]">
-						Verify your account
-					</button>
+
+					<section class="my-6 p-6 bg-surface-800 dark:bg-surface-200 bg-opacity-10 dark:bg-opacity-10 rounded-lg">
+						<div class="flex flex-col items-center">
+							<small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
+							<button in:fade={{duration:1000, delay: 4000, easing: cubicInOut}} class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20" on:click={resendActivationEmail} disabled={_sent}>
+								<iconify-icon icon="mdi:mail"></iconify-icon>{ _sending ? 'Sending' : _sent ? '' : 'Resend' } Activation Link { _sent ? 'Sent' : '' }
+							</button>
+						</div>
+					</section>
 				{:else}
-					<button on:click={()=>goto('/auth/login')} class="btn btn-sm variant-gradient-primary-secondary w-[10rem]">
+					<button on:click={()=>goto('/auth/login')} class="btn btn-sm variant-ghost w-[10rem]">
 						Log In
 					</button>
 				{/if}
 			</div>
 		{:else}
+			<hr class="transition-translate">
 
 			<!-- Dashboard circles - Signed in User -->
-			<div in:fade={{ duration:300, delay: 160 }} class="my-7 flex justify-evenly gap-3">
+			<div in:fade={{ duration:300, delay: 160 }} class="my-7 flex justify-evenly gap-2">
 				{#if _loadingPets || _loadingVets}
 					<span class="animate-pulse">Checking on your buddies...</span>
 				{:else}
@@ -138,7 +163,7 @@
 					{#each dashboardItems as item, index}
 						<div in:fade={{ duration:300, delay: 50*(index+1) }} title={ item.title }
 							class="rounded-2xl border-2 border-surface-300 shadow-[0_0.4rem_0.4rem_rgba(0,0,0,0.2)] hover:shadow-none transition-opacity bg-surface-50 dark:bg-surface-900">
-							<button on:click={()=>console.info('Button tapped')} class="btn text-left flex items-center">
+							<button on:click={()=>console.info('Button tapped')} class="btn btn-sm text-left flex items-center">
 								<iconify-icon icon={item.icon ?? ''} class=" text-2xl"></iconify-icon>
 								<span class="text-lg text-center">{ item.value }</span>
 							</button>
@@ -161,13 +186,8 @@
 
 		{/if}
 
-		<hr class="transition-translate">
-
-		<div class="hidden mt-[2rem]  flex-col items-center justify-center transition-transform">
+		<div class="mt-[2rem] hidden flex-col items-center justify-center transition-transform">
 			<p>{ $clinicstate?.length??0 } Clinics available</p>
-			<button on:click={()=>goto('/clinics/register')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg bg-gradient-to-br variant-gradient-secondary-tertiary">
-				Register your Clinic
-			</button>
 		</div>
 	</section>
 </main>

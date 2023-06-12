@@ -1,17 +1,12 @@
 import { ID, type Models, Permission, Role, Query } from 'appwrite';
 import { get, writable } from 'svelte/store';
-import { sdk, server } from './appwrite';
-import type { Gender, IPet, Type } from './_models/pet-model';
-import type { Account } from './_models/appwrite-model';
-import type { IClinic } from './_models/clinic-model';
-import { removePrefix, getFirstName } from './_utilities/split-names';
-import type { IAd } from './_models/ad-model';
-import type { IMail } from './_models/mail-model';
-
-export type Alert = {
-  color: string;
-  message: string;
-};
+import { sdk, server } from '../appwrite';
+import type { Gender, IPet, Type } from '../_models/pet-model';
+import type { Account } from '../_models/appwrite-model';
+import type { IClinic } from '../_models/clinic-model';
+import { removePrefix, getFirstName } from '../_utilities/split-names';
+import type { IAd } from '../_models/ad-model';
+import type { IMail } from '../_models/mail-model';
 
 // PETS
 
@@ -23,15 +18,17 @@ const createPets = () => {
   return {
     subscribe,
     fetch: async () => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID,'verified');
       if(!role)return;
   
-      const response = await sdk.database.listDocuments(server.database, server.collection_pets,
-        [ Query.orderDesc(''), Query.select(['name','photoID'])
+      const response = await sdk.database.listDocuments(server.database, server.collection_pets, [
+        Query.orderDesc("")
         ]
       );
-      return set({ pets: response.documents as any});
+      return set({ pets: response.documents as IPet[]});
     },
     viewPet: async (id: string) => {
       const userID = get(state).account!.$id;
@@ -195,7 +192,7 @@ const createPetPhoto = () => {
   
       try {
         const response: any = await sdk.storage.listFiles(server.bucket_buddies);
-        console.log('Bucket ', response);
+        // console.log('Bucket ', response);
         
         set(response.files);
       } catch (error) {
@@ -233,7 +230,7 @@ const createPetPhoto = () => {
       try {
         const photoPreview = await sdk.storage.getFilePreview(
           server.bucket_buddies,
-          id, 320, undefined, 'center', 75
+          id, 256, undefined, 'center', 75
         );
         // console.log('Bucket response: ',photoPreview);
         return photoPreview;
@@ -286,28 +283,28 @@ const createUserPhoto = () => {
             Permission.delete(role)
           ]
         );
-        userbucketstate.getPreview(photoBucket.$id);
-        // return photoBucket;
+        await userbucketstate.getPreview(photoBucket.$id);
+        return photoBucket;
       } catch (error) {
-        console.error('Failed to add user photo:', error);
-        return null;
+        console.info('Failed to add user photo:', error);
       }
     },
     getPreview: async (id: string) => {
-      const userID = get(state).account?.$id ?? '';
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID);
       if(!role)return;
 
       try {
-        const photoPreview = await sdk.storage.getFilePreview(
-          server.bucket_users,
-          id, 256, undefined, 'center', 80
+        const userPhoto:any = sdk.storage.getFilePreview(
+          server.bucket_users, id, 256, undefined, 'center', 80
         );
         // console.log('Bucket response: ',photoPreview);
-        set({ userPhoto: photoPreview});
+        set({ userPhoto });
         // return photoPreview;
       } catch (error) {
-        console.error('Failed to retrieve preview photo:', error);
+        console.info('Failed to retrieve preview photo:', error);
       }
     },
     clearPhoto: () => {
@@ -316,12 +313,12 @@ const createUserPhoto = () => {
   }
 }
 
-// User Account state
+// USER Account state
 
 const createState = () => {
   const { subscribe, set, update } = writable({
     account: null as Account|null,
-    // alert: null as Alert|null,
+    initials: null as string|null,
     _loading: false
   });
 
@@ -332,27 +329,46 @@ const createState = () => {
     subscribe,
     checkLoggedIn: async () => {
       setLoading(true);
+      try {
         const account:any = await sdk.account.get();
-        state.init(account);
+        const initials = sdk.avatars.getInitials();
+        state.init(account,initials.href);
+        if(account && get(state).account?.prefs.photoID){
+          await userbucketstate.getPreview(account.prefs.photoID)
+        }
         setLoading(false);
-        return account;
-  },
+      } catch (error) {
+        setLoading(false);
+      }
+    },
+    checkVerificationStatus: () =>{
+      return get(state).account?.emailVerification;
+    },
     signup: async (email: string, password: string, name: string) => {
       setLoading(true);
-      state.init();
       petstate.init();
-      const result = await sdk.account.create('unique()', email, password, name);
+      mail.clear();
+      await sdk.account.create('unique()', email, password, name);
+      const account = await state.login(email, password)
+      const initials = sdk.avatars.getInitials();
+      await state.init(account, initials.href)
+      await state.sendVerificationEmail();
       setLoading(false);
-      return result;
+      // return account;
+    },
+    sendVerificationEmail: async () => {
+      const host = 'http://localhost:5173/auth/verify';
+      return await sdk.account.createVerification(host)
     },
     login: async (email: string, password: string) => {
       setLoading(true);
       state.init();
       petstate.init();
       mail.clear();
-      await sdk.account.createEmailSession(email, password);
-      const session = await sdk.account.get();
-      state.init(session);
+      const session = await sdk.account.createEmailSession(email, password);
+      // await sdk.account.get();
+      const initials = sdk.avatars.getInitials();
+      state.init(session, initials.href);
       // setPrefs(await ...sdk.account.getPrefs());
       setLoading(false);
     },
@@ -365,6 +381,11 @@ const createState = () => {
       setLoading(false);
     },
     updateUserPrefs: async (prefs: Models.Preferences) => {
+      if(!get(state).account) {
+        console.info('No user logged in');
+        return;
+      }
+      
       setLoading(true);
       const prfs = await sdk.account.getPrefs();
       console.log('Current User Prefs: ',prfs);
@@ -372,22 +393,15 @@ const createState = () => {
       await sdk.account.updatePrefs({...prfs, ...prefs});
       setLoading(false);
     },
-    getUserPrefs: async ()=> await sdk.account.getPrefs(),
-    
-    
-    /*
-    alert: async (alert: Alert) =>
-      update((n) => {
-        n.alert = alert;
-        return n;
-      }),
-    */
-    getInitials(){
-      const userName = get(state).account?.name;
-      return sdk.avatars.getInitials(removePrefix(userName??''));
+    getUserPrefs: async ()=> {
+      if(!get(state).account) {
+        console.info('No user logged in');
+        return;
+      }
+      await sdk.account.getPrefs()
     },
-    init: async (account: any = null) => {
-      return set({ account,_loading: false });
+    init: async (account: any = null, initials: string|null = null ) => {
+      return set({ account,_loading: false, initials });
     },
   };
 };
@@ -400,12 +414,18 @@ const createAdsState = () => {
   return {
     subscribe,
     fetch: async () => {
-      const verifiedUser = get(state).account?.emailVerification;
+      const verifiedUser = get(state).account?.emailVerification || false;
 
-      const response: any = await sdk.database.listDocuments(server.database, server.collection_ads, [ Query.limit(10), Query.equal('is_active', true)]);
-      console.log('Ads: ',response.documents);
-      
-      return set(response.documents);
+      try {
+        const response: any = await sdk.database.listDocuments(server.database, server.collection_ads, [
+          Query.limit(10)
+        ]);
+        // console.log('Ads: ',response.documents);
+        
+        set(response.documents);
+      } catch (error) {
+        console.info('Error querying ads.',error)
+      }
     },
   }
 }
@@ -422,8 +442,8 @@ const createMailState = () => {
       const role = Role.user(userID,'verified');
       if(!role)return;
   
-      const response = await sdk.database.listDocuments(server.database, server.collection_mail,
-        [ Query.orderDesc(''), Query.select(['title','message','$createdAt'])
+      const response = await sdk.database.listDocuments(server.database, server.collection_mail, [
+        Query.orderDesc("")
         ]
       );
       return set(response.documents as any);

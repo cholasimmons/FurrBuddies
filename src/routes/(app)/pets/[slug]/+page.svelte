@@ -1,25 +1,34 @@
 <script lang="ts">
 	import type { IPet } from '$lib/_models/pet-model.js';
-	import { petbucketstate, petstate, state } from '$lib/store.js';
+	import { petbucketstate, petstate, state } from '$lib/_stores/auth_store.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-    import { Table, tableMapperValues, modalStore, type ModalSettings, type ModalComponent } from '@skeletonlabs/skeleton';
+    import { Table, tableMapperValues, modalStore, type ModalSettings, type ModalComponent, Avatar } from '@skeletonlabs/skeleton';
     import type {  TableSource } from '@skeletonlabs/skeleton';
 	import { toast } from 'svelte-french-toast';
 	import { goto } from '$app/navigation';
 	import RichToast from '$lib/_components/RichToast.svelte';
 	import { calculateAge } from '$lib/_utilities/calculate-age.js';
+    import QRViewComponent from '$lib/_components/QRViewComponent.svelte';
     import ImageViewComponent from '$lib/_components/ImageViewComponent.svelte';
+	import { sdk } from '$lib/appwrite.js';
+	import { page } from '$app/stores';
 
     export let data;
     let bud: IPet;
     let imageURL: string = '';
+    let QRcodeURL: string = '';
 
     //Loaders
     let _finding: boolean = true;
 
     onMount(async ()=>{
-        bud = $petstate.pets.find((pet:IPet)=>pet.$id === data.Id) as IPet;
+        if(state.checkVerificationStatus() === false) goto('pets', {replaceState:true});
+        
+		// if($petstate.pets.length < 1) {await petstate.fetch();}
+
+        bud = $petstate.pets.find((pet:IPet)=>pet.$id === $page.params.slug) as IPet;
+
         if(bud.photoID!.length > 0){
             try {
                 const file: URL|undefined = await petbucketstate.getPreview(bud.photoID![0]);
@@ -30,6 +39,8 @@
                 _finding = false;       
             }
         }
+
+        QRcodeURL = sdk.avatars.getQR(bud.$id, 64).href;
         
     });
 
@@ -51,6 +62,26 @@
     
         if(imageURL === '')return;
         modalStore.trigger(viewImage);
+    }
+
+    // View Buddy's QRcode for detail scanning
+    function viewQR() {
+        const modalComponent2: ModalComponent = {
+            // Pass a reference to your custom component
+            ref: QRViewComponent,
+            // Add the component properties as key/value pairs
+            props: {id: bud.$id},
+            // Provide a template literal for the default component slot
+            // slot: undefined
+        };
+        const viewQRimage: ModalSettings = {
+            type: 'component',
+            // Pass the component directly:
+            component: modalComponent2,
+        };
+    
+        if(imageURL === '')return;
+        modalStore.trigger(viewQRimage);
     }
 
     const sourceData = [
@@ -114,10 +145,16 @@
 
 <!-- HTML body -->
 <main>
-    <div class="w-full flex justify-center items-center py-6 relative bg-primary-300 bg-opacity-10">
+    <div class="w-full flex justify-evenly items-center py-6 relative bg-primary-300 bg-opacity-10">
+        <span></span>
+
         <div class="w-40 h-40 bg-red-300 rounded-full overflow-hidden">
-        <img on:click={viewPhoto} on:keypress src={imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
+            <img on:click={viewPhoto} on:keypress src={imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
         </div>
+
+        <span on:click={viewQR} on:keypress>
+            <Avatar src={QRcodeURL} class="bg-primary-500"/>
+        </span>
     </div>
 
     <!-- Buddy's Profile -->
@@ -139,8 +176,17 @@
         <hr class="my-6">
     </section>
 
+    <!-- Vaccinations table -->
     <section class="xl:text-xl px-{data.padding}">
         <h3 class="text-lg font-light my-3 opacity-60">Vaccinations</h3>
+        <Table source={tableSimple} interactive={true} on:selected={(mySelectionHandler)} />
+    </section>
+
+    <hr class="my-6">
+
+    <!-- Grooming table -->
+    <section class="xl:text-xl px-{data.padding}">
+        <h3 class="text-lg font-light my-3 opacity-60">Grooming</h3>
         <Table source={tableSimple} interactive={true} on:selected={(mySelectionHandler)} />
     </section>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
-	import { mail, state } from '$lib/store.js';
+	import { mail, state } from '$lib/_stores/auth_store.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -13,6 +13,14 @@
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
+			if($state.account?.emailVerification){
+				try {
+					await mail.fetch();
+				} catch {
+					console.log('Unable to retrieve mail');
+				}
+			}
+			
 			_loading = false;
 		} catch (error) {
 			console.log('Not signed in');
@@ -43,32 +51,24 @@
     <h3 class="title flex justify-between items-center">
         <!-- Left Panel -->
         <div class="flex items-center gap-2">
-            {#if account?.$id}
-                <button on:click|preventDefault={()=>goto('/pets/add')} type="button" class="btn btn-sm bg-gradient-to-br variant-gradient-secondary-tertiary shadow-[0_4px_4px_rgba(0,0,0,0.24)] hover:shadow-none">
+                <button in:fade={{ duration:100, delay:100}}  disabled={ !account?.emailVerification } type="button" class="btn btn-sm variant-ghost">
                     <span class=" flex items-center"><iconify-icon icon="mdi:refresh"></iconify-icon></span>
                     <span>Refresh Inbox</span>
                 </button>
-            {:else}
-                <button on:click|preventDefault={()=>goto('/auth/login')}  type="button" class="btn btn-sm variant-filled-surface">
-                    <span class=" flex items-center">
-						<iconify-icon icon="mdi:lock-open"></iconify-icon>
-					</span>
-					<span>Log In</span>
-                </button>
-            {/if}
-            {#if _loading}<LoadingClock/>{/if}
+            {#if _loading}<span in:fade={{duration:700}} out:fade={{duration:700}}><LoadingClock/></span>{/if}
         </div>
         
         <!-- Right Panel -->
-        <div class="{ account ? 'flex' : 'hidden'} items-center gap-2 ">
-            <button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
-            <button class="btn-icon btn-icon-lg " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
-        </div>
+		{#if account?.emailVerification }
+			<div class="{ account ? 'flex' : 'hidden'} items-center gap-2 ">
+				<button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
+				<button class="btn-icon btn-icon-lg " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
+			</div>
+		{/if}
     </h3>
 
-	<!-- Display Mail if User is logged in and verified -->
-
-	{#if account && account?.emailVerification }
+	{#if account && account.emailVerification }
+	<!-- User logged in and verified - Display Mail -->
 
 		{#if messages?.length < 1 }
 			<section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
@@ -97,22 +97,26 @@
 					</a>
 				{/each}
 			</dl>
-
 		{/if}
-		
+	
+	{:else if account && !account.emailVerification}
+	<!-- User logged in but not verified - Notice to get verified -->
+
+		<div in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
+			<iconify-icon icon="mdi:mail" class="text-3xl"></iconify-icon>
+			<p class="text-sm">Your account needs to be verified first</p>
+		</div>
+	
 	{:else}
-		
-		<!-- Non-verified users -->
+	<!-- User NOT logged in - Prompt to log in -->
+
 		<div class="flex flex-col items-center justify-center gap-3 pt-12">
-			{#if !account?.emailVerification}
-				<p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-sm">Your account needs to be verified first</p>
-				<button on:click={()=>goto('/auth/verify')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg bg-gradient-to-br variant-gradient-secondary-tertiary">
-					Verify your account
-				</button>
-			{/if}
+			<p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-lg">You're missing out!</p>
+			<button on:click={()=>goto('/auth/verify')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg">
+				Log in
+			</button>
 		</div>
 	{/if}
-
 </main>
 
 <style>

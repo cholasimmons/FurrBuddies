@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import RightPage from '$lib/_components/RightPage.svelte';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
-	import { state } from '$lib/store.js';
+	import { state } from '$lib/_stores/auth_store.js';
 
     export let data;
 

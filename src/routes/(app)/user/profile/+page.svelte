@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import ProfileEditForm from "$lib/_components/forms/ProfileEditForm.svelte";
 	import { toTitleCase } from "$lib/_utilities/text-transform.js";
-	import { state, userbucketstate } from "$lib/store";
+	import { state, userbucketstate } from "$lib/_stores/auth_store.js";
 	import { modalStore, type ModalComponent, type ModalSettings, Avatar } from "@skeletonlabs/skeleton";
 	import { Role } from "appwrite";
 	import { onMount } from "svelte";
@@ -10,27 +10,23 @@
 	import { fade } from "svelte/transition";   
 
     export let data;
-    // let initials: string|undefined = undefined;
-    let imageURL: string|undefined;
-    let file: URL|undefined;
+
+    // Loader for sending verification email
+    let _sending: boolean = false;
+    let _sent: boolean = false;
 
     onMount(async ()=>{
         try {
             await state.checkLoggedIn();
-
-            if($state.account?.prefs.photoID)
-                userbucketstate.getPreview( $state.account!.prefs.photoID );
         } catch (error) {
             console.log('Not logged in.',error);
         }
     });
 
 
-
     function managePhoto(): void {
         console.log('btn pressed');
     }
-    
 
     function editProfile() {
         // Skeleton Form stuff
@@ -84,9 +80,17 @@
             });
     }
 
-$: imageURL = $userbucketstate.userPhoto?.href ?? ''; 
+    // Resend email with verification link
+    async function resendActivationEmail() {
+        _sending = true;
+        await state.sendVerificationEmail();
+        _sent = true;
+        _sending = false;
+    }
+
+$: imageURL = $userbucketstate.userPhoto?.href;
 $: userAccount = $state.account;
-$: initials = state.getInitials().href;
+$: initials = $state.initials ?? 'ZM';
     
 </script>
 
@@ -102,7 +106,7 @@ $: initials = state.getInitials().href;
 <main class="text-center  px-{data.padding}">
     <section class="mx-auto w-full mt-3 max-w-xl">
         <div in:fade={{ duration: 300 }} class="flex justify-center relative">
-            <Avatar src={ imageURL } initials={ initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
+            <Avatar src={ imageURL ? imageURL : initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
             
             <button disabled={!userAccount?.prefs.photoID} on:click={removePhoto} class="absolute ml-36 btn variant-soft-error rounded-full w-8 h-8 ">
                 <iconify-icon icon="mdi:remove"></iconify-icon>
@@ -126,23 +130,23 @@ $: initials = state.getInitials().href;
         {#if userAccount}
             <div class="mt-6 flex flex-col items-center justify-start text-left">
                 <p hidden={!userAccount?.prefs.phoneNumber}><span>Phone: </span>{userAccount?.prefs.phoneNumber}</p>
-                <p hidden={!Role.user(userAccount?.$id)}><span>Role: </span>Registered User</p>
-                <p hidden={!userAccount?.prefs.gender}><span>Gender: </span>{userAccount?.prefs.gender}</p>
+                <p hidden={!Role.user(userAccount?.$id)}><span>Role: </span>User</p>
+                <p hidden={!userAccount?.prefs.gender}><span>Gender: </span>{ (userAccount?.prefs.gender ?? '').toTitleCase()}</p>
                 <!--p hidden={!userAccount?.prefs.}><span>Role: </span>Registered User</p-->
 
             </div>
 
-            <section class="my-6 py-6 bg-surface-200 bg-opacity-20 rounded-lg">
+            <section class="my-6 py-6 bg-surface-200 dark:bg-surface-700 bg-opacity-20 dark:bg-opacity-30 rounded-lg">
                 <div class="flex flex-col items-center">
                     {#if userAccount?.emailVerification}
                         <button class="text-500 btn gap-3 hover:bg-white hover:bg-opacity-20" on:click={editProfile}><iconify-icon icon="mdi:edit"></iconify-icon>Edit Profile</button>
                     {:else}
                         <small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
-                        <button class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20"><iconify-icon icon="mdi:email"></iconify-icon>Resend Activation Link</button>
+                        <button class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20" on:click={resendActivationEmail} disabled={_sent}>
+                            <iconify-icon icon="mdi:mail"></iconify-icon>{ _sending ? 'Sending' : _sent ? '' : 'Resend' } Activation Link { _sent ? 'Sent' : '' }
+                        </button>
                     {/if}
                 </div>
-
-                
             </section>
         {/if}
         <div class="my-6 max-w-xl btn-group variant-ghost">

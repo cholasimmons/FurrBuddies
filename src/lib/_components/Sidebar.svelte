@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from "$app/stores";
-	import { state } from "$lib/store";
+	import { state } from "$lib/_stores/auth_store";
     import "iconify-icon";
 
 </script>
 
-<ul class="">
+<ul>
     <a href="/" class="{$page.url.pathname === '/' ? 'chosen' : ''} order-3 md:order-none">
         <li><iconify-icon icon="mdi:home" class="home"></iconify-icon><span>Home</span></li>
     </a>
@@ -13,13 +13,14 @@
     <a href="/clinics" class="{$page.url.pathname.startsWith('/clinics') ? 'chosen' : ''} order-2 md:order-none"><li><iconify-icon icon="tabler:building-hospital"></iconify-icon>Clinics</li></a>
     <!--a href="/shop" class="xl:hidden {$page.url.pathname.startsWith('/shop') ? 'chosen' : ''} hidden md:block"><li><iconify-icon icon="tabler:shopping-cart"></iconify-icon>Shop</li></a-->
     <a href="/mail" class="{$page.url.pathname.startsWith('/mail') ? 'chosen' : ''} order-4 md:order-none"><li><iconify-icon icon="mdi:mail"></iconify-icon>Mail</li></a>
-    <a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon>Setup</li></a>
+    <!--a href="/setup" class="{$page.url.pathname.startsWith('/setup') ? 'chosen' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:cog"></iconify-icon>Setup</li></a-->
+    <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''} order-5 md:order-none"><li><iconify-icon icon="mdi:user"></iconify-icon>Account</li></a>
     <div class="hidden md:block">
         <hr class="mx-auto ">
         <!-- If User isn't logged in -->
         <span hidden={ !$state.account}>
-            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
-            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a>
+            <!--a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
+            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a-->
         </span>
 
         <!-- If User is successfully logged in -->
@@ -50,7 +51,7 @@
         ul {
             font-size: 0.9rem;
             margin: 0;
-            padding: 1.4rem 1.4rem 0.5rem 1.4rem;
+            padding: 1rem 1.6rem 0.5rem 1.6rem;
             display: flex;
             flex-direction: row;
             align-items: flex-end;
@@ -91,13 +92,14 @@
             opacity: 1;
         }
 
-        ul a li iconify-icon {
-            margin-right: 1rem;
+        ul a li {
+            opacity: 0.6;
         }
 
         ul a li iconify-icon {
             opacity: 0.6;
             font-size: 1.2rem;
+            margin-right: 1rem;
             transition: opacity 0.5s ease;
             transition: transform 0.3s ease;
         }

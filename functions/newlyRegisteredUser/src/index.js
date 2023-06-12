@@ -52,7 +52,7 @@ console.log(req.variables.SECRET);
     let { email, name } = user;
 
     // Create the activation URL
-    let activationUrl = `https://[HOSTNAME_OR_IP]/auth/activate?userId=${userId}`;
+    let activationUrl = `https://${HOSTNAME_OR_IP}/auth/activate?userId=${userId}`;
 
     // Create the email subject and body
     let subject = 'Activate your Furr Buddies account';

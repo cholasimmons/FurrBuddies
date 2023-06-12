@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { getFirstName } from "$lib/_utilities/split-names";
-	import { state, userbucketstate } from "$lib/store";
+	import { state, userbucketstate } from "$lib/_stores/auth_store";
 	import { modalStore } from "@skeletonlabs/skeleton";
 	import { field, form } from "svelte-forms";
 	import { pattern } from "svelte-forms/validators";
 	import toast from "svelte-french-toast";
+	import type { Models } from "appwrite";
 
     // RegEx pattern for the phoneNumber input field
     const phoneRegEx = /^(\d{1,12})?$/;
@@ -29,7 +30,7 @@
     async function submitEditedForm(){
         if(!$editProfileForm.valid)return;
         _saving = true;
-        let bucketResponse: any;
+        let bucketResponse: Models.File|undefined;
 
         try {
             let _photoSuccess: boolean = false;
@@ -39,7 +40,7 @@
                 gender: $fgender.value,
                 address: $faddress.value,
                 district: $fdistrict.value,
-                photoID: null
+                photoID: ''
             };
 
             if(photofile){
@@ -48,23 +49,13 @@
                 _photoSuccess = true;
                 _uploadingPhoto = false;
 
-                prefs = {
-                    phoneNumber: $fphone.value,
-                    gender: $fgender.value,
-                    address: $faddress.value,
-                    district: $fdistrict.value,
-                    photoID: bucketResponse.$id
-                };
+                prefs = { ...prefs, photoID: bucketResponse!.$id};
             }
-
             
             await state.updateUserPrefs(prefs);
-            modalStore.close();
+            modalStore.clear();
             editProfileForm.clear();
             toast.success('Your profile has been updated!',{icon: _photoSuccess ? '📸' : ''});
-            setTimeout(()=>{
-                userbucketstate.getPreview($state.account?.prefs.photoID);
-            },2000);
         } catch (error) {
             console.error('Unable to update User details. ',error);
             _saving = false;

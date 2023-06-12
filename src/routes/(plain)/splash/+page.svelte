@@ -11,7 +11,7 @@
         // Simulate loading time with a timeout
         setTimeout(() => {
             goto('/');
-        }, 3600); // Switch to app after 3.6 seconds
+        }, 4800); // Switch to app after 3.6 seconds
     });
 </script>
 
@@ -22,7 +22,7 @@
     </span>
 
     <div class="flex flex-col items-center">
-        <div><img src="/icons/FurrBuddy.webp" alt="Furr Buddies" class="w-20"></div>
+        <div><img src="/images/FurrPrints.webp" alt="Furr Buddies" class="w-20"></div>
         <!--div><img src="/favicon.png" alt="Furr Buddies" class="w-20"></div-->
         <h3 in:scale={{ duration: 800, start:0.6 }} class="text-3xl mt-8 p-0">{ title }</h3>
         <small class="m-0 p-0">v 0.7.0</small>
@@ -34,3 +34,15 @@
     </div>
     
 </div>
+
+<style>
+    * {
+        color: white
+    }
+    a {
+        color: #a3c6d3
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>

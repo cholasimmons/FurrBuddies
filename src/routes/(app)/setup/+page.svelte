@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { RangeSlider, SlideToggle, getModeOsPrefers, setModeCurrent } from '@skeletonlabs/skeleton';
-	import { state } from '$lib/store.js';
+	import { state } from '$lib/_stores/auth_store.js';
 
 	// Theme watcher
 	import { modeOsPrefers, modeUserPrefers, modeCurrent } from '@skeletonlabs/skeleton';
@@ -70,12 +70,7 @@
 <!-- HTML body -->
 <main class="px-{data.padding}">
 
-	<!-- Furr Buddies logo, preferrably with subtle animation -->
-	<div class="flex flex-col justify-center items-center">
-		<img src="/icons/FurrBuddy2.webp" alt="" width="128" class="dark:block hidden m-0">
-		<img src="/icons/FurrBuddy.webp" alt="" width="128" class="dark:hidden block m-0">
-		<small class="mb-4 p-0 opacity-50">App Version: 0.7.0</small>
-	</div>
+	
 
 	<hr class="mb-6">
 
@@ -112,15 +107,7 @@
 	
 	</section>
 
-	<hr class="my-6">
-
-	<p><small class="font-light opacity-70">Please report any bugs or send in your sugesstions to help improve the app.</small></p>
-
-	<div class="flex justify-evenly items-center">
-
-		<a href="mailto:info@simmons.studio?subject=Furr Buddies | Report a bug" class="btn variant-soft-success"><iconify-icon icon="mdi:bug" class="mr-3"></iconify-icon>Report a Bug</a>
-		<a href="mailto:info@simmons.studio?subject=Furr Buddies | App suggestions" class="btn variant-filled-tertiary"><iconify-icon icon="mdi:mail" class="mr-3"></iconify-icon>Suggestions</a>
-	</div>
+	
 	
 
 </main>

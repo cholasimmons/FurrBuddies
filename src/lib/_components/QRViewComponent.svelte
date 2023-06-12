@@ -2,12 +2,12 @@
 	import { petbucketstate } from "$lib/_stores/auth_store";
 	import { onMount } from "svelte";
 	import LoadingClock from "./icons/Loading_Clock.svelte";
+	import { sdk } from "$lib/appwrite";
 
 
     // export let image: string;
     export let parent: any;
-    export let ids: string[];
-    export let name: string = '';
+    export let id: string;
 
     // Loaders
     let image: string = '';
@@ -15,8 +15,8 @@
 
     onMount(async ()=>{
         try {
-            const urlData = await petbucketstate.getFile(ids[0]);
-            image = urlData?.href ?? '';
+            const urlData = await sdk.avatars.getQR(id, 512);
+            image = urlData.href;
             _loading = false;
         } catch (error) {
             console.log(error);
@@ -33,11 +33,8 @@
     {#if _loading}
         <LoadingClock/>
     {:else}
-        <div class="flex flex-col relative">
+        <div>
             <img src={image} alt="" class="w-full  object-cover object-center">
-            <div class=" absolute bottom-0 left-0 px-8 py-4 sm:py-6 rounded-tr-2xl bg-surface-100 bg-opacity-80">
-                <h3 class="text-lg sm:text-2xl text-surface-800">{name}</h3>
-            </div>
         </div>
     {/if}
 </main>
