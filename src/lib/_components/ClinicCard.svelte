@@ -5,7 +5,7 @@
 
     export let clinicName: string;
     export let clinicLocation: string = "Ibex, Lusaka";
-    export const layout: boolean = true; // true: Grid, false: List
+    // export const layout: boolean = true; // true: Grid, false: List
 </script>
 
 <main>

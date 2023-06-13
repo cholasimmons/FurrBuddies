@@ -21,7 +21,7 @@
     const timerSeconds: number = 4000;
 
     // URL to return to for verification
-    const returnUrl: string = 'localhost/auth/verify'
+    const returnUrl: string = 'https://buddies.simmons.studio/auth/verify'
 
     // "isLoading" type of boolean
     let _verifying: boolean = true;

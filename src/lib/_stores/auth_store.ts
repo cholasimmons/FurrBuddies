@@ -31,7 +31,9 @@ const createPets = () => {
       return set({ pets: response.documents as IPet[]});
     },
     viewPet: async (id: string) => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID,'verified');
       if(!role)return;
   
@@ -46,21 +48,25 @@ const createPets = () => {
           return p;
         })
       }))
+      return pet;
     },
-    addPet: async (name:string, type: Type, gender: Gender, breed: string) => {
-      const userID = get(state).account!.$id;
+    addPet: async (name:string, breed: string, gender: Gender, type: Type, dob: string) => {
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID);
       if(!role)return;
 
-      const pet = await sdk.database.createDocument<IPet>(
+      const petDoc = await sdk.database.createDocument<IPet>(
         server.database,
         server.collection_pets,
         ID.unique(),
         {
           name,
-          type,
-          gender,
           breed,
+          gender,
+          type,
+          dob,          
           ownerID: [userID]
         },
         [
@@ -69,10 +75,8 @@ const createPets = () => {
       );
       // const petphoto = await sdk.storage.createFile(server.bucket_buddies,ID.unique(),photofile)
       // document.getElementById('uploader').files[0]
-      update((state) => ({
-        pets: [pet, ...state.pets]
-      }));
-      return pet;
+
+      return petDoc;
     },
 
     removePet: async (pet: IPet) => {
@@ -83,9 +87,11 @@ const createPets = () => {
       }));
     },
   
-    updatePet: async (pet: IPet, body: {[key:string]:any[]}) => { // Partial<Pet>
-      const userID = get(state).account!.$id;
+    updatePet: async (pet: IPet, body: {[key:string]:any}) => { // Partial<Pet>
+      const userID = get(state).account?.$id;
+      if(!userID) return;
       const role = Role.user(userID);
+      if(!role) return;
 
       await sdk.database.updateDocument(
         server.database,
@@ -185,9 +191,10 @@ const createPetPhoto = () => {
   return {
     subscribe,
     fetch: async () => {
-      const userId = get(state).account!.$id;
-      const role = Role.user(userId, 'verified');
+      const userId = get(state).account?.$id;
+      if(!userId){console.warn('User not logged in');throw new Error("Cannot fetch photos. User not available");}
 
+      const role = Role.user(userId, 'verified');
       if(!role){console.warn('User not verified');throw new Error("Cannot fetch photos. User not verified");}
   
       try {
@@ -200,7 +207,9 @@ const createPetPhoto = () => {
       }
     },
     addPetPhoto: async (file: File) => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID);
       if(!role)return;
 
@@ -215,14 +224,14 @@ const createPetPhoto = () => {
             Permission.delete(role),
           ]
         );
-        update((photos) => [...photos]);
+        // update((photos) => [...photos]);
         return photoBucket;
       } catch (error) {
         console.error('Failed to add pet photo:', error);
         return null;
       }
     },
-    getPreview: async (id: string) => {
+    getPreview: async (id: string, size:number = 256) => {
       const userID = get(state).account!.$id;
       const role = Role.user(userID);
       if(!role)return;
@@ -230,7 +239,7 @@ const createPetPhoto = () => {
       try {
         const photoPreview = await sdk.storage.getFilePreview(
           server.bucket_buddies,
-          id, 256, undefined, 'center', 75
+          id, size, undefined, 'center', 75
         );
         // console.log('Bucket response: ',photoPreview);
         return photoPreview;
@@ -357,7 +366,7 @@ const createState = () => {
       // return account;
     },
     sendVerificationEmail: async () => {
-      const host = 'http://localhost:5173/auth/verify';
+      const host = 'https://buddies.simmons.studio/auth/verify';
       return await sdk.account.createVerification(host)
     },
     login: async (email: string, password: string) => {

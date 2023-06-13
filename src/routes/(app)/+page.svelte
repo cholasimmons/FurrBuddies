@@ -23,7 +23,6 @@
 	let _sent: boolean = false;
 
 	onMount(async ()=>{
-		ads.fetch();
 		try {
 			await state.checkLoggedIn();
 
@@ -43,10 +42,6 @@
 		}
 	});
 
-	
-	// Reactive User state
-	$: account = $state.account;
-
 	// Count types of owned animals for dashboard
 	function countAnimalTypes(type: string): number {
 		let petCount: number = 0;
@@ -55,9 +50,9 @@
 		if($petstate.pets.length < 1) return petCount;
 
 		// iterate through number of different animal types
-		$petstate.pets.forEach(pet => {
-			pet.type === type ? petCount += 1 : null;
-		})
+		$petstate.pets.forEach(pet => 
+			pet.type === type ? petCount += 1 : null
+		)
 		return petCount;
 	}
 
@@ -132,14 +127,14 @@
 	<section class="px-{data.padding}">
 		<!-- If no signed in User -->
 
-		{#if !account || !account.emailVerification}
+		{#if !$state.account || !$state.account.emailVerification}
 			<div in:fade={{ duration:300 }} out:fade={{ duration: 150 }} class="my-8 w-full flex flex-col items-center justify-center">
-				<h3 class="w-full title text-center">{ !account ? 'A' : 'Your' } new account awaits you { !account?.emailVerification ? getFirstName(account?.name??'') : '' }</h3>
-				{#if account?.emailVerification === false}
+				<h3 class="w-full title text-center">{ !$state.account ? 'A' : 'Your' } new $state.account awaits you { !$state.account?.emailVerification ? getFirstName($state.account?.name??'') : '' }</h3>
+				{#if $state.account?.emailVerification === false}
 
 					<section class="my-6 p-6 bg-surface-800 dark:bg-surface-200 bg-opacity-10 dark:bg-opacity-10 rounded-lg">
 						<div class="flex flex-col items-center">
-							<small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
+							<small class="font-light opacity-70">Your $state.account is not verified, check your email for the activation link.</small>
 							<button in:fade={{duration:1000, delay: 4000, easing: cubicInOut}} class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20" on:click={resendActivationEmail} disabled={_sent}>
 								<iconify-icon icon="mdi:mail"></iconify-icon>{ _sending ? 'Sending' : _sent ? '' : 'Resend' } Activation Link { _sent ? 'Sent' : '' }
 							</button>
@@ -173,7 +168,7 @@
 			</div>
 			
 			<!-- Display buddies if available -->
-			{#if !_loadingPets || $petstate.pets.length > 0}
+			{#if !_loadingPets && $petstate.pets.length > 0}
 				<!-- Display each available buddy -->
 				<div in:fade={{ duration:500 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
 					{#each $petstate.pets as pet, i}

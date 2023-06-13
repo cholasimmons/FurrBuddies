@@ -5,23 +5,33 @@
     import { onMount } from "svelte";
 	import { get } from "svelte/store";
 	import { fade } from "svelte/transition";
+	import LoadingCircle from "./icons/Loading_Circle.svelte";
 
     export let petName: string;
     export let photoID: string;
     
     let _loading: boolean = true;
-    let imageURL: string|undefined = '';
+    let imageURL: string|undefined = '/images/FurrPrints.webp';
 
     onMount(async ()=>{
-        if(!photoID) return;
-        if(!get(petbucketstate)) return;
+        // if(!photoID) return;
 
-        _loading = true;
+        // if(!$petbucketstate) return;
 
-        const file: URL|undefined = await petbucketstate.getPreview(photoID);
-        imageURL = file?.href;
+        try {
+            _loading = true;
 
-        _loading = false;
+            const file: URL|undefined = await petbucketstate.getPreview(photoID);
+            if(file){
+                imageURL = file?.href;
+                // console.warn(file, imageURL);
+                _loading = false;
+            }
+            _loading = false;
+        } catch (error) {
+            _loading = false;
+        }
+       
 /*
         await petbucketstate.fetch();
 
@@ -31,11 +41,12 @@
         // console.log('Photos.', photos);
 */
     });
+
 </script>
 
 <main>
     <div class="circle border-2 border-surface-500">
-        <img src={ _loading ? imageURL : '' } alt='' in:fade={{ duration: 300 }}>
+        <img src={ _loading ? null : imageURL } alt='' in:fade={{ duration: 300 }}>
     </div>
     <p class="text-lg md:text-xl font-medium">{petName}</p>
 </main>
@@ -74,12 +85,12 @@
     }
 
     .circle::before {
-        content: '?';
+        content: '🐾';
         position: absolute;
         top: 55%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 3rem;
-        color: #b8a;
+        font-size: 4rem;
     }
+
 </style>

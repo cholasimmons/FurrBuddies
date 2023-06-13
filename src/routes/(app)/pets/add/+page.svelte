@@ -4,8 +4,9 @@
     import { Gender, Type, type IPet } from "$lib/_models/pet-model";
 	import { petbucketstate, petstate } from "$lib/_stores/auth_store.js";
 	import { Avatar } from "@skeletonlabs/skeleton";
+	import { redirect } from "@sveltejs/kit";
 	import { field, form } from "svelte-forms";
-	import { email, min, pattern, required } from "svelte-forms/validators";
+	import { email, max, min, pattern, required } from "svelte-forms/validators";
 	import toast from "svelte-french-toast";
 	import { fly } from "svelte/transition";
 
@@ -24,9 +25,19 @@
     const ftype = field('type', Type.DOG);
     const fbreed = field('breed', '');
     const fgender = field('gender', Gender.UNSPECIFIED);
+    const fdob = field('dob', '');
     const ffile = field('uploader', File);
-    const addPetForm = form(fname,ftype,fbreed,fgender,ffile);
+    const addPetForm = form(fname,ftype,fbreed,fgender,fdob,ffile);
 
+/*
+    function validateDate(value) {
+        const regex = /^\d{2}\/\d{2}\/\d{2}$/;
+        if (!regex.test(value)) {
+        return 'Please enter a valid date in the format DD/MM/YY';
+        }
+        return null;
+    }
+*/
 
     // function to add a new buddy
     const addBuddy = async ()=>{
@@ -35,7 +46,7 @@
         _adding = true;
         try {
             // Add valid form details to Appwrite collection
-            const petDoc:any = await petstate.addPet($fname.value,$ftype.value,$fgender.value,$fbreed.value);
+            const petDoc:any = await petstate.addPet($fname.value,$fbreed.value,$fgender.value,$ftype.value,$fdob.value);
             // console.log('Returned after adding pet to appwrite: ',petDoc);
             
             // a small variable to notify us with an emoji in the toast, if a photo was uploaded too
@@ -49,18 +60,20 @@
                 
                 await petstate.updatePet(petDoc, {"photoID": [response.$id]});
                 _photoSuccess = true;
-                _uploadingPhoto = false
+                _uploadingPhoto = false;
             }
 
-            toast.success('Added ' + $fname.value + ' to the family!', {icon: _photoSuccess ? '📸' : ''});
-            addPetForm.clear();
+            toast.success('Added ' + $fname.value + ' to the family!', {icon: _photoSuccess ? '📸!' : ''});
             _adding = false;
-            goto('/pets');
+            addPetForm.reset();
+            clearThumbnail();
+            throw redirect(307,'/pets');
         } catch (error: any) {
             // state.alert({ color: 'red', message: petName+' was not added. '+error.message})
             console.warn('Unable to add '+$fname.value+'. ',error.message);
             _adding = false;
             _uploadingPhoto = false;
+            redirect(307,'/pets')
         }
     }
 
@@ -84,6 +97,11 @@
         // console.log('Event onchanged: ', photoFile);
         previewImage();
     };
+
+    function clearThumbnail() {
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview!.innerHTML = ``;
+    }
 </script>
 
 <!-- HTML head -->
@@ -155,13 +173,25 @@
                 </div>
                 
 
-                <!-- Breed -->
-
-                <label class="block mt-6" for="breed"> Breed</label>
-                <input
-                    id="breed" type="text" placeholder="Breed" class:invalid={!$fbreed.valid}
-                    bind:value={$fbreed.value}/>
-                
+                <div class="flex gap-3">
+                    <!-- Breed -->
+                    <div class="flex-grow">
+                        <label class="block mt-6" for="breed"> Breed</label>
+                        <input
+                            id="breed" type="text" placeholder="Breed" class:invalid={!$fbreed.valid}
+                            bind:value={$fbreed.value}/>
+                    </div>
+                    
+                    <!-- Date of Birth -->
+                    <div class="flex-grow">
+                        <label class="block mt-6" for="dob"> Date of Birth</label>
+                        <input
+                            id="dob" type="date" placeholder="DD / MM / YYYY" pattern="(0[1-9]|1\d|2\d|3[01])/(0[1-9]|1[0-2])/\d{2}"
+                            max={Date.now()} class:invalid={!$fdob.valid}
+                            bind:value={$fdob.value}/>
+                        <p class="text-sm opacity-60 text-right">Estimate if not sure.</p>
+                    </div>
+                </div>
 
                 <!-- Form Buttons (Clear Form & Submit) -->
 

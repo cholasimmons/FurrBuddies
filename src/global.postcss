@@ -17,6 +17,11 @@ html, body {
 	/*@apply bg-surface-50-900-token;*/
 	-webkit-tap-highlight-color: transparent;
     tap-highlight-color: transparent;
+	overflow-y: hidden;
+}
+body::-webkit-scrollbar {
+	display: none;
+	
 }
 a {
 	@apply text-primary-800 dark:text-primary-200;
@@ -66,7 +71,7 @@ form input, form select, .form input, .form select {
 	transition: border 0.2s ease-in;
 }
 form select {
-	padding: 1rem;
+	padding: 0.8rem;
 	text-align: center;
 }
 form select option, .form select option {

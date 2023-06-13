@@ -5,7 +5,7 @@ export type IPet = {
     type: Type;
     breed?: string;
     gender?: Gender;
-    dob?: Date;
+    dob?: string;
     ownerID: string[];
     photoID?: string[];
   } & Models.Document;

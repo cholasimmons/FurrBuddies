@@ -13,23 +13,29 @@
     import ImageViewComponent from '$lib/_components/ImageViewComponent.svelte';
 	import { sdk } from '$lib/appwrite.js';
 	import { page } from '$app/stores';
+	import BuddyEditForm from '$lib/_components/forms/BuddyEditForm.svelte';
+    
 
     export let data;
     let bud: IPet;
-    let imageURL: string = '';
+    let imageURL: string = '/images/FurrPrints.jpg';
     let QRcodeURL: string = '';
 
     //Loaders
     let _finding: boolean = true;
 
     onMount(async ()=>{
+        await state.checkLoggedIn();
+
         if(state.checkVerificationStatus() === false) goto('pets', {replaceState:true});
         
-		// if($petstate.pets.length < 1) {await petstate.fetch();}
+		if($petstate.pets.length < 1) {await petstate.fetch();}
 
-        bud = $petstate.pets.find((pet:IPet)=>pet.$id === $page.params.slug) as IPet;
+        bud = await petstate.viewPet($page.params.slug) as IPet;
+        _finding = false;
 
         if(bud.photoID!.length > 0){
+            _finding = true;
             try {
                 const file: URL|undefined = await petbucketstate.getPreview(bud.photoID![0]);
                 imageURL = file?.href ?? '';
@@ -85,8 +91,8 @@
     }
 
     const sourceData = [
-        { vaccinationDate: new Date(), vaccine: 'Rabisin', batchNo: 'A123456', diseases: ['Rabies'], nextDueDate: '04-06-2024', weight: 3.24 },
-        { vaccinationDate: new Date(), vaccine: 'Malariox', batchNo: 'B123456', diseases: ['Malaria'], nextDueDate: '04-06-2024', weight: 2.24 },
+        { vaccinationDate: new Date().getFullYear(), vaccine: 'Rabisin', batchNo: 'A123456', diseases: ['Rabies'], nextDueDate: new Date().getUTCFullYear(), weight: 3.24 },
+        { vaccinationDate: new Date().getUTCFullYear(), vaccine: 'Malariox', batchNo: 'B123456', diseases: ['Malaria'], nextDueDate: new Date().getUTCFullYear(), weight: 2.24 },
 
     ];
     const tableSimple: TableSource = {
@@ -106,7 +112,25 @@
     }
 
     // Edit button to edit Buddy's profile
-    function editBuddy(): void {}
+    function editBuddy(): void {
+        // Skeleton Form stuff
+        const modalComponent: ModalComponent = {
+            // Pass a reference to your custom component
+            ref: BuddyEditForm,
+            // Add the component properties as key/value pairs
+            props: { buddy },
+            // Provide a template literal for the default component slot
+            // slot: '<p>Skeleton</p>'
+        };
+
+        const modal: ModalSettings = {
+            type: 'component',
+            // Pass the component directly:
+            component: modalComponent,
+        };
+
+        modalStore.trigger(modal);
+    }
 
     // Delete button to remove Buddy from Database
     function removeBuddy():void {
@@ -115,8 +139,8 @@
         // Prompt Modal to confirm decision to delete Buddy, with an added layer of security
         const promptModal: ModalSettings = {
             type: 'prompt',
-            title: 'Remove '+bud.name+'?',
-            body: 'Enter your Buddy\'s name below.',
+            title: 'Remove this Buddy?',
+            body: 'If you\'re sure, enter your Buddy\'s name below.',
             // Populates the input value and attributes
             value: '',
             valueAttr: { type: 'text', minlength: 2, maxlength: 18, required: true },
@@ -125,8 +149,8 @@
                 // Verify input name and pet's name are the same, then delete pet
                 if(r !== bud.name)return;
                 await petstate.removePet(bud);
+                toast.success(bud.name+' was removed.');
                 goto('/pets');
-                toast.success(bud.name+' was removed.')
             },
         };
         modalStore.trigger(promptModal);
@@ -145,24 +169,30 @@
 
 <!-- HTML body -->
 <main>
-    <div class="w-full flex justify-evenly items-center py-6 relative bg-primary-300 bg-opacity-10">
+    <div class="w-full flex justify-evenly items-center py-6 relative ">
         <span></span>
 
-        <div class="w-40 h-40 bg-red-300 rounded-full overflow-hidden">
-            <img on:click={viewPhoto} on:keypress src={imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
+        <div class="w-40 h-40 bg-red-300 rounded-full overflow-hidden absolute top-0">
+            <img on:click={viewPhoto} on:keypress src={ _finding ? '' : imageURL} alt='' in:fade={{ duration: 300 }} class="w-full h-full object-cover">
         </div>
 
-        <span on:click={viewQR} on:keypress>
-            <Avatar src={QRcodeURL} class="bg-primary-500"/>
+        <span on:click={viewQR} on:keypress class="absolute top-0 ml-44">
+            <Avatar src={QRcodeURL} initials="QR" class="border-2"/>
         </span>
     </div>
 
     <!-- Buddy's Profile -->
-    <section class="text-lg xl:text-2xl mt-6 text-center px-{data.padding}">
-        <h2 class="title p-0 flex justify-center gap-2 text-4xl">{buddy?.name || ''} {#if _finding}<iconify-icon icon="line-md:loading-alt-loop"></iconify-icon>{/if}</h2>
-        { #if bud?.dob }<p class="m-0 text-500">
+    <section class="text-lg xl:text-2xl mt-[8rem] text-center px-{data.padding}">
+        {#if _finding}
+            <iconify-icon icon="line-md:loading-alt-loop"></iconify-icon>
+        {:else}
+            <h2 class="title p-0 flex justify-center gap-2 text-4xl">
+                {buddy?.name || ''}
+            </h2>
+        {/if}
+        { #if bud?.dob }<p class="m-0 text-500 flex items-center justify-center">
             <iconify-icon icon="mdi:calendar" type="date" class="mr-2 opacity-60"></iconify-icon>
-            <small title={ 'Born: '+bud?.dob.toString() }>{ calculateAge(bud?.dob) } </small></p>
+            <small title={ 'Born: '+(buddy?.dob??'').toString() }>{ calculateAge(buddy?.dob??'') } Months</small></p>
         {/if}
         
         <hr class="my-6">

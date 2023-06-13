@@ -58,19 +58,16 @@
 
     {#if !clinics.length}
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
-            
+            <p class="text-3xl opacity-70 m-0 mb-3">No Clinics available yet</p>
             {#if _loading}
                 <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class=" m-0 animate-pulse">Searching...</p>
-            {:else}
-                <p class="text-3xl opacity-70 m-0 mb-3">No Clinics found</p>
             {/if}
-
         </section>
     {:else}
-        <div in:fade={{ duration: 300, delay:300 }} class="my-8 {isGrid ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3' : 'flex flex-col'} gap-4">
+        <div in:fade={{ duration: 300, delay:300 }} class="my-8 {isGrid ? 'grid grid-cols-1 sm:grid-cols-2 ' : 'flex flex-col'} gap-4">
             {#each clinics as clinic, index}
             <a href="/clinics/{clinic.$id}">
-                <ClinicCard clinicName={clinic.name} layout={isGrid}/>
+                <ClinicCard clinicName={clinic.name}/>
             </a>        
             {/each}
         </div>

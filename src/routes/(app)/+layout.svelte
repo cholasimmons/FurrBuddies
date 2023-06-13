@@ -41,7 +41,7 @@
 
 	// User avatar
 	let imageURL: string = '';
-	let initials: string;
+	const fallbackImage = '/images/FurrPrints.webp';
 
 	// Routes to display in the AppBar via getRouteName() function below
 	const routes: { [key: string]: string } = {
@@ -114,7 +114,7 @@
 
 	$: imageURL = $userbucketstate.userPhoto?.href ?? '';
 	$: userAccount = $state.account;
-	$: initials = $state.initials ?? '';
+	$: initials = $state.initials ?? 'ZM';
 	$: { state.updateUserPrefs({'lightMode': $modeCurrent}); }
 	
 </script>
@@ -147,7 +147,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 					{#if !userAccount}
 						<UserSVG/>
 					{:else}
-						<Avatar src={ imageURL ? imageURL : initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[3px] border-red-500'}" width="w-[3rem]" title={ getFirstName(userAccount.name ?? '')} />
+						<Avatar src={ imageURL ? imageURL : initials }  fallback={fallbackImage} border="{ userAccount?.emailVerification ? 'border-2 border-surface-500' : 'border-[2px] border-red-400'}" width="w-[3rem]" title={ getFirstName(userAccount.name ?? '')} background="bg-surface-900" />
 					{/if}
 				</button>
 			</svelte:fragment>

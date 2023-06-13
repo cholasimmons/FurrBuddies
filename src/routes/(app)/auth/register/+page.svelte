@@ -4,7 +4,7 @@
 	import toast from "svelte-french-toast";
 	import { fly } from "svelte/transition";
     import { form, field } from 'svelte-forms';
-    import { required, email, pattern, min } from 'svelte-forms/validators';
+    import { required, email, pattern, min, matchField, max } from 'svelte-forms/validators';
 
     export let data;
 
@@ -21,14 +21,17 @@
 
     // RegEx pattern for the phoneNumber input field
     const phoneRegEx = /^(\d{1,12})?$/;
+    const phoneRegEx2 = /^(?!.*[a-zA-Z])(\d{1,12})?$/;
 
     // svelte-forms form and validation = https://chainlist.github.io/svelte-forms/
     const fname = field('name', '', [required(),min(1)]);
-    const fphone = field('phoneNumber', '', [pattern(phoneRegEx)]);
+    const fphone = field('phoneNumber', '', [pattern(phoneRegEx2), min(9), max(12)]);
     const fgender = field('gender', undefined, []);
     const femail = field('email', '', [required(), email()]);
     const fpassword = field('password', '', [required(), pattern(regExPattern3)]);
-    const registrationForm = form(fname,fphone,fgender,femail,fpassword);
+    const fconfirmpassword = field('confirm-password', '', [required(), matchField(fpassword)]);
+    const ftc = field('terms', false, [required()]);
+    const registrationForm = form(fname,fphone,fgender,femail,fpassword,fconfirmpassword,ftc);
 
     // Sign Up with Appwrite :)
     const signup = async () => {
@@ -108,35 +111,82 @@
                         <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right">This is not a valid email address.</p>
                     {/if}
 
-            <!-- User Password-->
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <div class="flex-grow">
+                <!-- User Password-->
+                    <label class="block mt-6" for="password"> Password</label>
+                    <input id="password" type="password" inputmode="text" class:invalid={!$fpassword.valid} placeholder="passWORD"
+                        bind:value="{$fpassword.value}" />
+                </div>
 
-                <label class="block mt-6" for="password"> Password</label>
-                <input id="password" type="password" inputmode="text" class:invalid={!$fpassword.valid} placeholder="passWORD"
-                    bind:value="{$fpassword.value}" />
-                    {#if !$fpassword.valid && $fpassword}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right"
-                        >Minimum 6 characters, at least one uppercase letter.</p>
-                    {/if}
+                <div class="flex-grow">
+                <!-- User Password Confirmation -->
+                    <label class="block mt-6" for="confirmpassword"> Confirm Password</label>
+                    <input id="confirmpassword" type="password" inputmode="text" class:invalid={!$fconfirmpassword.valid} placeholder="passWORD"
+                        bind:value="{$fconfirmpassword.value}" />
+                </div>
+                {#if !$fpassword.valid && $fpassword}
+                    <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="col-span-2 text-gray-300 text-left">Minimum 6 characters, at least one uppercase letter.</p>
+                {/if}
+            </div>
+
+            <!--div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <div class="flex-grow">
+                <!-- User Password-->
+                    <!--label class="block mt-6" for="district"> District</label>
+                    <input id="district" type="district" inputmode="text" class:invalid={!$fdistrict.valid} placeholder="The city you live in"
+                        bind:value="{$fdistrict.value}" />
+                </div>
+
+                <div class="flex-grow">
+                <!-- User Password Confirmation -->
+                    <!--label class="block mt-6" for="confirmpassword"> Confirm Password</label>
+                    <input id="confirmpassword" type="password" inputmode="text" class:invalid={!$fconfirmpassword.valid} placeholder="passWORD"
+                        bind:value="{$fconfirmpassword.value}" />
+                </div>
+                {#if !$fpassword.valid && $fpassword}
+                    <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="col-span-2 text-gray-300 text-left">Minimum 6 characters, at least one uppercase letter.</p>
+                {/if}
+            </div-->
+            
 
             <!-- Optional -->
+                <hr class="w-full mt-6">
+                <p class="text-primary-500">Optional</p>
+
+                <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                    <div class="flex-grow">
+                    <!-- User Phone Number (Optional) -->
+                        <label class="block mt-6" for="phoneNumber"> Phone Number</label>
+                        <!-- svelte-ignore a11y-autofocus -->
+                        <input id="phoneNumber" type="tel" on:input={validateNumericInput} bind:value="{$fphone.value}"
+                            inputmode="tel" maxlength="12" class:invalid={!$fphone.valid} placeholder="Optional"/>
+                    </div>
+                
+                    <div class="flex-grow">
+                    <!-- User Gender (Optional) -->
+                        <label class="block mt-6" for="gender"> Gender</label>
+                        <!-- svelte-ignore a11y-autofocus -->
+                        <select id="gender" bind:value="{$fgender.value}" class:invalid={!$fphone.valid} placeholder="Optional">
+                            <option value={null}>Undisclosed</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                </div>
+            
+
+            
+            
+            <!-- Legal -->
+                <section class="w-full flex p-2">
+                    <span class="p-4">
+                        <input type="checkbox" bind:value={$ftc.value} class="w-6">
+                    </span>
+                    <p class="opacity-50">I agree to the terms and conditions concerning Account registration and community behavior</p>
+                </section>
                 <hr>
-
-            <!-- User Phone Number (Optional) -->
-
-                <label class="block mt-6" for="phoneNumber"> Phone Number</label>
-                <!-- svelte-ignore a11y-autofocus -->
-                <input id="phoneNumber" type="tel" on:input={validateNumericInput} bind:value="{$fphone.value}"
-                    inputmode="tel" class:invalid={!$fphone.valid} placeholder="Optional"/>
-
-            <!-- User Gender (Optional) -->
-
-                <label class="block mt-6" for="gender"> Gender</label>
-                <!-- svelte-ignore a11y-autofocus -->
-                <select id="gender" bind:value="{$fgender.value}" class:invalid={!$fphone.valid} placeholder="Optional">
-                    <option value={null}>Undisclosed</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
 
             <!-- Form Buttons (Clear Form & Submit) -->
 
@@ -144,7 +194,7 @@
                     <button disabled={!$registrationForm.dirty} on:click={registrationForm.reset} type="reset">
                         Clear Form
                     </button>
-                    <button disabled={!$registrationForm.valid || _registering || $fname.value.length < 1} class="btn variant-filled-warning" type="submit">
+                    <button disabled={!$registrationForm.valid || _registering || !$fname.value.length || $ftc.value===false} class="btn variant-filled-warning" type="submit">
                         {#if _registering}Registering{:else}Register{/if} 
                     </button>
                 </div>
