@@ -7,6 +7,9 @@
 
     let _loading: boolean = true;
 
+    // Cancel timeout timer if regular logout is successful
+    let timerId: NodeJS.Timeout;
+
     onMount(()=>{
         _loading = true;
         try {
@@ -14,14 +17,15 @@
                 await state.logout();
                 _loading = false;
 
-                // Return User to previous page upon successful logout
+                // Return User to previous page upon successful logout;
+                clearTimeout(timerId);
                 goto("/splash");
             }, 2000);
         } catch (error) {
             console.warn('Unable to log out from server');
             _loading = false;
         } finally {
-            setTimeout(()=>{
+            timerId = setTimeout(()=>{
                 goto("/splash");
             }, 5000);
         }

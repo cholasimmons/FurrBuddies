@@ -6,7 +6,7 @@
 
 
     // export let image: string;
-    export let parent: any;
+    export const parent: any = null;
     export let id: string;
 
     // Loaders
@@ -22,7 +22,7 @@
             console.log(error);
             _loading = false;
         }
-        console.log(parent);
+        // console.log(parent);
         
     });
 

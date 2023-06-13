@@ -19,8 +19,8 @@
         <hr class="mx-auto ">
         <!-- If User isn't logged in -->
         <span hidden={ !$state.account}>
-            <!--a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
-            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a-->
+            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
+            <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a>
         </span>
 
         <!-- If User is successfully logged in -->
@@ -32,6 +32,7 @@
         <!-- Always show this regardless... -->
         <span>
             <a href="/about" class="{$page.url.pathname === '/about' ? 'chosen' : ''}"><li>About</li></a>
+            <a href="mailto:bug@buddies.simmons.studio" target="buddies"><li>Report a Bug</li></a>
         </span>
     </div>
     

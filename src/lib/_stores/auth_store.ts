@@ -54,7 +54,7 @@ const createPets = () => {
       const userID = get(state).account?.$id;
       if(!userID)return;
 
-      const role = Role.user(userID);
+      const role = Role.user(userID, 'verified');
       if(!role)return;
 
       const petDoc = await sdk.database.createDocument<IPet>(
@@ -90,6 +90,7 @@ const createPets = () => {
     updatePet: async (pet: IPet, body: {[key:string]:any}) => { // Partial<Pet>
       const userID = get(state).account?.$id;
       if(!userID) return;
+
       const role = Role.user(userID);
       if(!role) return;
 
@@ -399,7 +400,8 @@ const createState = () => {
       const prfs = await sdk.account.getPrefs();
       console.log('Current User Prefs: ',prfs);
       console.log('New User Prefs: ',prefs);
-      await sdk.account.updatePrefs({...prfs, ...prefs});
+      const result = await sdk.account.updatePrefs({...prfs, ...prefs});
+      state.init(result),
       setLoading(false);
     },
     getUserPrefs: async ()=> {
@@ -407,7 +409,8 @@ const createState = () => {
         console.info('No user logged in');
         return;
       }
-      await sdk.account.getPrefs()
+      const result = await sdk.account.getPrefs();
+      state.init(result);
     },
     init: async (account: any = null, initials: string|null = null ) => {
       return set({ account,_loading: false, initials });
@@ -452,24 +455,27 @@ const createMailState = () => {
       if(!role)return;
   
       const response = await sdk.database.listDocuments(server.database, server.collection_mail, [
-        Query.orderDesc("")
+        Query.orderDesc(""), // implement way to fetch only titles and body, for performance, then full fetch per individual message
         ]
       );
-      return set(response.documents as any);
+      set(response.documents as any);
     },
     openMessage: async (id: string) => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID,'verified');
       if(!role)return;
   
-      const response: any = await sdk.database.listDocuments(server.database, server.collection_mail,
-        [ Query.orderDesc(''), Query.select([id])
-        ]
-      );
-      return update((m) => ([response.documents, ...m]));
+      const response: any = await sdk.database.getDocument(server.database, server.collection_mail, id);
+        // this dance might need to be swapped
+      update((m) => ([response.documents, ...m]));
+      await mail.isRead(id);
     },
     sendMessage: async (title:string|undefined = undefined, message: string, toId: string, isRead: boolean = false) => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID);
       if(!role)return;
 
@@ -494,18 +500,19 @@ const createMailState = () => {
       );
       update((m) => ([msg, ...m]
       ));
-      return msg;
     },
 
-    isRead: async (message: IMail) => {
-      const userID = get(state).account!.$id;
+    isRead: async (messageId: string) => {
+      const userID = get(state).account?.$id;
+      if(!userID)return;
+
       const role = Role.user(userID);
       if(!role)return;
 
       const msg:any = await sdk.database.updateDocument(
         server.database,
         server.collection_mail,
-        message.$id,
+        messageId,
         {isRead: true},
         [
           Permission.read(role), Permission.update(role)
@@ -515,7 +522,7 @@ const createMailState = () => {
       update((m) => ([msg, ...m]));
     },
     clear: async () => {
-      return set([]);
+      set([]);
     }
   };
 };

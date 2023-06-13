@@ -5,6 +5,7 @@
 	import { fly } from "svelte/transition";
     import { form, field } from 'svelte-forms';
     import { required, email, pattern, min, matchField, max } from 'svelte-forms/validators';
+	import { appSettings } from "$lib/_stores/settings_store.js";
 
     export let data;
 
@@ -180,11 +181,11 @@
             
             
             <!-- Legal -->
-                <section class="w-full flex p-2">
-                    <span class="p-4">
-                        <input type="checkbox" bind:value={$ftc.value} class="w-6">
+                <section class="w-full flex p-2 pl-0">
+                    <span class="p-4 pl-0">
+                        <input type="checkbox" bind:value={$ftc.value} class="w-8">
                     </span>
-                    <p class="opacity-50">I agree to the terms and conditions concerning Account registration and community behavior</p>
+                    <p class="opacity-50">I agree to the <a href="/legal/terms">{$appSettings.app.name} Terms and Conditions</a> concerning Account registration and community behavior</p>
                 </section>
                 <hr>
 
@@ -202,3 +203,9 @@
         </div>
     </section>
 </main>
+
+<style>
+a:hover {
+        @apply text-tertiary-500;
+    }
+</style>

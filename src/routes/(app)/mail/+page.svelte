@@ -2,22 +2,29 @@
 	import { goto } from '$app/navigation';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 	import { mail, state } from '$lib/_stores/auth_store.js';
+	import { truncateString } from '$lib/_utilities/text-transform.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+
 
 	export let data;
 
 	// Loaders
 	let _loading: boolean = true;
+	let _fetching: boolean = false;
 
 	onMount(async ()=>{
+		_loading = true;
 		try {
 			await state.checkLoggedIn();
 			if($state.account?.emailVerification){
+				_fetching = true;
 				try {
 					await mail.fetch();
+					_fetching = false;
 				} catch {
 					console.log('Unable to retrieve mail');
+					_fetching = false;
 				}
 			}
 			
@@ -28,20 +35,23 @@
 		}
 	});
 
-	const dummyMail = [
-		{ id: 0, title: 'Thank you for coming', message: 'We appreciate you trusting us with your buddies', fromId: '12345', toId: '67890', isRead: false, date: '04-06-2023'},
-		{ id: 1, title: 'We miss you', message: 'Please take note that Poopie is due for a checkup', fromId: '12345', toId: '67890', isRead: false, date: '04-06-2023'},
-		{ id: 2, title: 'Check this offer', message: 'We would like to offer you 50% off...', fromId: '12345', toId: '67890', isRead: true, date: '04-06-2023'},
-	]
+	// Manual refresh
+	function refreshInbox() {
+		_fetching = true;
+		try {
+			mail.fetch();
+			_fetching = false;
+		} catch (error) {
+			_fetching = false;
+		}
+	}
 
-	$: account = $state.account;
-	$: messages = $mail;
 </script>
 
 <!-- HTML head -->
 <svelte:head>
 	<title>{data.appName} | Messages</title>
-	<meta name="description" content="About this app" />
+	<meta name="description" content="Your personalized inbox" />
 </svelte:head>
 
 <!-- HTML body -->
@@ -51,27 +61,39 @@
     <h3 class="title flex justify-between items-center">
         <!-- Left Panel -->
         <div class="flex items-center gap-2">
-                <button in:fade={{ duration:100, delay:100}}  disabled={ !account?.emailVerification } type="button" class="btn btn-sm variant-ghost">
-                    <span class=" flex items-center"><iconify-icon icon="mdi:refresh"></iconify-icon></span>
+                <button in:fade={{ duration:100, delay:100}} on:click|preventDefault={refreshInbox} disabled={ !$state.account?.emailVerification } type="button" class="btn btn-sm variant-ghost">
+                    <span class=" flex items-center"><iconify-icon icon="{_fetching ? 'line-md:loading-alt-loop' : 'mdi:refresh'}"></iconify-icon></span>
                     <span>Refresh Inbox</span>
                 </button>
             {#if _loading}<span in:fade={{duration:700}} out:fade={{duration:700}}><LoadingClock/></span>{/if}
         </div>
         
         <!-- Right Panel -->
-		{#if account?.emailVerification }
-			<div class="{ account ? 'flex' : 'hidden'} items-center gap-2 ">
+		{#if $state.account?.emailVerification }
+			<div class="{ $state.account ? 'flex' : 'hidden'} items-center gap-2 ">
 				<button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
 				<button class="btn-icon btn-icon-lg " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
 			</div>
 		{/if}
     </h3>
 
-	{#if account && account.emailVerification }
+
+	{#if _loading}
+		<section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
+			<div class="flex flex-col items-center justify-center gap-3 pt-12">
+				<iconify-icon icon="mdi:mail-outline" class="text-3xl"></iconify-icon>
+				<div class="flex flex-col items-center">
+					<h3 class="title">Please hold on a moment...</h3>
+				</div>
+				
+			</div>
+			
+		</section>
+	{:else if $state.account && $state.account.emailVerification }
 	<!-- User logged in and verified - Display Mail -->
 
-		{#if messages?.length < 1 }
-			<section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
+		{#if $mail?.length < 1 }
+			<section in:fade={{ duration: 300, delay: 250 }} out:fade={{ duration:200 }} class="text-center mt-16">
 				<div class="flex flex-col items-center justify-center gap-3 pt-12">
 					<iconify-icon icon="mdi:mail-outline" class="text-3xl"></iconify-icon>
 					<div class="flex flex-col items-center">
@@ -84,14 +106,14 @@
 		{:else}
 
 			<!-- Display each available message -->
-			<dl class="mt-5 list-dl">
-				{#each dummyMail as mail}
-					<a href="/mail/{mail.id}">
-						<div class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token">
+			<dl in:fade={{ duration:200, delay: 250 }} class="mt-5 list-dl">
+				{#each $mail as mail, index}
+					<a href="/mail/{mail.$id}">
+						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token">
 							<span class="w-[2rem] h-[2rem]">💌</span>
-							<span class="flex-auto  overflow-clip">
-								<dt class="font-light">{mail.title}</dt>
-								<dd class="font-medium">{mail.message}</dd>
+							<span class="flex-col overflow-x-hidden ">
+								<dt class="{mail.isRead ? 'font-light opacity-80' : 'font-bold'}">{mail.title}</dt>
+								<dd class="font-medium {mail.isRead ? 'opacity-60' : ''}">{ truncateString(mail.message)}</dd>
 							</span>
 						</div>
 					</a>
@@ -99,10 +121,10 @@
 			</dl>
 		{/if}
 	
-	{:else if account && !account.emailVerification}
+	{:else if $state.account && !$state.account.emailVerification}
 	<!-- User logged in but not verified - Notice to get verified -->
 
-		<div in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
+		<div in:fade={{ duration: 300, delay: 250 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
 			<iconify-icon icon="mdi:mail" class="text-3xl"></iconify-icon>
 			<p class="text-sm">Your account needs to be verified first</p>
 		</div>

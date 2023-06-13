@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { sdk } from '$lib/appwrite.js';
     import { form, field } from 'svelte-forms';
-    import { required, pattern } from 'svelte-forms/validators';
+    import { required, pattern, matchField } from 'svelte-forms/validators';
 	import toast from 'svelte-french-toast';
 	import { fly } from 'svelte/transition';
 
@@ -20,7 +22,7 @@
 
     // svelte-forms form and validation = https://chainlist.github.io/svelte-forms/
     const fpassword = field('password', '', [required(), pattern(regExPattern3)]);
-    const fpassword2 = field('confirmpassword', '', [required(), pattern(regExPattern3)]);
+    const fpassword2 = field('confirmpassword', '', [required(), matchField(fpassword)]);
     const resetForm = form(fpassword);
 
     // Reset password function
@@ -30,14 +32,14 @@
         }
         try {
             _resetting = true;
-            // (await) function to reset password
-            toast.loading('Method not yet implemented');
+            await sdk.account.updateRecovery($page.params.userId,$page.params.secret,$fpassword.value, $fpassword2.value)
+            toast.loading('Your password has been changed!');
             resetForm.reset();
-            // goto("/");
+            goto("/");
+            _resetting = false;
         } catch (error: any) {
             // state.alert({ color: "red", message: error.message });
             toast.error(error.message, { style: "red" });
-        } finally {
             _resetting = false;
         }
     };
@@ -65,20 +67,22 @@
                 <label class="block mt-6" for="password"> Password</label>
                 <input id="password" type="password" class:invalid={!$fpassword.valid} placeholder="passWORD"
                     bind:value="{$fpassword.value}" />
+                    <div class="h-6">
                     {#if !$fpassword.valid && $fpassword}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right"
+                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right m-0"
                         >Minimum 6 characters, at least one uppercase letter.</p>
-                    {/if}
+                    {/if}</div>
 
             <!-- User Confirmation Password-->
 
-                <label class="block mt-6" for="password"> Password</label>
-                <input id="password" type="password" class:invalid={!$fpassword2.valid} placeholder="passWORD"
+                <label class="block mt-6" for="password2"> Confirm Password</label>
+                <input id="password2" type="password2" class:invalid={!$fpassword2.valid} placeholder="passWORD"
                     bind:value="{$fpassword2.value}" />
-                    {#if !$fpassword2.valid && $fpassword2}
-                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right"
-                        >Minimum 6 characters, at least one uppercase letter.</p>
-                    {/if}
+                    <div class="h-6">
+                    {#if $fpassword2.valid && $fpassword2}
+                        <p in:fly={{ duration: 500, y: -20 }} out:fly={{ duration: 300, y: -20 }} class="text-gray-300 text-right m-0"
+                        >It's a match!!</p>
+                    {/if}</div>
 
             <!-- Form Buttons (Clear Form & Submit) -->
 
@@ -86,7 +90,7 @@
                     <button disabled={!$resetForm.dirty} on:click={resetForm.reset} type="reset">
                         Clear Form
                     </button>
-                    <button disabled={!($resetForm.valid && $fpassword.value) || _resetting} type="submit">
+                    <button disabled={!($resetForm.valid && $fpassword.value) || _resetting} class="btn btn-sm variant-filled-warning" type="submit">
                         {#if _resetting}Resetting{:else}Reset{/if} 
                     </button>
                 </div>
@@ -94,52 +98,3 @@
         </div>
     </section>
 </main>
-
-<style>
-* {
-    outline: none
-}
-form input {
-    width: 100%;
-    padding: 1.2rem 1.6rem;
-
-    border-radius: 0.6rem;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 1.2rem;
-    border: 3px transparent solid;
-    transition: border 0.2s ease-in;
-}
-
-form label {
-    opacity: 0.75
-}
-form button[type="submit"] {
-    padding: 1rem 3rem;
-    font-size: 1.2rem;
-    background-color:darksalmon;
-    border-radius: 6px;
-    color:white
-}
-form button[type="submit"]:hover {
-    color:gray;
-    background-color: rgba(210, 200, 190);
-}
-form button[type="submit"]:disabled {
-    color: darkslateblue;
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-form button[type="reset"] {
-    padding: 1rem 3rem 1rem 0;
-    font-size: 1.2rem;
-    background-color:none;
-    color:lightsalmon
-}
-form button[type="reset"]:hover {
-    color:lightcyan
-}
-input.invalid {
-    border: 3px red solid;
-}
-</style>

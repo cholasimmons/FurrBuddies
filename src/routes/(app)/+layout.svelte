@@ -59,6 +59,7 @@
 		'/auth/pass-forgot': 'Forgotten Password',
 		'/auth/pass-reset': 'Password Reset',
 		'/user/profile': 'User Profile',
+		'/legal/terms': 'Terms and Conditions'
 	};
 
 	onMount(async ()=>{
@@ -113,7 +114,6 @@
 	}
 
 	$: imageURL = $userbucketstate.userPhoto?.href ?? '';
-	$: userAccount = $state.account;
 	$: initials = $state.initials ?? 'ZM';
 	$: { state.updateUserPrefs({'lightMode': $modeCurrent}); }
 	
@@ -144,10 +144,10 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 			<svelte:fragment slot="trail">
 				<LightSwitch/>
 				<button use:popup={popupCloseQuery} on:keypress>
-					{#if !userAccount}
+					{#if !$state.account}
 						<UserSVG/>
 					{:else}
-						<Avatar src={ imageURL ? imageURL : initials }  fallback={fallbackImage} border="{ userAccount?.emailVerification ? 'border-2 border-surface-500' : 'border-[2px] border-red-400'}" width="w-[3rem]" title={ getFirstName(userAccount.name ?? '')} background="bg-surface-900" />
+						<Avatar src={ imageURL ? imageURL : initials }  fallback={fallbackImage} border="{ $state.account?.emailVerification ? 'border-2 border-surface-500' : 'border-[2px] border-red-400'}" width="w-[3rem]" title={ getFirstName($state.account.name ?? '')} background="bg-surface-900" />
 					{/if}
 				</button>
 			</svelte:fragment>
@@ -156,10 +156,10 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 
 			<div class="surface-card p-4 max-w-sm -ml-4" data-popup="popupCloseQuery">
 				<div class="grid grid-cols-1 gap-3 text-right z-50" id="userMenu">
-					{#if !userAccount}
+					{#if !$state.account}
 						<button class="bg-surface-100 hover:bg-green-300 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
 						<button class="bg-gray-100 hover:bg-orange-200 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/register')} id="will-close"><iconify-icon icon="mdi:edit"></iconify-icon> Sign Up</button>
-					{:else if userAccount}
+					{:else if $state.account}
 						<button class="bg-surface-100 hover:bg-green-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
 						<button class="bg-gray-100 hover:bg-red-400 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/auth/logout')} id="will-close"><iconify-icon icon="mdi:lock"></iconify-icon> Log Out</button>
 						<button class="bg-gray-100 hover:bg-indigo-400 hover:rotate-3 btn btn-lg" on:click={()=>goto('/help/bugs')} id="will-close"><iconify-icon icon="mdi:bug"></iconify-icon> Report a Bug</button>
@@ -179,7 +179,7 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 	</svelte:fragment>
 
 	<div class="flex h-full justify-center">
-		<div class="min-h-full w-full lg:max-w-2xl">
+		<div class="min-h-full w-full lg:max-w-3xl">
 			<PageTransition key="{data.pathname}">
 				<slot/>
 			</PageTransition>

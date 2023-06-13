@@ -43,10 +43,10 @@
             <p>Furr Buddies name, Feature suggestions, QA</p>
         </div>
 
-        <div>
+        <!--div>
             <span><a href="https://www.linkedin.com/in/francis-banda-3a4824101/" target="francisbanda">Francis Banda</a> </span>
             <p>Art direction, Design</p>
-        </div>
+        </div-->
 
         <div>
             <span><a href="https://www.skeleton.dev/blog/welcome-to-the-skeleton-blog" target="chrissimmons">Chris Simmons</a> </span>

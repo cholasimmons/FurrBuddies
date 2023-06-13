@@ -6,7 +6,20 @@ interface ISettings {
     scale: number;
     showLandingImage: boolean;
     landingImage: string;
+    fallback_pet_image: string;
     showCarousel: boolean;
+    app: {
+        name: string;
+        short_name: string;
+        version: string;
+        mascot_dark: string;
+        mascot_light: string;
+    },
+    developer: {
+        name: string;
+        email: string;
+        website: string;
+    }
 }
 
 // SETTINGS
@@ -17,17 +30,27 @@ const createSettingsStore = () => {
         scale: 1,
         showLandingImage: true,
         landingImage: '/images/welcome.jpg',
+        fallback_pet_image: '/images/FurrPrints.webp',
         showCarousel: false,
+        app: {
+            name: 'Furr Buddies',
+            short_name: 'Buddies',
+            version: '0.7.0',
+            mascot_dark: '/icons/FurrBuddy2.webp',
+            mascot_light: '/icons/FurrBuddy.webp',
+        },
+        developer: {
+            name: 'Frank Simmons',
+            email: 'frank@simmons.studio',
+            website: 'https://simmons.studio'
+        }
       });
   
     return {
         subscribe,
         update,
         setSettings: (key:string, value:any) => {
-            update((settings:any) => {
-                settings[key] = value;
-                return settings;
-            });
+            update((settings:any) => settings[key] = value);
         },
         getSetting: (key: string) => {
             const settings: any =  get(appSettings);

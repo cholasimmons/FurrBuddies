@@ -20,6 +20,7 @@
     let bud: IPet;
     let imageURL: string = '/images/FurrPrints.jpg';
     let QRcodeURL: string = '';
+    let hasPhoto: boolean = false;
 
     //Loaders
     let _finding: boolean = true;
@@ -39,6 +40,7 @@
             try {
                 const file: URL|undefined = await petbucketstate.getPreview(bud.photoID![0]);
                 imageURL = file?.href ?? '';
+                hasPhoto = true;
                 _finding = false;
             } catch (error) {
                 console.log('Could not retrieve preview. ',error);
@@ -52,6 +54,8 @@
 
     // View Buddy image
     function viewPhoto(): void {
+        if(!hasPhoto) return;
+
         const modalComponent: ModalComponent = {
             // Pass a reference to your custom component
             ref: ImageViewComponent,

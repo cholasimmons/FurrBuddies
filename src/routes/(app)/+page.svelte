@@ -35,6 +35,7 @@
 
 			await clinicstate.fetch();
 			_loadingVets = false;
+			dashboardItems;
 		} catch (error) {
 			console.warn('Error . ', error);
 			_loadingPets = false;
@@ -42,9 +43,11 @@
 		}
 	});
 
+	let petCount:number;
+	$: count = petCount;
 	// Count types of owned animals for dashboard
 	function countAnimalTypes(type: string): number {
-		let petCount: number = 0;
+		petCount = 0;
 
 		// check pet state
 		if($petstate.pets.length < 1) return petCount;
@@ -129,12 +132,12 @@
 
 		{#if !$state.account || !$state.account.emailVerification}
 			<div in:fade={{ duration:300 }} out:fade={{ duration: 150 }} class="my-8 w-full flex flex-col items-center justify-center">
-				<h3 class="w-full title text-center">{ !$state.account ? 'A' : 'Your' } new $state.account awaits you { !$state.account?.emailVerification ? getFirstName($state.account?.name??'') : '' }</h3>
+				<h3 class="w-full title text-center">{ !$state.account ? 'A' : 'Your' } new account awaits you { !$state.account?.emailVerification ? getFirstName($state.account?.name??'') : '' }</h3>
 				{#if $state.account?.emailVerification === false}
 
 					<section class="my-6 p-6 bg-surface-800 dark:bg-surface-200 bg-opacity-10 dark:bg-opacity-10 rounded-lg">
 						<div class="flex flex-col items-center">
-							<small class="font-light opacity-70">Your $state.account is not verified, check your email for the activation link.</small>
+							<small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
 							<button in:fade={{duration:1000, delay: 4000, easing: cubicInOut}} class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20" on:click={resendActivationEmail} disabled={_sent}>
 								<iconify-icon icon="mdi:mail"></iconify-icon>{ _sending ? 'Sending' : _sent ? '' : 'Resend' } Activation Link { _sent ? 'Sent' : '' }
 							</button>

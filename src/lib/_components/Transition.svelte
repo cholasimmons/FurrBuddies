@@ -3,13 +3,13 @@
   
     export let key: string
     // export let meta: string
-    export let duration: number = 250
+    export let duration: number = 350
   </script>
   
   {#key key}
     <div
-      in:fly={{ duration, delay: duration+25, x:-6 }}
-      out:fly={{ duration, x:6 }}>
+      in:fly={{ duration, delay: duration+50, y:-4 }}
+      out:fly={{ duration, y:4 }}>
       <slot />
     </div>
   {/key}

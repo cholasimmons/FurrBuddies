@@ -34,7 +34,7 @@
             // Pass a reference to your custom component
             ref: ProfileEditForm,
             // Add the component properties as key/value pairs
-            props: { name: userAccount?.name },
+            props: { name: $state.account?.name },
             // Provide a template literal for the default component slot
             // slot: '<p>Skeleton</p>'
         };
@@ -89,7 +89,6 @@
     }
 
 $: imageURL = $userbucketstate.userPhoto?.href;
-$: userAccount = $state.account;
 $: initials = $state.initials ?? 'ZM';
     
 </script>
@@ -106,39 +105,37 @@ $: initials = $state.initials ?? 'ZM';
 <main class="text-center  px-{data.padding}">
     <section class="mx-auto w-full mt-3 max-w-xl">
         <div in:fade={{ duration: 300 }} class="flex justify-center relative">
-            <Avatar src={ imageURL ? imageURL : initials } border="{ userAccount?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
+            <Avatar src={ imageURL?? initials } border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
             
-            <button disabled={!userAccount?.prefs.photoID} on:click={removePhoto} class="absolute ml-36 btn variant-soft-error rounded-full w-8 h-8 ">
+            <button disabled={!$state.account?.prefs.photoID} on:click={removePhoto} class="absolute ml-36 btn variant-soft-error rounded-full w-8 h-8 ">
                 <iconify-icon icon="mdi:remove"></iconify-icon>
             </button>
         </div>
         
         <!-- Display name of User --> 
         <h3 class="text-xl md:text-3xl font-bold text-center mt-6 p-0 flex items-center justify-center gap-2 -mr-4">
-            {userAccount?.name || 'Welcome Guest'}
-            {#if $state._loading}
-                <iconify-icon icon="line-md:loading-alt-loop"></iconify-icon>
-            {:else if userAccount}
-                <iconify-icon icon={userAccount.emailVerification ? 'mdi:tick' : 'mdi:cancel'} class="text-lg {userAccount.emailVerification ? 'text-green-500' : 'text-red-500'}" title={userAccount && userAccount.emailVerification ? 'Verified Account' : 'Unverified Account'}></iconify-icon>
-            {/if}
+            {$state.account?.name ?? 'Welcome Guest'}
+
+                <iconify-icon icon="{ $state._loading ? 'line-md:loading-alt-loop' : $state.account?.emailVerification ? 'mdi:tick' : 'mdi:cancel'}"
+                class="text-lg {$state.account?.emailVerification ? 'text-green-500' : 'text-red-500'}" title={$state.account && $state.account.emailVerification ? 'Verified Account' : 'Unverified Account'}></iconify-icon>
         </h3>
 
         <!-- Display email of User --> 
-        <p class="opacity-70 m-0 p-0 text-sm">{userAccount?.email || ''}</p>
+        <p class="opacity-70 m-0 p-0 text-sm">{$state.account?.email ?? ''}</p>
 
         <!-- If logged in -->
-        {#if userAccount}
+        {#if $state.account}
             <div class="mt-6 flex flex-col items-center justify-start text-left">
-                <p hidden={!userAccount?.prefs.phoneNumber}><span>Phone: </span>{userAccount?.prefs.phoneNumber}</p>
-                <p hidden={!Role.user(userAccount?.$id)}><span>Role: </span>User</p>
-                <p hidden={!userAccount?.prefs.gender}><span>Gender: </span>{ (userAccount?.prefs.gender ?? '').toTitleCase()}</p>
-                <!--p hidden={!userAccount?.prefs.}><span>Role: </span>Registered User</p-->
+                <p hidden={!$state.account?.prefs.phoneNumber}><span>Phone: </span>{$state.account?.prefs.phoneNumber}</p>
+                <p hidden={!Role.user($state.account?.$id)}><span>Role: </span>User</p>
+                <p hidden={!$state.account?.prefs.gender}><span>Gender: </span>{ ($state.account?.prefs.gender ?? '').toTitleCase()}</p>
+                <!--p hidden={!$state.account?.prefs.}><span>Role: </span>Registered User</p-->
 
             </div>
 
             <section class="my-6 py-6 bg-surface-200 dark:bg-surface-700 bg-opacity-20 dark:bg-opacity-30 rounded-lg">
                 <div class="flex flex-col items-center">
-                    {#if userAccount?.emailVerification}
+                    {#if $state.account?.emailVerification}
                         <button class="text-500 btn gap-3 hover:bg-white hover:bg-opacity-20" on:click={editProfile}><iconify-icon icon="mdi:edit"></iconify-icon>Edit Profile</button>
                     {:else}
                         <small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
@@ -150,9 +147,9 @@ $: initials = $state.initials ?? 'ZM';
             </section>
         {/if}
         <div class="my-6 max-w-xl btn-group variant-ghost">
-            <button disabled={userAccount !== null} on:click={()=>goto('/auth/login')} class="rounded-none text-success-400 btn ">Log In</button>
-            <button disabled={userAccount !== null} on:click={()=>goto('/auth/register')} class="rounded-none text-primary-400 btn ">Sign Up</button>
-            <button disabled={!userAccount} on:click={()=>goto('/auth/logout')} class="rounded-none text-red-400 btn">Log Out</button>
+            <button disabled={$state.account !== null} on:click={()=>goto('/auth/login')} class="rounded-none text-success-400 btn ">Log In</button>
+            <button disabled={$state.account !== null} on:click={()=>goto('/auth/register')} class="rounded-none text-primary-400 btn ">Sign Up</button>
+            <button disabled={!$state.account} on:click={()=>goto('/auth/logout')} class="rounded-none text-red-400 btn">Log Out</button>
         </div>
     </section>
 </main>
