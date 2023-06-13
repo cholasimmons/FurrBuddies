@@ -2,35 +2,6 @@
     "projectId": "646a0d3e5e9219b01742",
     "projectName": "Furr Buddies",
     "functions": [
-        {
-            "$id": "6473a5ee59f31295c028",
-            "name": "DemoFunction",
-            "runtime": "node-16.0",
-            "path": "src/functions/DemoFunction",
-            "entrypoint": "src/index.ts",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        },
-        {
-            "$id": "6474f94866b219236e30",
-            "name": "newlyRegisteredUser",
-            "runtime": "node-16.0",
-            "path": "functions/newlyRegisteredUser",
-            "entrypoint": "src/index.js",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        }
+
     ]
 }

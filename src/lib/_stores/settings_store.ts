@@ -35,7 +35,7 @@ const createSettingsStore = () => {
         app: {
             name: 'Furr Buddies',
             short_name: 'Buddies',
-            version: '0.7.0',
+            version: '0.8.0',
             mascot_dark: '/icons/FurrBuddy2.webp',
             mascot_light: '/icons/FurrBuddy.webp',
         },
