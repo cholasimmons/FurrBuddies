@@ -19,7 +19,6 @@
         <hr class="mx-auto ">
         <!-- If User isn't logged in -->
         <span hidden={ !$state.account}>
-            <a href="/user/profile" class="{$page.url.pathname === '/user/profile' ? 'chosen dark:text-primary-400' : ''}"><li>Account</li></a>
             <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a>
         </span>
 

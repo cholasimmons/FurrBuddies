@@ -15,8 +15,8 @@
 	export let data;
 
 	// Loaders
-	let _loadingVets: boolean = true;
-	let _loadingPets: boolean = true;
+	let _loadingVets: boolean = false;
+	let _loadingPets: boolean = false;
 
 	// Activation Email Loader
 	let _sending: boolean = false;
@@ -26,17 +26,29 @@
 
 	onMount(async ()=>{
 		try {
-			await state.checkLoggedIn();
+			// No need to fetch user if already signed in, the layout handled that already
+			if(!$state.account) {
+				await state.checkLoggedIn();
+			}
+			
 
-			if($state.account?.prefs.showCarousel){
-				ads.fetch();
+			if($state.account?.prefs.showCarousel === true){
+				ads.fetch(); // we don\'t have to wait on this
 			}
 
-			await petstate.fetch();
-			_loadingPets = false;
-
-			await clinicstate.fetch();
-			_loadingVets = false;
+			// If our CliPets store is empty, make a fresh fetch
+			if($petstate.pets.length < 1){
+				_loadingPets = true;
+				await petstate.fetch();
+				_loadingPets = false;
+			}
+			
+			// If our Clinics store is empty, make a fresh fetch
+			if($clinicstate.length < 1){
+				_loadingVets = true;
+				await clinicstate.fetch();
+				_loadingVets = false;
+			}
 			
 			dashboardItems = [
 				{name: 'Dog', value: dogCount, icon: 'mdi:dog', title: 'Your available Dog\'s'},
@@ -111,7 +123,7 @@
 
 	{#if browser && carousel.length>0 && $appSettings.showCarousel }
 		<!-- Carousel containing information/ads from the server -->
-		<div class="max-w-xl mx-auto max-h-[14rem] rounded-2xl overflow-hidden">
+		<div in:fade={{ duration:200, delay:100 }} class="max-w-xl mx-auto max-h-[14rem] rounded-2xl overflow-hidden">
 		<Carousel autoplay autoplayDuration={4400} pauseOnFocus={false} dots={false} arrows={false} swiping={true}>
 			{#each carousel as { image, title, details, link }}
 				<a href={link}  target="_blank">
@@ -196,7 +208,7 @@
 					<!-- Add a new Buddy -->
 					<span on:click|preventDefault={()=>goto('/pets/add')} on:keypress in:fade={{ duration:300 }}>
 						<main class="flex flex-col justify-center items-center text-center ">
-							<div class="rounded-full w-[80%] pb-[50%] border-[50%] pt-8 relative flex flex-col justify-center items-center">
+							<div class="rounded-full w-[80%] pb-[20%] border-[50%] pt-8 relative flex flex-col justify-center items-center focus:bg-surface-500 bg-opacity-10">
 								Add Buddy
 								<iconify-icon icon="mdi:plus" class="animate-ping text-3xl "></iconify-icon>
 							</div>
