@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
+	import { appSettings } from '$lib/_stores/settings_store';
     import { onMount } from 'svelte';
 	import { fade, fly, scale, slide } from 'svelte/transition';
 
@@ -25,7 +26,7 @@
         <div><img src="/images/FurrPrints.webp" alt="Furr Buddies" class="w-20"></div>
         <!--div><img src="/favicon.png" alt="Furr Buddies" class="w-20"></div-->
         <h3 in:scale={{ duration: 800, start:0.6 }} class="text-3xl mt-8 p-0">{ title }</h3>
-        <small class="m-0 p-0">v 0.7.0</small>
+        <small class="m-0 p-0">v { $appSettings.app.version }</small>
         <span><LoadingClock/></span>
     </div>
 

@@ -22,6 +22,8 @@
 	let _sending: boolean = false;
 	let _sent: boolean = false;
 
+	let dashboardItems: any = [];
+
 	onMount(async ()=>{
 		try {
 			await state.checkLoggedIn();
@@ -35,7 +37,20 @@
 
 			await clinicstate.fetch();
 			_loadingVets = false;
-			dashboardItems;
+			
+			dashboardItems = [
+				{name: 'Dog', value: dogCount, icon: 'mdi:dog', title: 'Your available Dog\'s'},
+				{name: 'Cat', value: catCount, icon: 'mdi:cat', title: 'Your available Cat\'s'},
+				{name: 'Bird', value: birdCount, icon: 'mdi:bird', title: 'Your available Bird\'s'},
+				{name: 'Rabbit', value: rabbitCount, icon: 'mdi:rabbit', title: 'Your available Rabbit\'s'},
+				{name: 'Rodent', value: rodentCount, icon: 'mdi:rodent', title: 'Your available Rodent\'s'},
+				{name: 'Horse', value: horseCount, icon: 'mdi:horse', title: 'Your available Horse\'s'},
+				{name: 'Doctor', value: $clinicstate.length, icon: 'mdi:doctor', title: 'Available Vet\'s'}
+		/*		
+				{name: 'Injection', value: 95434, icon: 'mdi:injection'},
+				{name: 'Medicine', value: 127890, icon: 'mdi:pill'}
+		*/
+			]
 		} catch (error) {
 			console.warn('Error . ', error);
 			_loadingPets = false;
@@ -59,6 +74,16 @@
 		return petCount;
 	}
 
+	$: dogCount = $petstate.pets.reduce((count, pet) => (pet.type === Type.DOG ? count + 1 : count), 0);
+	$: catCount = $petstate.pets.reduce((count, cat) => (cat.type === Type.CAT ? count + 1 : count), 0);
+	$: birdCount = $petstate.pets.reduce((count, bird) => (bird.type === Type.BIRD ? count + 1 : count), 0);
+	$: rabbitCount = $petstate.pets.reduce((count, rabbit) => (rabbit.type === Type.RABBIT ? count + 1 : count), 0);
+	$: rodentCount = $petstate.pets.reduce((count, rodent) => (rodent.type === Type.RODENT ? count + 1 : count), 0);
+	$: horseCount = $petstate.pets.reduce((count, horse) => (horse.type === Type.HORSE ? count + 1 : count), 0);
+
+	console.warn($petstate.pets.reduce((count, pet) => (pet.type === "DOG" ? count + 1 : count), 0));
+	
+
 	// Resend email with verification link
     async function resendActivationEmail() {
         _sending = true;
@@ -67,16 +92,7 @@
         _sending = false;
     }
 
-	const dashboardItems = [
-		{name: 'Dog', value: countAnimalTypes(Type.DOG), icon: 'mdi:dog', title: 'Your available Dog\'s'},
-		{name: 'Cat', value: countAnimalTypes(Type.CAT), icon: 'mdi:cat', title: 'Your available Cat\'s'},
-		{name: 'Bird', value: countAnimalTypes(Type.BIRD), icon: 'mdi:bird', title: 'Your available Bird\'s'},
-		{name: 'Doctor', value: $clinicstate.length, icon: 'mdi:doctor', title: 'Available Vet\'s'}
-/*		
-		{name: 'Injection', value: 95434, icon: 'mdi:injection'},
-		{name: 'Medicine', value: 127890, icon: 'mdi:pill'}
-*/
-	]
+	
 
 	$:carousel = $ads;
 
@@ -152,18 +168,20 @@
 			<!-- Dashboard circles - Signed in User -->
 			<div in:fade={{ duration:100, delay: 160 }} class="my-8 h-[3rem] flex justify-evenly gap-2">
 				{#if _loadingPets || _loadingVets}
-					<div out:fade={{ duration:90 }} class="mx-auto w-full h-[2rem] rounded-xl placeholder animate-pulse bg-surface-800 bg-opacity-20">&nbsp;
+					<div out:fade={{ duration:90 }} class="mx-auto w-[80%] h-[2rem] rounded-xl placeholder animate-pulse bg-surface-700 bg-opacity-20">&nbsp;
 					</div>
 				{:else}
 					<!-- Display animal status -->
 					{#each dashboardItems as item, index}
+						{#if item.value > 0}
 						<div in:fade={{ duration:300, delay: 100*(index+1) }} title={ item.title }
 							class="rounded-xl border-2 border-surface-500 shadow-[0_0.4rem_0.4rem_rgba(0,0,0,0.2)] hover:shadow-none transition-opacity bg-surface-50 dark:bg-surface-900 h-min">
 							<button on:click={()=>console.info('Button tapped')} class="btn btn-sm text-left flex items-center py-1 px-3">
 								<iconify-icon icon={item.icon ?? ''} class=" text-2xl"></iconify-icon>
-								<span class="text-lg text-center">{ item.value }</span>
+								<span class="text-lg text-center">{ item.value !== undefined ? `${item.value}` : '0' }</span>
 							</button>
 						</div>
+						{/if}
 					{/each}
 				{/if}
 			</div>
@@ -186,7 +204,7 @@
 					</span>
 
 					{#each $petstate.pets as pet, i}
-						<span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
+						<span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}} class="hover:scale-105 transition-transform duration-100 ease-out">
 							<BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />
 						</span>
 					{/each}
