@@ -36,10 +36,10 @@
 	});
 
 	// Manual refresh
-	function refreshInbox() {
+	async function refreshInbox() {
 		_fetching = true;
 		try {
-			mail.fetch();
+			await mail.fetch();
 			_fetching = false;
 		} catch (error) {
 			_fetching = false;
@@ -62,7 +62,7 @@
         <!-- Left Panel -->
         <div class="flex items-center gap-2">
                 <button in:fade={{ duration:100, delay:100}} on:click|preventDefault={refreshInbox} disabled={ !$state.account?.emailVerification } type="button" class="btn btn-sm variant-ghost">
-                    <span class=" flex items-center"><iconify-icon icon="{_fetching ? 'line-md:loading-alt-loop' : 'mdi:refresh'}"></iconify-icon></span>
+                    <span class=" flex items-center"><iconify-icon icon="mdi:refresh" class="{_fetching ? 'animate-spin' : ''}"></iconify-icon></span>
                     <span>Refresh Inbox</span>
                 </button>
             {#if _loading}<span in:fade={{duration:700}} out:fade={{duration:700}}><LoadingClock/></span>{/if}
@@ -109,11 +109,11 @@
 			<dl in:fade={{ duration:200, delay: 250 }} class="mt-5 list-dl">
 				{#each $mail as mail, index}
 					<a href="/mail/{mail.$id}">
-						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token">
+						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-20 hover:bg-surface-hover-token border-2 border-surface-300">
 							<span class="w-[2rem] h-[2rem]">💌</span>
 							<span class="flex-col overflow-x-hidden ">
-								<dt class="{mail.isRead ? 'font-light opacity-80' : 'font-bold'}">{mail.title}</dt>
-								<dd class="font-medium {mail.isRead ? 'opacity-60' : ''}">{ truncateString(mail.message)}</dd>
+								<dt class="{mail.isRead ? 'font-light' : 'font-bold'}">{mail.title}</dt>
+								<dd class="font-medium">{ truncateString(mail.message)}</dd>
 							</span>
 						</div>
 					</a>
@@ -132,9 +132,9 @@
 	{:else}
 	<!-- User NOT logged in - Prompt to log in -->
 
-		<div class="flex flex-col items-center justify-center gap-3 pt-12">
-			<p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-lg">You're missing out!</p>
-			<button on:click={()=>goto('/auth/verify')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg">
+		<div in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
+			<p class="text-lg">You're missing out!</p>
+			<button on:click={()=>goto('/auth/login')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg">
 				Log in
 			</button>
 		</div>

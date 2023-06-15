@@ -2,6 +2,20 @@
     "projectId": "646a0d3e5e9219b01742",
     "projectName": "Furr Buddies",
     "functions": [
-
+        {
+            "$id": "welcome_user_id",
+            "name": "WelcomeUser",
+            "runtime": "node-16.0",
+            "path": "functions/WelcomeUser",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
     ]
 }

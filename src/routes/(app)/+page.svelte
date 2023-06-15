@@ -44,7 +44,7 @@
 	});
 
 	let petCount:number;
-	$: count = petCount;
+
 	// Count types of owned animals for dashboard
 	function countAnimalTypes(type: string): number {
 		petCount = 0;
@@ -77,12 +77,6 @@
 		{name: 'Medicine', value: 127890, icon: 'mdi:pill'}
 */
 	]
-	const carouselStories:any = [
-		{ image: '../images/slider1.webp', title: 'Council to ban certain breeds', details: 'Description goes here', link: 'https://simmons.studio', isActive: true },
-		{ image: 'https://th.bing.com/th/id/OIP.O7ynhEfTIg0w3eUBu1SZ9wEyDM', title: 'Stray dogs on the rise', details: 'Description goes here', link: 'https://appwrite.io', isActive: true },
-		{ image: 'https://th.bing.com/th/id/OIP.sz0-7EhYcQUFDQD7SPxUgAHaEA', title: '', story: 'Description goes here', link: '', isActive: true },
-		{ image: 'https://res.cloudinary.com/petrescue/image/upload/h_638,w_638,c_pad,q_auto:best,f_auto/v1561053876/gjehpvxtpqmfcl9qtizu.jpg', title: 'Lost but found', details: 'Description goes here', link: '', isActive: true },
-	]
 
 	$:carousel = $ads;
 
@@ -97,7 +91,7 @@
 <!-- HTML body -->
 <main class="px-{data.padding}">
 
-	<!-- Carousel -->	
+	<!-- Carousel slideshow -->	
 
 	{#if browser && carousel.length>0 && $appSettings.showCarousel }
 		<!-- Carousel containing information/ads from the server -->
@@ -119,7 +113,7 @@
 		</Carousel>
 		</div>
 	{:else if $appSettings.showLandingImage}
-		<!-- If no carousel items, display default static welcome image -->
+		<!-- If no carousel items, display default static landing image -->
 		<div class=" mx-auto w-full max-h-[12rem] rounded-2xl overflow-hidden">
 			<img src={ $appSettings.landingImage } alt="Welcome" class="w-full h-[12rem] object-cover object-center">
 		</div>
@@ -128,6 +122,7 @@
 	<!-- "Dashboard" -->
 
 	<section class="px-{data.padding}">
+
 		<!-- If no signed in User -->
 
 		{#if !$state.account || !$state.account.emailVerification}
@@ -149,19 +144,22 @@
 					</button>
 				{/if}
 			</div>
+
+		<!-- Signe In -->
 		{:else}
-			<hr class="transition-translate">
+			<hr>
 
 			<!-- Dashboard circles - Signed in User -->
-			<div in:fade={{ duration:300, delay: 160 }} class="my-7 flex justify-evenly gap-2">
+			<div in:fade={{ duration:100, delay: 160 }} class="my-8 h-[3rem] flex justify-evenly gap-2">
 				{#if _loadingPets || _loadingVets}
-					<span class="animate-pulse">Checking on your buddies...</span>
+					<div out:fade={{ duration:90 }} class="mx-auto w-full h-[2rem] rounded-xl placeholder animate-pulse bg-surface-800 bg-opacity-20">&nbsp;
+					</div>
 				{:else}
 					<!-- Display animal status -->
 					{#each dashboardItems as item, index}
-						<div in:fade={{ duration:300, delay: 50*(index+1) }} title={ item.title }
-							class="rounded-2xl border-2 border-surface-300 shadow-[0_0.4rem_0.4rem_rgba(0,0,0,0.2)] hover:shadow-none transition-opacity bg-surface-50 dark:bg-surface-900">
-							<button on:click={()=>console.info('Button tapped')} class="btn btn-sm text-left flex items-center">
+						<div in:fade={{ duration:300, delay: 100*(index+1) }} title={ item.title }
+							class="rounded-xl border-2 border-surface-500 shadow-[0_0.4rem_0.4rem_rgba(0,0,0,0.2)] hover:shadow-none transition-opacity bg-surface-50 dark:bg-surface-900 h-min">
+							<button on:click={()=>console.info('Button tapped')} class="btn btn-sm text-left flex items-center py-1 px-3">
 								<iconify-icon icon={item.icon ?? ''} class=" text-2xl"></iconify-icon>
 								<span class="text-lg text-center">{ item.value }</span>
 							</button>
@@ -171,9 +169,22 @@
 			</div>
 			
 			<!-- Display buddies if available -->
-			{#if !_loadingPets && $petstate.pets.length > 0}
+			{#if _loadingPets }
+					<span class="animate-pulse" out:fade={{ duration:150}}>Checking on your buddies...</span>
+			{:else}
 				<!-- Display each available buddy -->
-				<div in:fade={{ duration:500 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
+				<div in:fade={{ duration:500, delay: 180 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
+					
+					<!-- Add a new Buddy -->
+					<span on:click|preventDefault={()=>goto('/pets/add')} on:keypress in:fade={{ duration:300 }}>
+						<main class="flex flex-col justify-center items-center text-center ">
+							<div class="rounded-full w-[80%] pb-[50%] border-[50%] pt-8 relative flex flex-col justify-center items-center">
+								Add Buddy
+								<iconify-icon icon="mdi:plus" class="animate-ping text-3xl "></iconify-icon>
+							</div>
+						</main>
+					</span>
+
 					{#each $petstate.pets as pet, i}
 						<span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
 							<BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />
@@ -189,3 +200,14 @@
 		</div>
 	</section>
 </main>
+
+<style>
+	main {
+        padding-bottom:50%; /* Maintain 1:1 aspect ratio */
+	}
+    .circle{
+        position: absolute;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+</style>

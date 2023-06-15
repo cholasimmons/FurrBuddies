@@ -56,7 +56,7 @@
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
     }
     main div {

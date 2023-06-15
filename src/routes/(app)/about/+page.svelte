@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 
     export let data;
 
@@ -22,8 +23,8 @@
 	<div class="flex flex-col justify-center items-center">
 		<img src="/icons/FurrBuddy2.webp" alt="" width="96" class="dark:block hidden m-0">
 		<img src="/icons/FurrBuddy.webp" alt="" width="96" class="dark:hidden block m-0">
-		<p class="m-0 p-0 text-xl">{ data.appName }</p>
-		<small class="mb-4 p-0 opacity-50">App Version: { data.version }</small>
+		<p class="m-0 p-0 text-xl">{ $appSettings.app.name }</p>
+		<small class="mb-4 p-0 opacity-50">App Version: { $appSettings.app.version }</small>
 	</div>
 
     <p>Lorem ipsum, dolor sit amet conse-ctetur adipisicing elit. Harum cupiditate iusto id fugiat numquam dolor? Eum quibusdam et, facere voluptate ipsum necessitatibus magnam, architecto pariatur veritatis possimus labore. Asperiores, cumque.</p>
@@ -78,7 +79,7 @@
 
 
 <style>
-    section > div > span, section > div > span > a { @apply text-primary-500; text-align: center }
+    section > div > span, section > div > span > a { @apply text-primary-500 text-center; }
     section > div > p { margin: 0; font-weight:200; text-align: center; }
     section > div { display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 1rem 0 }
 </style>
