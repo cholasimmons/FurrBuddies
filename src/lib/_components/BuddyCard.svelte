@@ -1,17 +1,15 @@
 <script lang="ts">
 	import type { IPet } from "$lib/_models/pet-model";
 	import { petbucketstate } from "$lib/_stores/auth_store";
-	import type { Models } from "appwrite";
+	import { appSettings } from "$lib/_stores/settings_store";
     import { onMount } from "svelte";
-	import { get } from "svelte/store";
 	import { fade } from "svelte/transition";
-	import LoadingCircle from "./icons/Loading_Circle.svelte";
 
     export let petName: string;
-    export let photoID: string;
+    export let photoID: string|undefined;
     
     let _loading: boolean = true;
-    let imageURL: string|undefined = '/images/FurrPrints.webp';
+    let imageURL: string|undefined;
 
     onMount(async ()=>{
         // if(!photoID) return;
@@ -21,7 +19,12 @@
         try {
             _loading = true;
 
+            if(!photoID || photoID === ''){
+                _loading = false;
+                return;
+            }
             const file: URL|undefined = await petbucketstate.getPreview(photoID);
+
             if(file){
                 imageURL = file?.href;
                 // console.warn(file, imageURL);
@@ -44,11 +47,11 @@
 
 </script>
 
-<main>
-    <div class="circle border-2 border-surface-500">
-        <img src={ _loading ? null : imageURL } alt='' in:fade={{ duration: 300 }}>
+<main class="w-full h-full">
+    <div class=" cursor-pointer circle border-2 border-surface-500 hover:scale-110 transition-transform duration-200 ease-out">
+        <img src={ _loading ? null : imageURL } alt='' in:fade={{ duration: 300 }} class="object-cover object-center h-full w-full scale-110 hover:scale-100 transition-transform duration-200 ease-out">
     </div>
-    <p class="text-lg md:text-xl font-medium">{petName}</p>
+    <p class="mt-4 text-2xl md:text-xl font-medium">{petName}</p>
 </main>
 
 <style>
@@ -56,41 +59,29 @@
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
     }
-    main div {
-        transition: scale 0.4s ease-in-out;
-        text-align: center;position: relative;
-    }
-    /* main:hover div, main:hover div img{
-        scale: 103%;
-    }*/
     .circle{
         position: relative;
-        width: 80%;
-        padding-bottom:76%; /* Maintain 1:1 aspect ratio */
+        width: 90%;
+        padding-bottom:88%; /* Maintain 1:1 aspect ratio */
         border-radius: 50%;
         overflow: hidden;
     }
     .circle > img {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 102%;
-        height: 102%;
-        object-fit: cover;
-        transition: scale 0.3s ease-in-out;
     }
 
     .circle::before {
-        content: '🐾';
+        content: url('icons/FurrPrints.svg') /*'🐾'*/;
         position: absolute;
         top: 55%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 4rem;
+        width: 4rem;
+        border: none;
+        outline: none;
     }
 
 </style>

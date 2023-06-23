@@ -51,13 +51,13 @@
 			}
 			
 			dashboardItems = [
-				{name: 'Dog', value: dogCount, icon: 'mdi:dog', title: 'Your available Dog\'s'},
-				{name: 'Cat', value: catCount, icon: 'mdi:cat', title: 'Your available Cat\'s'},
-				{name: 'Bird', value: birdCount, icon: 'mdi:bird', title: 'Your available Bird\'s'},
-				{name: 'Rabbit', value: rabbitCount, icon: 'mdi:rabbit', title: 'Your available Rabbit\'s'},
-				{name: 'Rodent', value: rodentCount, icon: 'mdi:rodent', title: 'Your available Rodent\'s'},
-				{name: 'Horse', value: horseCount, icon: 'mdi:horse', title: 'Your available Horse\'s'},
-				{name: 'Doctor', value: $clinicstate.length, icon: 'mdi:doctor', title: 'Available Vet\'s'}
+				{name: 'Dog', value: dogCount, icon: 'mdi:dog', title: 'Dog\'s'},
+				{name: 'Cat', value: catCount, icon: 'mdi:cat', title: 'Cat\'s'},
+				{name: 'Bird', value: birdCount, icon: 'mdi:bird', title: 'Bird\'s'},
+				{name: 'Rabbit', value: rabbitCount, icon: 'mdi:rabbit', title: 'Rabbit\'s'},
+				{name: 'Rodent', value: rodentCount, icon: 'mdi:rodent', title: 'Rodent\'s'},
+				{name: 'Horse', value: horseCount, icon: 'mdi:horse', title: 'Horse\'s'},
+				{name: 'Doctor', value: $clinicstate.length, icon: 'mdi:doctor', title: 'Veterinarian\'s'}
 		/*		
 				{name: 'Injection', value: 95434, icon: 'mdi:injection'},
 				{name: 'Medicine', value: 127890, icon: 'mdi:pill'}
@@ -93,7 +93,7 @@
 	$: rodentCount = $petstate.pets.reduce((count, rodent) => (rodent.type === Type.RODENT ? count + 1 : count), 0);
 	$: horseCount = $petstate.pets.reduce((count, horse) => (horse.type === Type.HORSE ? count + 1 : count), 0);
 
-	console.warn($petstate.pets.reduce((count, pet) => (pet.type === "DOG" ? count + 1 : count), 0));
+	// console.warn($petstate.pets.reduce((count, pet) => (pet.type === Type.DOG ? count + 1 : count), 0));
 	
 
 	// Resend email with verification link
@@ -173,21 +173,21 @@
 				{/if}
 			</div>
 
-		<!-- Signe In -->
+		<!-- Signed In -->
 		{:else}
 			<hr>
 
-			<!-- Dashboard circles - Signed in User -->
+			<!-- Dashboard - Signed in User -->
 			<div in:fade={{ duration:100, delay: 160 }} class="my-8 h-[3rem] flex justify-evenly gap-2">
 				{#if _loadingPets || _loadingVets}
-					<div out:fade={{ duration:90 }} class="mx-auto w-[80%] h-[2rem] rounded-xl placeholder animate-pulse bg-surface-700 bg-opacity-20">&nbsp;
+					<div out:fade={{ duration:90 }} class="mx-auto w-[50%] h-[2rem] rounded-xl placeholder animate-pulse bg-surface-700 bg-opacity-20">&nbsp;
 					</div>
 				{:else}
 					<!-- Display animal status -->
 					{#each dashboardItems as item, index}
 						{#if item.value > 0}
 						<div in:fade={{ duration:300, delay: 100*(index+1) }} title={ item.title }
-							class="rounded-xl border-2 border-surface-500 shadow-[0_0.4rem_0.4rem_rgba(0,0,0,0.2)] hover:shadow-none transition-opacity bg-surface-50 dark:bg-surface-900 h-min">
+							class="rounded-xl border-2 border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-900 h-min">
 							<button on:click={()=>console.info('Button tapped')} class="btn btn-sm text-left flex items-center py-1 px-3">
 								<iconify-icon icon={item.icon ?? ''} class=" text-2xl"></iconify-icon>
 								<span class="text-lg text-center">{ item.value !== undefined ? `${item.value}` : '0' }</span>
@@ -200,23 +200,23 @@
 			
 			<!-- Display buddies if available -->
 			{#if _loadingPets }
-					<span class="animate-pulse" out:fade={{ duration:150}}>Checking on your buddies...</span>
+				<span class="animate-pulse" out:fade={{ duration:150}}>Checking on your buddies...</span>
 			{:else}
 				<!-- Display each available buddy -->
-				<div in:fade={{ duration:500, delay: 180 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
+				<div in:fade={{ duration:400, delay: 180 }} class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
 					
 					<!-- Add a new Buddy -->
 					<span on:click|preventDefault={()=>goto('/pets/add')} on:keypress in:fade={{ duration:300 }}>
 						<main class="flex flex-col justify-center items-center text-center ">
-							<div class="rounded-full w-[80%] pb-[20%] border-[50%] pt-8 relative flex flex-col justify-center items-center focus:bg-surface-500 bg-opacity-10">
-								Add Buddy
+							<div class="rounded-[50%] w-[90%] py-[28%] border-[50%] relative flex flex-col justify-center items-center hover:cursor-pointer">
+								<p>Add Buddy</p>
 								<iconify-icon icon="mdi:plus" class="animate-ping text-3xl "></iconify-icon>
 							</div>
 						</main>
 					</span>
 
 					{#each $petstate.pets as pet, i}
-						<span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}} class="hover:scale-105 transition-transform duration-100 ease-out">
+						<span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
 							<BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />
 						</span>
 					{/each}
@@ -230,14 +230,3 @@
 		</div>
 	</section>
 </main>
-
-<style>
-	main {
-        padding-bottom:50%; /* Maintain 1:1 aspect ratio */
-	}
-    .circle{
-        position: absolute;
-        border-radius: 50%;
-        overflow: hidden;
-    }
-</style>

@@ -7,6 +7,7 @@ interface ISettings {
     showLandingImage: boolean;
     landingImage: string;
     fallback_pet_image: string;
+    fallback_pet_icon: string;
     showCarousel: boolean;
     app: {
         name: string;
@@ -31,11 +32,12 @@ const createSettingsStore = () => {
         showLandingImage: true,
         landingImage: '/images/welcome.jpg',
         fallback_pet_image: '/images/FurrPrints.webp',
+        fallback_pet_icon: '/icons/FurrPrints.svg',
         showCarousel: false,
         app: {
             name: 'Furr Buddies',
             short_name: 'Buddies',
-            version: '0.8.0',
+            version: '0.8.1',
             mascot_dark: '/icons/FurrBuddy2.webp',
             mascot_light: '/icons/FurrBuddy.webp',
         },

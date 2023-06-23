@@ -9,11 +9,11 @@
 	import { fade } from 'svelte/transition';
 	import LoadingCircle from '$lib/_components/icons/Loading_Circle.svelte';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
-    import { filter } from '@skeletonlabs/skeleton';
+    import { Ratings, filter } from '@skeletonlabs/skeleton';
 
     export let data;
 
-    let clinic: IClinic;
+    // let clinic: IClinic;
     const defaultImage = '/images/vet.jpg';
 
     // Loaders
@@ -23,18 +23,15 @@
     onMount(async ()=>{
         try {
             _loading = true;
-            await clinicstate.fetch();
+            if($clinicstate.length < 1)
+                await clinicstate.fetch();
             _loading = false;
         } catch (error) {
             _loading = false;
             throw redirect(307, '/clinics')
         }
         
-
-        clinic = $clinicstate.find(()=>$page.params.slug) as IClinic;
-
-        console.log(clinic);
-        
+    // console.log(clinic);
         
     });
 
@@ -50,6 +47,7 @@
 		{ image: 'https://th.bing.com/th/id/OIP.sz0-7EhYcQUFDQD7SPxUgAHaEA', title: '', story: 'Description goes here', link: '', isActive: true },
 		{ image: 'https://res.cloudinary.com/petrescue/image/upload/h_638,w_638,c_pad,q_auto:best,f_auto/v1561053876/gjehpvxtpqmfcl9qtizu.jpg', title: 'Lost but found', details: 'Description goes here', link: '', isActive: true },
 	]
+    $:clinic = $clinicstate.find(()=>$page.params.slug) as IClinic;
     
 </script>
 
@@ -63,7 +61,7 @@
 <main class="px-{data.padding}">
 
     <!-- Carousel containing Clinic's photos -->
-    <div class="max-w-2xl mx-auto max-h-[14rem] rounded-2xl overflow-hidden mb-8">
+    <div class="w-full mx-auto max-h-[14rem] rounded-2xl overflow-hidden mb-6">
         <!-- svelte-ignore missing-declaration -->
         {#if !_loadingPhotos}
             <!-- display default static welcome image while loading -->
@@ -91,57 +89,56 @@
     
     <!-- Clinic Name -->
     <h3 class="text-2xl text-center flex justify-center" in:fade={{ duration:600}}>
-        {#if _loading}<LoadingClock/>{:else}{clinic?.name}{/if}
+        {#if _loading}<LoadingClock/>{:else}<span title={clinic?.$id ?? ''}>{clinic?.name ?? ''}</span>{/if}
     </h3>
 
     <!-- Clinic details -->
-    {#if _loading }
-
-        <section class="surface-card w-full my-4">
-                <div class="w-full text-center gap-4" >
-                    <div class="placeholder" />
-                </div>
-        </section>
-
-    {:else}
+    {#if !_loading }
 
         <div in:fade={{ duration: 600 }} class="flex justify-evenly flex-wrap">
             <div class="w-full text-center gap-4">
-                <!--
-                {#each Object.keys(interactions) as f}
-                    <span
-                        class="chip {interactions[f] ? 'variant-filled' : 'variant-soft'}"
-                        on:click={()=>filter(f)} on:keypress>
-                        {#if interactions[f]}<span><iconify-icon icon="mdi:thumbs-up"></iconify-icon></span>{/if}
-                        <span class="capitalize">{f}</span>
-                    </span>
-                {/each}
-                -->
+                
+                <Ratings spacing="3" max={5} value={1.5}>
+                    <svelte:fragment slot="empty"> </svelte:fragment>
+                    <svelte:fragment slot="half">⭕</svelte:fragment>
+                    <svelte:fragment slot="full">🔴</svelte:fragment>
+                </Ratings>
+                
             </div>
             
 
-            <p class={clinic?.city ? 'flex' : 'hidden'}>City: { clinic?.city }</p>
+            <p class={clinic?.city ? 'flex' : 'hidden'}>{ (clinic?.address ?? '') } { clinic?.city ?? '' }</p>
             <p class={clinic?.location ? 'flex' : 'hidden'}>Location: { clinic?.location }</p>
 
-            <hr class="w-full my-4">
 
             <!-- Contact Info -->
-            <div class="w-full p-4 flex justify-evenly my-{data.padding}">
-                <a href="tel:{clinic?.phoneNumber}" class="{clinic?.phoneNumber ? 'flex' : 'hidden'} btn variant-filled-secondary">
-                    <iconify-icon icon="mdi:phone" class="mr-3"></iconify-icon>Call Us
-                </a>
-                <a href="mailto:{clinic?.email}" class="{clinic?.email ? 'flex' : 'hidden'} btn variant-filled-primary">
-                    <iconify-icon icon="mdi:email" class="mr-3"></iconify-icon>Email Us
-                </a>
-                <button class="{clinic?.location ? 'flex' : 'hidden'} btn variant-filled-tertiary">
-                    <iconify-icon icon="mdi:location" class="mr-3"></iconify-icon>Get Directions
-                </button>
-                <button class="btn variant-filled-surface">
-                    <iconify-icon icon="mdi:chevron-double-down" class="mr-3"></iconify-icon>Book Appointment
-                </button>
+            <div class="w-full p-8 flex flex-col justify-evenly my-{data.padding} bg-gradient-to-r from-transparent via-tertiary-800  to-transparent">
+                <div class="flex justify-evenly">
+                    <a href="tel:{clinic?.phoneNumber}" class="{clinic?.phoneNumber ? 'flex' : 'hidden'} btn variant-filled-secondary">
+                        <iconify-icon icon="mdi:phone" class="mr-3"></iconify-icon>Call Us
+                    </a>
+                    <a href="mailto:{clinic?.email}" class="{clinic?.email ? 'flex' : 'hidden'} btn variant-filled-primary">
+                        <iconify-icon icon="mdi:email" class="mr-3"></iconify-icon>Email Us
+                    </a>
+                    <button class="{clinic?.location ? 'flex' : 'hidden'} btn variant-filled-tertiary">
+                        <iconify-icon icon="mdi:location" class="mr-3"></iconify-icon>Get Directions
+                    </button>
+                </div>
+                <div class="flex justify-center">
+                    <button class="btn text-white hover:bg-tertiary-400 hover:text-black">
+                        <iconify-icon icon="mdi:chevron-double-down" class="mr-3"></iconify-icon>Book Appointment
+                    </button>
+                </div>
+                
             </div>
 
-            <hr class="w-full my-4">
+            <section>
+                <div>
+                    <p>Sunday: <span>{ clinic?.hours_sun ?? '' }</span></p>
+                    <p>Monday: <span>{ clinic?.hours_mon ?? '' }</span></p>
+                    <p>Tuesday: <span>{ clinic?.hours_tue ?? '' }</span></p>
+                </div>
+            </section>
 
             <!-- Services-->
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 my-{data.padding}">
@@ -174,8 +171,5 @@
     dt {
         font-size: 1.2rem;
         font-weight: 400;
-    }
-    dl {
-        font-weight: 200;
     }
 </style>

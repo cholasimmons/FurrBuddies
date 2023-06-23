@@ -2,9 +2,10 @@
 	import { goto } from "$app/navigation";
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
     import { Gender, Type, type IPet } from "$lib/_models/pet-model";
-	import { petbucketstate, petstate } from "$lib/_stores/auth_store.js";
+	import { petbucketstate, petstate, state } from "$lib/_stores/auth_store.js";
 	import { Avatar } from "@skeletonlabs/skeleton";
 	import { redirect } from "@sveltejs/kit";
+	import { onMount } from "svelte";
 	import { field, form } from "svelte-forms";
 	import { email, max, min, pattern, required } from "svelte-forms/validators";
 	import toast from "svelte-french-toast";
@@ -26,8 +27,27 @@
     const fbreed = field('breed', '');
     const fgender = field('gender', Gender.UNSPECIFIED);
     const fdob = field('dob', '');
+    const fcolor = field('color', '');
+    const fremarks = field('remarks', '');
     const ffile = field('uploader', File);
-    const addPetForm = form(fname,ftype,fbreed,fgender,fdob,ffile);
+    const addPetForm = form(fname,ftype,fbreed,fgender,fdob,fcolor,fremarks,ffile);
+
+    onMount(async ()=>{
+        try {
+            // Check if User is signed in
+            await state.checkLoggedIn();
+            
+            // Check if User account is verified
+            if(!state.checkVerificationStatus()) {
+                toast.error('Please verify your account');
+                throw redirect(307, '/user/profile');
+            }
+        } catch (error:any) {
+            console.warn('Access Denied: ',error);
+            toast.error('You are not authorized to add a new Buddy')
+            throw redirect(307,'/pets');
+        }
+    });
 
 /*
     function validateDate(value) {
@@ -46,7 +66,7 @@
         _adding = true;
         try {
             // Add valid form details to Appwrite collection
-            const petDoc:any = await petstate.addPet($fname.value,$fbreed.value,$fgender.value,$ftype.value,$fdob.value);
+            const petDoc:any = await petstate.addPet($fname.value,$fbreed.value,$fgender.value,$ftype.value,$fdob.value,$fcolor.value,$fremarks.value);
             // console.log('Returned after adding pet to appwrite: ',petDoc);
             
             // a small variable to notify us with an emoji in the toast, if a photo was uploaded too
@@ -113,11 +133,11 @@
 <!-- HTML body -->
 <main class="px-{data.padding}">
     <h3 class="title text-center">Add a Buddy</h3>
-    <p class="mt-0 text-center">
+    <p class="m-0 text-center font-light opacity-60">
         Grow the family
     </p>
 
-    <section class="flex justify-center">
+    <section class="flex justify-center mt-2">
         <div class="flex-grow flex flex-col max-w-lg justify-center">
 
             <form on:submit|preventDefault={addBuddy}>
@@ -125,14 +145,14 @@
                 <!-- Pet Photo -->
 
                 <div on:click={()=>document.getElementById('uploader')?.click()} on:keypress id="imagePreview"
-                    class="w-28 h-28 bg-surface-400 bg-opacity-30 rounded-full flex justify-center items-center overflow-hidden mx-auto transition-transform hover:scale-110">
-                    <iconify-icon icon="mdi:image" class="text-2xl"></iconify-icon>
+                    class="w-32 h-32 bg-surface-400 bg-opacity-30 rounded-full flex justify-center items-center overflow-hidden mx-auto transition-transform hover:scale-110 ease-out duration-300">
+                    <iconify-icon icon="mdi:image" class="text-2xl "></iconify-icon>
                 </div>
                 <input type="file" id="uploader" bind:value={$ffile.value} style="display:none" accept="image/*" on:change={handleFileUpload} />
 
                 <!-- Pet Name -->
 
-                <label class="block mt-6" for="name"> Name</label>
+                <label class="block mt-2" for="name"> Name</label>
                 <input
                     id="name" type="text" placeholder="Pet Name"
                     class:invalid="{!$fname.valid}"
@@ -146,50 +166,68 @@
                     <!-- Animal Type -->
 
                     <div class="flex-grow">
-                    <label class="block mt-6" for="type"> Animal Type</label>
+                    <label class="block mt-4" for="type"> Species</label>
                     <select
                         id="type" placeholder="Animal Type" class:invalid={!$ftype.valid}
                         bind:value={$ftype.value}>
-                        <option value="DOG">Dog</option>
-                        <option value="CAT">Cat</option>
-                        <option value="BIRD">Bird</option>
-                        <option value="RABBIT">Rabbit</option>
-                        <option value="RODENT">Rodent</option>
-                        <option value="HORSE">Horse</option>
+                        <option value={Type.DOG}>{Type.DOG}</option>
+                        <option value={Type.CAT}>{Type.CAT}</option>
+                        <option value={Type.BIRD}>{Type.BIRD}</option>
+                        <option value={Type.RABBIT}>{Type.RABBIT}</option>
+                        <option value={Type.RODENT}>{Type.RODENT}</option>
+                        <option value={Type.HORSE}>{Type.HORSE}</option>
                     </select>
                     </div>
 
                     <!-- Gender -->
 
                     <div class="flex-grow">
-                    <label class="block mt-6" for="gender"> Gender</label>
+                    <label class="block mt-4" for="gender"> Gender</label>
                     <select
                         id="gender" placeholder="Gender" class:invalid={!$fgender.valid} bind:value={$fgender.value}>
-                        <option value="UNSPECIFIED">Unspecified</option>
-                        <option value="MALE">Male</option>
-                        <option value="FEMALE">Female</option>
+                        <option value={Gender.UNSPECIFIED}>{Gender.UNSPECIFIED}</option>
+                        <option value={Gender.MALE}>{Gender.MALE}</option>
+                        <option value={Gender.FEMALE}>{Gender.FEMALE}</option>
                     </select>
                     </div>
                 </div>
-                
+
 
                 <div class="flex gap-3">
                     <!-- Breed -->
                     <div class="flex-grow">
-                        <label class="block mt-6" for="breed"> Breed</label>
+                        <label class="block mt-4" for="breed"> Breed</label>
                         <input
-                            id="breed" type="text" placeholder="Breed" class:invalid={!$fbreed.valid}
+                            name="breed" type="text" placeholder="Breed" class:invalid={!$fbreed.valid}
                             bind:value={$fbreed.value}/>
                     </div>
                     
                     <!-- Date of Birth -->
                     <div class="flex-grow">
-                        <label class="block mt-6" for="dob"> Date of Birth</label>
+                        <label class="block mt-4" for="dob"> Date of Birth</label>
                         <input
                             id="dob" type="date" placeholder="DD / MM / YYYY" pattern="(0[1-9]|1\d|2\d|3[01])/(0[1-9]|1[0-2])/\d{2}"
-                            max={Date.now()} class:invalid={!$fdob.valid}
+                            max={Date.now()} class:invalid={!$fdob.valid} inputmode="numeric"
                             bind:value={$fdob.value}/>
-                        <p class="text-sm opacity-60 text-right">Estimate if not sure.</p>
+                        <p class="hidden text-sm opacity-60 text-right">Estimate if unsure.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <!-- Color -->
+                    <div class="flex-grow">
+                        <label class="block mt-4" for="color"> Color</label>
+                        <input
+                            name="color" type="text" placeholder="Color" class:invalid={!$fcolor.valid}
+                            bind:value={$fcolor.value}/>
+                    </div>
+                    
+                    <!-- Special Remarks -->
+                    <div class="flex-grow">
+                        <label class="block mt-4" for="remarks"> Special Remarks</label>
+                        <input
+                            id="remarks" type="text" placeholder="Special Remarks" class:invalid={!$fremarks.valid} 
+                            bind:value={$fremarks.value}/>
                     </div>
                 </div>
 
@@ -209,6 +247,3 @@
         </div>
     </section>
 </main>
-
-<style>
-</style>

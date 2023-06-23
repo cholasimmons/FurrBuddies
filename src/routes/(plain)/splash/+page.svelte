@@ -11,7 +11,7 @@
     onMount(() => {
         // Simulate loading time with a timeout
         setTimeout(() => {
-            goto('/');
+            goto('/', {replaceState: true});
         }, 4800); // Switch to app after 3.6 seconds
     });
 </script>

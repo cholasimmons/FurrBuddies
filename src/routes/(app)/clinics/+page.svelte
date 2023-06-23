@@ -26,8 +26,8 @@
         }
     });
 
-    $:clinics = $clinicstate;
-    $:account = $state.account;
+    $: grid = isGrid;
+
 </script>
 
 <!-- HTML head -->
@@ -42,7 +42,7 @@
     <h3 class="title flex justify-between items-center">
         <!-- Left Panel -->
         <div class="flex items-center gap-2">
-            <button in:fade={{ duration:100, delay:100}} hidden={!clinics.length} on:click|preventDefault={()=>goto('/clinics/register')} type="button" class="btn btn-sm variant-filled-secondary">
+            <button in:fade={{ duration:100, delay:100}} hidden={!$clinicstate.length} on:click|preventDefault={()=>goto('/clinics/register')} type="button" class="btn btn-sm variant-filled-secondary">
                 <span class=" flex items-center"><iconify-icon icon="mdi:hospital"></iconify-icon></span>
                 <span>Own a Clinic?</span>
             </button>
@@ -51,23 +51,23 @@
 
         <!-- Right Panel -->
         <div class="flex items-center gap-2 ">
-            <button class="btn-icon" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
-            <button class="btn-icon" type="button" on:click={()=>isGrid = !isGrid}><iconify-icon icon="mdi:{isGrid ? 'grid' : 'format-list-bulleted-square'}"></iconify-icon></button>
+            <button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
+            <button class="btn-icon btn-icon-lg" type="button" on:click={()=>isGrid = !isGrid}><iconify-icon icon="mdi:{isGrid ? 'grid' : 'format-list-bulleted-square'}"></iconify-icon></button>
         </div>
     </h3>
 
-    {#if !clinics.length}
+    {#if !$clinicstate.length}
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center py-8 h-full flex flex-col items-center">
-            <p class="text-3xl opacity-70 m-0 mb-3">No Clinics available yet</p>
+            <p class="text-2xl opacity-70 m-0 mb-3">No Clinics available yet</p>
             {#if _loading}
                 <p in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class=" m-0 animate-pulse">Searching...</p>
             {/if}
         </section>
     {:else}
-        <div in:fade={{ duration: 300, delay:300 }} class="my-8 {isGrid ? 'grid grid-cols-1 sm:grid-cols-2 ' : 'flex flex-col'} gap-4">
-            {#each clinics as clinic, index}
+        <div in:fade={{ duration: 300, delay:300 }} class="my-8 {grid ? 'grid grid-cols-1 sm:grid-cols-2 ' : 'flex flex-col'} gap-4">
+            {#each $clinicstate as clinic, index}
             <a href="/clinics/{clinic.$id}">
-                <ClinicCard clinicName={clinic.name}/>
+                <ClinicCard clinicName={clinic.name} grid={grid}/>
             </a>        
             {/each}
         </div>

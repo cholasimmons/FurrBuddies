@@ -50,7 +50,7 @@ const createPets = () => {
       }))
       return pet;
     },
-    addPet: async (name:string, breed: string, gender: Gender, type: Type, dob: string) => {
+    addPet: async (name:string, breed: string, gender: Gender, type: Type, dob: string, color: string, specialRemarks: string) => {
       const userID = get(state).account?.$id;
       if(!userID)return;
 
@@ -67,7 +67,9 @@ const createPets = () => {
           gender,
           type,
           dob,          
-          ownerID: [userID]
+          ownerID: [userID],
+          color,
+          specialRemarks
         },
         [
           Permission.read(role), Permission.update(role), Permission.delete(role),

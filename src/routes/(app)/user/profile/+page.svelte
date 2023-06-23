@@ -17,7 +17,8 @@
 
     onMount(async ()=>{
         try {
-            await state.checkLoggedIn();
+            if(!$state.account)
+                await state.checkLoggedIn();
         } catch (error) {
             console.log('Not logged in.',error);
         }
@@ -34,11 +35,10 @@
             // Pass a reference to your custom component
             ref: ProfileEditForm,
             // Add the component properties as key/value pairs
-            props: { name: $state.account?.name },
+            // props: { },
             // Provide a template literal for the default component slot
             // slot: '<p>Skeleton</p>'
         };
-
         const modal: ModalSettings = {
             type: 'component',
             // Pass the component directly:
@@ -89,7 +89,7 @@
     }
 
 $: imageURL = $userbucketstate.userPhoto?.href;
-$: initials = $state.initials ?? 'ZM';
+// $: initials = $state.initials!;
     
 </script>
 
@@ -105,7 +105,7 @@ $: initials = $state.initials ?? 'ZM';
 <main class="text-center  px-{data.padding}">
     <section class="mx-auto w-full mt-3 max-w-xl">
         <div in:fade={{ duration: 300 }} class="flex justify-center relative">
-            <Avatar src={ imageURL?? initials } border="{ $state.account?.emailVerification ? 'border-2' : 'border-[4px] border-red-500'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
+            <Avatar src={ !imageURL ? '/icons/user.svg' : imageURL } border="{ $state.account?.emailVerification ? 'border-2' : 'border-[3px] border-red-400'}" width="w-32 shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] transition-transform hover:scale-110" />
             
             <button disabled={!$state.account?.prefs.photoID} on:click={removePhoto} class="absolute ml-36 btn variant-soft-error rounded-full w-8 h-8 ">
                 <iconify-icon icon="mdi:remove"></iconify-icon>
@@ -113,15 +113,17 @@ $: initials = $state.initials ?? 'ZM';
         </div>
         
         <!-- Display name of User --> 
-        <h3 class="text-xl md:text-3xl font-bold text-center mt-6 p-0 flex items-center justify-center gap-2 -mr-4">
-            {$state.account?.name ?? 'Welcome Guest'}
+        <h3 class="text-xl md:text-3xl font-medium text-center mt-6 p-0 flex items-center justify-center gap-2 -mr-4">
+            {$state.account?.name ?? 'Hello Visitor'}
 
+            {#if $state.account}
                 <iconify-icon icon="{ $state._loading ? 'line-md:loading-alt-loop' : $state.account?.emailVerification ? 'mdi:tick' : 'mdi:cancel'}"
                 class="text-lg {$state.account?.emailVerification ? 'text-green-500' : 'text-red-500'}" title={$state.account && $state.account.emailVerification ? 'Verified Account' : 'Unverified Account'}></iconify-icon>
+            {/if}
         </h3>
 
         <!-- Display email of User --> 
-        <p class="opacity-70 m-0 p-0 text-sm">{$state.account?.email ?? ''}</p>
+        <p class="opacity-70 m-1 p-0 text-sm">{$state.account?.email ?? ''}</p>
 
         <!-- If logged in -->
         {#if $state.account}
@@ -129,14 +131,14 @@ $: initials = $state.initials ?? 'ZM';
                 <p hidden={!$state.account?.prefs.phoneNumber}><span>Phone: </span>{$state.account?.prefs.phoneNumber}</p>
                 <p hidden={!Role.user($state.account?.$id)}><span>Role: </span>User</p>
                 <p hidden={!$state.account?.prefs.gender}><span>Gender: </span>{ ($state.account?.prefs.gender ?? '').toTitleCase()}</p>
-                <!--p hidden={!$state.account?.prefs.}><span>Role: </span>Registered User</p-->
+                <p hidden={!$state.account?.prefs.dob}><span>Date of Birth: </span>{ $state.account?.prefs.dob }</p>
 
             </div>
 
-            <section class="my-6 py-6 bg-surface-200 dark:bg-surface-700 bg-opacity-20 dark:bg-opacity-30 rounded-lg">
+            <section class="border-2 border-surface-300 dark:border-surface-700 my-6 py-6 bg-surface-300 dark:bg-surface-700 bg-opacity-40 dark:bg-opacity-20 rounded-lg">
                 <div class="flex flex-col items-center">
                     {#if $state.account?.emailVerification}
-                        <button class="text-500 btn gap-3 hover:bg-white hover:bg-opacity-20" on:click={editProfile}><iconify-icon icon="mdi:edit"></iconify-icon>Edit Profile</button>
+                        <button class="text-500 btn gap-3 hover:bg-surface-500 hover:bg-opacity-30" on:click={editProfile}><iconify-icon icon="mdi:edit"></iconify-icon>Edit Profile</button>
                     {:else}
                         <small class="font-light opacity-70">Your account is not verified, check your email for the activation link.</small>
                         <button class="text-500 btn gap-2 hover:bg-white hover:bg-opacity-20" on:click={resendActivationEmail} disabled={_sent}>

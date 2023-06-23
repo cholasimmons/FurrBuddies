@@ -12,13 +12,12 @@
 
     // svelte-forms form and validation = https://chainlist.github.io/svelte-forms/
     const fphone = field('phone', $state.account?.prefs.phoneNumber, [pattern(phoneRegEx)]);
+    const fdob = field('dob', $state.account?.prefs.dob, []);
     const fgender = field('gender', $state.account?.prefs.gender);
     const faddress = field('address', $state.account?.prefs.address);
     const fdistrict = field('district', $state.account?.prefs.district);
     const ffile = field('uploader', $state.account?.prefs.photoID);
-    const editProfileForm = form(fphone,fgender,faddress,fdistrict,ffile);
-    
-    export let name: any;
+    const editProfileForm = form(fphone,fdob,fgender,faddress,fdistrict,ffile);
 
     // Status of form, Loaders
     let _saving: boolean = false;
@@ -29,6 +28,7 @@
     // Form submit function
     async function submitEditedForm(){
         if(!$editProfileForm.valid)return;
+
         _saving = true;
         let bucketResponse: Models.File|undefined;
 
@@ -95,13 +95,13 @@
     }
 </script>
 
-<main>
-    <div class=" bg-surface-100 dark:bg-slate-800 p-8 rounded-2xl w-96 md:w-[40rem]">
-        <h3 class="title">Edit { getFirstName(name)}'s Details</h3>
+<main class=" w-full">
+    <div class=" bg-surface-100 dark:bg-slate-800 p-6 rounded-2xl mx-auto w-full sm:w-3/4 lg:w-[48rem]">
+        <h3 class="title">Edit { getFirstName($state.account?.name ?? 'User')}'s Details</h3>
 
         <form on:submit|preventDefault={submitEditedForm}>
-            <div class="my-6 grid grid-cols-3 gap-3">
-                <div class="col-span-3 flex flex-col gap-2 items-center justify-center bg-surface-300 rounded-xl p-6">
+            <div class="my-6 grid grid-cols-4 gap-3">
+                <div on:click={()=>document.getElementById('uploader')?.click()} on:keypress class="col-span-4 flex flex-col gap-2 items-center justify-center bg-surface-300 rounded-xl p-6 dark:text-surface-700">
                     <input type="file" id="uploader" bind:value={$ffile.value} accept="image/*" style="display:none" on:change={onChangeHandler}/>
                     
                     {#if photofile}
@@ -111,30 +111,36 @@
                     {/if}
 
                     <div class="flex flex-col md:flex-row justify-evenly items-center gap-6">
-                        <span on:click={()=>document.getElementById('uploader')?.click()} on:keypress >Click here to upload an image</span>
+                        <span >Click here to upload an image</span>
                         <span hidden={!photofile}><button on:click={()=>photofile=undefined} class="btn variant-ghost-surface" type="button"><iconify-icon icon="mdi:close" class="mr-2"></iconify-icon>Remove image</button> </span>
                     </div>
                 </div>
                 
-                <div class="col-span-3 md:col-span-1">
-                    <label for="gender">Gender:</label>
+                <div class="col-span-4 md:col-span-2">
+                    <label for="gender">Gender</label>
                     <select id="gender" bind:value={$fgender.value}>
                         <option value="">Undisclosed</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
                 </div>
-                <div class="col-span-3 md:col-span-2">
-                    <label for="phoneNumber">Phone Number:</label>
+
+                <div class="col-span-4 md:col-span-2">
+                    <label for="phoneNumber">Phone Number</label>
                     <input type="tel" id="phoneNumber" placeholder="260" inputmode="tel" on:input={validateNumericInput} bind:value={$fphone.value}>
                 </div>
 
-                <div class="col-span-3 md:col-span-2">
-                    <label for="address">Physical Address:</label>
+                <div class="col-span-4">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" placeholder="dd/mm/yyyy" inputmode="numeric" bind:value={$fdob.value}>
+                </div>
+
+                <div class="col-span-4 md:col-span-2">
+                    <label for="address">Physical Address</label>
                     <input type="text" id="address" inputmode="text" bind:value={$faddress.value}>
                 </div>
-                <div class="col-span-3 md:col-span-1">
-                    <label for="district">District:</label>
+                <div class="col-span-4 md:col-span-2">
+                    <label for="district">District</label>
                     <select id="district" inputmode="text" bind:value={$fdistrict.value}>
                         <option value="">None</option>
                         <option value="lusaka">Lusaka</option>

@@ -70,7 +70,7 @@
         
         <!-- Right Panel -->
 		{#if $state.account?.emailVerification }
-			<div class="{ $state.account ? 'flex' : 'hidden'} items-center gap-2 ">
+			<div class="{ $state.account ? 'flex items-center gap-2 ' : 'hidden'} ">
 				<button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
 				<button class="btn-icon btn-icon-lg " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
 			</div>
@@ -109,7 +109,7 @@
 			<dl in:fade={{ duration:200, delay: 250 }} class="mt-5 list-dl">
 				{#each $mail as mail, index}
 					<a href="/mail/{mail.$id}">
-						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-20 hover:bg-surface-hover-token border-2 border-surface-300">
+						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token border-2 border-surface-300 dark:border-surface-700">
 							<span class="w-[2rem] h-[2rem]">💌</span>
 							<span class="flex-col overflow-x-hidden ">
 								<dt class="{mail.isRead ? 'font-light' : 'font-bold'}">{mail.title}</dt>

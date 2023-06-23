@@ -74,12 +74,12 @@
         </div>
         
         <!-- Right Panel -->
-        <div class="flex items-center gap-2">
+        <!--div class="flex items-center gap-2">
             {#if account?.emailVerification }
             <button class="btn-icon btn-sm " type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
             <button class="btn-icon btn-sm " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
             {/if}
-        </div>
+        </div-->
         
     </h3>
 
@@ -114,7 +114,7 @@
                 {/if}
             {:else}
                 <!-- Display each available buddy -->
-                <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6  justify-center">
+                <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6 justify-center">
                     {#each $petstate.pets as pet, i}
                         <span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
                             <BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />

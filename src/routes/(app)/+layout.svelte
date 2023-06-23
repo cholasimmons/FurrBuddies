@@ -8,7 +8,7 @@
     import '@skeletonlabs/skeleton/styles/skeleton.css';
 
     // Finally, your application's global stylesheet (sometimes labeled 'app.css')
-    import '../../global.postcss';
+	import '../../global.postcss';
 
     import {AppShell, AppBar, Avatar, LightSwitch, setModeUserPrefers, setModeCurrent, modeCurrent, getModeUserPrefers } from '@skeletonlabs/skeleton';
 	import { storePopup, popup, Modal, modalStore } from '@skeletonlabs/skeleton';
@@ -160,9 +160,9 @@ slotSidebarLeft="w-0 md:w-[11rem] h-full scroll-none transition ease-in-out -tra
 						<button class="bg-surface-100 hover:bg-green-300 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/login')} id="will-close"><iconify-icon icon="mdi:lock-open"></iconify-icon> Log In</button>
 						<button class="bg-gray-100 hover:bg-orange-200 hover:rotate-3 btn btn-lg" on:click={()=>goto('/auth/register')} id="will-close"><iconify-icon icon="mdi:edit"></iconify-icon> Sign Up</button>
 					{:else if $state.account}
-						<button class="bg-surface-100 hover:bg-green-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
+						<button class="bg-surface-100 hover:bg-green-300 hover:rotate-3 btn btn-lg" on:click={()=>goto('/user/profile')} id="will-close"><iconify-icon icon="mdi:user"></iconify-icon> My Account</button>
 						<button class="bg-gray-100 hover:bg-red-400 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/auth/logout')} id="will-close"><iconify-icon icon="mdi:lock"></iconify-icon> Log Out</button>
-						<button class="bg-gray-100 hover:bg-indigo-400 hover:rotate-3 btn btn-lg" on:click={()=>goto('/help/bugs')} id="will-close"><iconify-icon icon="mdi:bug"></iconify-icon> Report a Bug</button>
+						<a class="bg-gray-100 hover:bg-indigo-400 hover:rotate-3 btn dark:text-black" href="mailto:bugs@buddies.simmons.studio" id="will-close"><iconify-icon icon="mdi:bug" class="text-2xl mr-2"></iconify-icon> Report a Bug</a>
 					{/if}
 						<button class="bg-gray-100 hover:bg-pink-300 hover:-rotate-3 btn btn-lg" on:click={()=>goto('/about')} id="will-close"><iconify-icon icon="mdi:about"></iconify-icon> About</button>
 					

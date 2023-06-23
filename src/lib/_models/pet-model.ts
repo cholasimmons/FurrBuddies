@@ -12,16 +12,15 @@ export type IPet = {
 
 
 	export enum Gender {
-		UNSPECIFIED = "UNSPECIFIED",
-		MALE = "MALE",
-		FEMALE = "FEMALE",
-		Gender = "Gender"
+		UNSPECIFIED = "Unspecified",
+		MALE = "Male",
+		FEMALE = "Female",
 	}
   export enum Type {
-    DOG="DOG",
-    CAT="CAT",
-    BIRD="BIRD",
-    RABBIT="RABBIT",
-    RODENT="RODENT",
-    HORSE="HORSE",
+    DOG="Dog",
+    CAT="Cat",
+    BIRD="Bird",
+    RABBIT="Rabbit",
+    RODENT="Rodent",
+    HORSE="Horse",
   }
