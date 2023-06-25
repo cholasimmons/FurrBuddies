@@ -5,14 +5,12 @@
     import { onMount } from 'svelte';
 	import { fade, fly, scale, slide } from 'svelte/transition';
 
-    const title: string = 'Furr Buddies';
-
     // Simulated loading screen
     onMount(() => {
         // Simulate loading time with a timeout
         setTimeout(() => {
             goto('/', {replaceState: true});
-        }, 4800); // Switch to app after 3.6 seconds
+        }, 3600); // Switch to app after 3.6 seconds
     });
 </script>
 
@@ -25,9 +23,9 @@
     <div class="flex flex-col items-center">
         <div><img src="/images/FurrPrints.webp" alt="Furr Buddies" class="w-20"></div>
         <!--div><img src="/favicon.png" alt="Furr Buddies" class="w-20"></div-->
-        <h3 in:scale={{ duration: 800, start:0.6 }} class="text-3xl mt-8 p-0">{ title }</h3>
+        <h3 in:scale={{ duration: 800, start:0.6 }} class="text-3xl mt-8 p-0">{ $appSettings.app.name }</h3>
         <small class="m-0 p-0">v { $appSettings.app.version }</small>
-        <span><LoadingClock/></span>
+        <span><LoadingClock /></span>
     </div>
 
     <div>

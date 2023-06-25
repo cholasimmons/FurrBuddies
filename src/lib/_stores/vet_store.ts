@@ -14,39 +14,50 @@ const createClinics = () => {
   return {
     subscribe,
     fetch: async () => {
-      const response: any = await sdk.database.listDocuments(server.database, server.vetcollection_clinics);
-      return set(response.documents);
+      const response: any = await sdk.database.listDocuments(server.vetdb, server.vetcollection_clinics);
+      // set([]);
+      update((clinicstate) => [...response.documents.filter((doc: any) => doc.isActive === true)] )
     },
-    addVet: async (name: string, city: string) => {
-      const userId = get(state).account!.$id;
+    addVet: async (clinic: IClinic) => {
+      const userId = get(state).account?.$id;
+      if(!userId) return;
+
       const role = Role.user(userId);
+      if(!role) return;
       
-      const application = await sdk.database.createDocument<IClinic>(
-        server.database,
-        server.vetcollection_clinics,
+      const newclinic = await sdk.database.createDocument<IClinic>(
+        server.vetdb,
+        server.vetcollection_applications,
         ID.unique(),
-        {
-          name,
-          city,
-          userId
-        },
+        clinic,
         [
           Permission.read('any'),
           Permission.update(role),
           Permission.delete(role),
         ]
       );
-      update((n) => [application, ...n]);
+      update((clinics) => [newclinic, ...clinics]);
     },
+    fetchVet: async (clinicID: string) => {
+      const userId = get(state).account?.$id;
+      if(!userId) return;
 
-    removeVet: async (clinic: IClinic) => {
-      await sdk.database.deleteDocument(server.database, server.vetcollection_clinics, clinic.$id);
-      update((n) => n.filter((t) => t.$id !== clinic.$id));
+      const role = Role.user(userId);
+      if(!role) return;
+      
+      const newclinic = await sdk.database.getDocument<IClinic>(
+        server.vetdb,
+        server.vetcollection_clinics,
+        clinicID
+      );
+      return newclinic;
     },
     updateVet: async (clinic: IClinic) => { // Partial<Clinic>
       const user = Role.user(get(state).account!.$id);
+      if(!user) return;
+
       await sdk.database.updateDocument(
-        server.database,
+        server.vetdb,
         server.vetcollection_clinics,
         clinic.$id,
         clinic,
@@ -56,13 +67,10 @@ const createClinics = () => {
           Permission.delete(user),
         ]
       );
-      update((n) => {
-        const index = n.findIndex((c) => c.$id === clinic.$id);
-        n[index] = {
-          ...n[index],
-          ...(<IClinic>clinic),
-        };
-        return n;
+      update((clinics) => {
+        const index = clinics.findIndex((fclinic) => fclinic.$id === clinic.$id);
+        clinics[index] = { ...clinics[index], ...(<IClinic>clinic)};
+        return clinics;
       });
     },
   };
@@ -87,6 +95,27 @@ const createImageState = () => {
         set(response.documents);
       } catch (error) {
         console.info('Error querying ads.',error)
+      }
+    },
+
+    getPreview: async (id: string, size:number = 720) => {
+      const userID = get(state).account?.$id;
+      if(!userID) return;
+
+      const role = Role.user(userID);
+      if(!role)return;
+
+      try {
+        const photoPreview = await sdk.storage.getFilePreview(
+          server.bucket_clinics,
+          id, size, undefined, 'center', 75
+        );
+        console.log('Photo preview: ',photoPreview);
+        update(vetbucketstate => ({...vetbucketstate, photos: photoPreview}));
+
+        return photoPreview;
+      } catch (error) {
+        console.error('Failed to retrieve preview photo:', error);
       }
     },
   }

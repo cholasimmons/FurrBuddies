@@ -15,10 +15,13 @@ interface ISettings {
         version: string;
         mascot_dark: string;
         mascot_light: string;
+        home_url: string;
+        verification_url: string;
     },
     developer: {
         name: string;
         email: string;
+        whatsapp: number;
         website: string;
     }
 }
@@ -40,10 +43,13 @@ const createSettingsStore = () => {
             version: '0.8.1',
             mascot_dark: '/icons/FurrBuddy2.webp',
             mascot_light: '/icons/FurrBuddy.webp',
+            home_url: 'https://buddies.simmons.studio',
+            verification_url: '/auth/verify'
         },
         developer: {
             name: 'Frank Simmons',
             email: 'frank@simmons.studio',
+            whatsapp: 260969667697,
             website: 'https://simmons.studio'
         }
       });

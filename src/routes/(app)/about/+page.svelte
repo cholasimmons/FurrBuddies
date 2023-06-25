@@ -9,8 +9,8 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName}</title>
-	<meta name="description" content="About {data.appName}" />
+	<title>{$appSettings.app.name}</title>
+	<meta name="description" content="About {$appSettings.app.name}" />
 </svelte:head>
 
 <!-- HTML body -->
@@ -27,10 +27,7 @@
 		<small class="mb-4 p-0 opacity-50">App Version: { $appSettings.app.version }</small>
 	</div>
 
-    <p>Lorem ipsum, dolor sit amet conse-ctetur adipisicing elit. Harum cupiditate iusto id fugiat numquam dolor? Eum quibusdam et, facere voluptate ipsum necessitatibus magnam, architecto pariatur veritatis possimus labore. Asperiores, cumque.</p>
-
-
-    <h3 class="title flex justify-start items-center mt-8">Credit</h3>
+    <h3 class="title flex justify-start items-center ">Credit</h3>
     <p>Major thanks and congratulations to the team at <a href="https://kit.svelte.dev" target="">SvelteKit</a> for creating such a magnificent framework! 
         <a href="https://ppwrite.io" target="appwrite">Appwrite</a>, this would not have been possible without you guys as well.
         And to the entire open-source community,<br><b>Thank You</b>.

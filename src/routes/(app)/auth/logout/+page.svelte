@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
     import { state } from "$lib/_stores/auth_store.js";
+	import { appSettings } from "$lib/_stores/settings_store.js";
 	import { onMount } from "svelte";
 
     export let data;
@@ -13,20 +14,19 @@
     onMount(()=>{
         _loading = true;
         try {
-            setTimeout(async ()=>{
-                await state.logout();
+            timerId = setTimeout(async ()=>{
                 _loading = false;
-
+                await state.logout();
                 // Return User to previous page upon successful logout;
                 clearTimeout(timerId);
-                goto("/splash");
+                goto("/splash", {replaceState: true});
             }, 2000);
         } catch (error) {
             console.warn('Unable to log out from server');
             _loading = false;
         } finally {
             timerId = setTimeout(()=>{
-                goto("/splash");
+                goto("/splash", {replaceState: true});
             }, 5000);
         }
     })

@@ -6,8 +6,8 @@
 	import { modalStore, type ModalComponent, type ModalSettings, Avatar } from "@skeletonlabs/skeleton";
 	import { Role } from "appwrite";
 	import { onMount } from "svelte";
-	import { init } from "svelte/internal";
 	import { fade } from "svelte/transition";   
+	import { appSettings } from "$lib/_stores/settings_store.js";
 
     export let data;
 
@@ -95,7 +95,7 @@ $: imageURL = $userbucketstate.userPhoto?.href;
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | User Profile</title>
+	<title>{$appSettings.app.name} | User Profile</title>
 	<meta name="description" content="Manage your Account" />
 </svelte:head>
 
@@ -118,7 +118,7 @@ $: imageURL = $userbucketstate.userPhoto?.href;
 
             {#if $state.account}
                 <iconify-icon icon="{ $state._loading ? 'line-md:loading-alt-loop' : $state.account?.emailVerification ? 'mdi:tick' : 'mdi:cancel'}"
-                class="text-lg {$state.account?.emailVerification ? 'text-green-500' : 'text-red-500'}" title={$state.account && $state.account.emailVerification ? 'Verified Account' : 'Unverified Account'}></iconify-icon>
+                class="text-lg {$state.account?.emailVerification ? 'text-green-500' : 'text-red-500'}" title={$state.account && $state.account?.emailVerification ? 'Verified Account' : 'Unverified Account'}></iconify-icon>
             {/if}
         </h3>
 
@@ -130,7 +130,7 @@ $: imageURL = $userbucketstate.userPhoto?.href;
             <div class="mt-6 flex flex-col items-center justify-start text-left">
                 <p hidden={!$state.account?.prefs.phoneNumber}><span>Phone: </span>{$state.account?.prefs.phoneNumber}</p>
                 <p hidden={!Role.user($state.account?.$id)}><span>Role: </span>User</p>
-                <p hidden={!$state.account?.prefs.gender}><span>Gender: </span>{ ($state.account?.prefs.gender ?? '').toTitleCase()}</p>
+                <p hidden={!$state.account?.prefs.gender}><span>Gender: </span>{ ($state.account?.prefs.gender).toTitleCase()}</p>
                 <p hidden={!$state.account?.prefs.dob}><span>Date of Birth: </span>{ $state.account?.prefs.dob }</p>
 
             </div>

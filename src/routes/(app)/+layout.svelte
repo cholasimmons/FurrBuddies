@@ -59,11 +59,16 @@
 		'/auth/pass-forgot': 'Forgotten Password',
 		'/auth/pass-reset': 'Password Reset',
 		'/user/profile': 'User Profile',
+		'/help': 'Help Section',
 		'/legal/terms': 'Terms and Conditions'
 	};
 
 	onMount(async ()=>{
+		modeCurrent.set($appSettings.lightMode ? true : false);
+
 		try {
+
+			// if(!$state.account)
 			await state.checkLoggedIn();
 			
 			toast.success('Welcome back '+getFirstName($state.account?.name || 'Stranger')+'!' );
@@ -71,7 +76,7 @@
 			// Personalize App
 			setModeUserPrefers($state.account?.prefs.lightMode ?? $appSettings.lightMode);
 			setModeCurrent($state.account?.prefs.lightMode ?? $appSettings.lightMode);
-			setModeCurrent($modeCurrent); 
+			// setModeCurrent($modeCurrent); 
 			
 			// state.updateUserPrefs({'lightMode':$modeCurrent})
 			// Demo of User Prefs as settings
@@ -79,7 +84,7 @@
 		} catch (error) {
 			// console.warn('No signed in User.');
 			toast.error('Hello there Stranger', {icon: '👋🏾'});
-			modeCurrent.set($appSettings.lightMode ? true : false);
+			
 		}
 	});
 
@@ -98,7 +103,7 @@
 			return routes[routeKeys[i]];
 			}
 		}
-		return data.appName;
+		return $appSettings.app.name;
 	}
 
 	// Dropdown menu from the avatar icon

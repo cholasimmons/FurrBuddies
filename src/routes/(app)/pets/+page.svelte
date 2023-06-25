@@ -6,6 +6,7 @@
     import { fade } from 'svelte/transition';
 	import BuddyCard from '$lib/_components/BuddyCard.svelte';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 
     export let data;
 
@@ -43,13 +44,12 @@
         _sending = false;
     }
 
-    $: account = $state.account;
     // $: pets = $petstate.pets;
 </script>
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | My Buddies</title>
+	<title>{$appSettings.app.name} | My Buddies</title>
 	<meta name="description" content="A collection of your Furr Buddies" />
 </svelte:head>
 
@@ -60,7 +60,7 @@
     <h3 class="title flex justify-between items-center">
         <!-- Left Panel -->
         <div class="flex items-center gap-2">
-            {#if account}
+            {#if $state.account}
                 <button in:fade={{ duration:100, delay:100}} on:click|preventDefault={()=>goto('/pets/add')}  type="button" class="btn btn-sm variant-filled-secondary">
                     <span class=" flex items-center"><iconify-icon icon="mdi:paw"></iconify-icon></span>
                     <span>Add Buddy</span>
@@ -85,7 +85,7 @@
 
     <!-- Display Buddies if User is logged in and has buddies, otherwise no Buddies shown-->
 
-    {#if !account }
+    {#if !$state.account }
     <!-- If NOT logged in -->
         <section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
 
@@ -114,7 +114,7 @@
                 {/if}
             {:else}
                 <!-- Display each available buddy -->
-                <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6 justify-center">
+                <div class="my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-6 gap-6">
                     {#each $petstate.pets as pet, i}
                         <span on:click|preventDefault={()=>goto('/pets/'+pet.$id)} on:keypress in:fade={{ duration:300, delay: 200*(i+1)}}>
                             <BuddyCard petName={pet.name} photoID={ pet.photoID?.[0] ?? '' } />

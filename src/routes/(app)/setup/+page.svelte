@@ -5,6 +5,7 @@
 
 	// Theme watcher
 	import { modeOsPrefers, modeUserPrefers, modeCurrent } from '@skeletonlabs/skeleton';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 
 	// Layout Service
 	// import { layoutSettings } from '$lib/_services/layout-service.js';
@@ -63,7 +64,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Setup</title>
+	<title>{$appSettings.app.name} | Setup</title>
 	<meta name="description" content="Configure your app" />
 </svelte:head>
 

@@ -27,7 +27,6 @@
 
             if(file){
                 imageURL = file?.href;
-                // console.warn(file, imageURL);
                 _loading = false;
             }
             _loading = false;

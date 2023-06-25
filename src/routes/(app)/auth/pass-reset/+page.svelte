@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 	import { sdk } from '$lib/appwrite.js';
     import { form, field } from 'svelte-forms';
     import { required, pattern, matchField } from 'svelte-forms/validators';
@@ -47,8 +48,8 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Password Reset</title>
-	<meta name="description" content="Securely reset your {data.appName} password" />
+	<title>{$appSettings.app.name} | Password Reset</title>
+	<meta name="description" content="Securely reset your {$appSettings.app.name} password" />
 </svelte:head>
 
 <!-- HTML body -->

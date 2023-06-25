@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
     import { state } from "$lib/_stores/auth_store.js";
+	import { appSettings } from "$lib/_stores/settings_store.js";
     import { form, field } from 'svelte-forms';
     import { required, email, pattern } from 'svelte-forms/validators';
 	import toast from "svelte-french-toast";
@@ -46,8 +47,8 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Login</title>
-	<meta name="description" content="{data.appName} authenticated login" />
+	<title>{$appSettings.app.name} | Login</title>
+	<meta name="description" content="{$appSettings.app.name} authenticated login" />
 </svelte:head>
 
 <!-- HTML body -->

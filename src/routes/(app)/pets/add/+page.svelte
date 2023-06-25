@@ -3,6 +3,7 @@
 	import LoadingClock from "$lib/_components/icons/Loading_Clock.svelte";
     import { Gender, Type, type IPet } from "$lib/_models/pet-model";
 	import { petbucketstate, petstate, state } from "$lib/_stores/auth_store.js";
+	import { appSettings } from "$lib/_stores/settings_store.js";
 	import { Avatar } from "@skeletonlabs/skeleton";
 	import { redirect } from "@sveltejs/kit";
 	import { onMount } from "svelte";
@@ -126,7 +127,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Add a Buddy</title>
+	<title>{$appSettings.app.name} | Add a Buddy</title>
 	<meta name="description" content="Add a Buddy to the family" />
 </svelte:head>
 

@@ -33,10 +33,10 @@
 			
 
 			if($state.account?.prefs.showCarousel === true){
-				ads.fetch(); // we don\'t have to wait on this
+				ads.fetch(); // we don't have to wait on this
 			}
 
-			// If our CliPets store is empty, make a fresh fetch
+			// If our Pet state is empty, make a fresh fetch
 			if($petstate.pets.length < 1){
 				_loadingPets = true;
 				await petstate.fetch();
@@ -69,7 +69,7 @@
 			_loadingVets = false;
 		}
 	});
-
+/*
 	let petCount:number;
 
 	// Count types of owned animals for dashboard
@@ -85,7 +85,7 @@
 		)
 		return petCount;
 	}
-
+*/
 	$: dogCount = $petstate.pets.reduce((count, pet) => (pet.type === Type.DOG ? count + 1 : count), 0);
 	$: catCount = $petstate.pets.reduce((count, cat) => (cat.type === Type.CAT ? count + 1 : count), 0);
 	$: birdCount = $petstate.pets.reduce((count, bird) => (bird.type === Type.BIRD ? count + 1 : count), 0);
@@ -94,7 +94,6 @@
 	$: horseCount = $petstate.pets.reduce((count, horse) => (horse.type === Type.HORSE ? count + 1 : count), 0);
 
 	// console.warn($petstate.pets.reduce((count, pet) => (pet.type === Type.DOG ? count + 1 : count), 0));
-	
 
 	// Resend email with verification link
     async function resendActivationEmail() {
@@ -104,16 +103,12 @@
         _sending = false;
     }
 
-	
-
-	$:carousel = $ads;
-
 </script>
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName}</title>
-	<meta name="description" content="{data.appName} Home" />
+	<title>{$appSettings.app.name}</title>
+	<meta name="description" content="{$appSettings.app.name} Home" />
 </svelte:head>
 
 <!-- HTML body -->
@@ -121,11 +116,11 @@
 
 	<!-- Carousel slideshow -->	
 
-	{#if browser && carousel.length>0 && $appSettings.showCarousel }
+	{#if browser && $ads.length>0 && $appSettings.showCarousel }
 		<!-- Carousel containing information/ads from the server -->
 		<div in:fade={{ duration:200, delay:100 }} class="max-w-xl mx-auto max-h-[14rem] rounded-2xl overflow-hidden">
 		<Carousel autoplay autoplayDuration={4400} pauseOnFocus={false} dots={false} arrows={false} swiping={true}>
-			{#each carousel as { image, title, details, link }}
+			{#each $ads as { image, title, details, link }}
 				<a href={link}  target="_blank">
 					<div class="w-full h-[14rem] relative">
 						<img src={image} alt='' class="w-full h-[14rem] object-cover object-center">
@@ -177,8 +172,8 @@
 		{:else}
 			<hr>
 
-			<!-- Dashboard - Signed in User -->
-			<div in:fade={{ duration:100, delay: 160 }} class="my-8 h-[3rem] flex justify-evenly gap-2">
+			<!-- Dashboard items - Signed in User -->
+			<div in:fade={{ duration:100, delay: 170 }} class="my-8 h-[3rem] flex justify-evenly gap-2">
 				{#if _loadingPets || _loadingVets}
 					<div out:fade={{ duration:90 }} class="mx-auto w-[50%] h-[2rem] rounded-xl placeholder animate-pulse bg-surface-700 bg-opacity-20">&nbsp;
 					</div>

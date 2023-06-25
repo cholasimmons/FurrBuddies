@@ -11,6 +11,9 @@
 	import { cubicIn, cubicInOut, cubicOut } from "svelte/easing";
 	import { emailValidator } from "$lib/_utilities/validators";
 	import { page } from "$app/stores";
+	import { appSettings } from "$lib/_stores/settings_store.js";
+	import type { AppwriteException } from "appwrite";
+	import { redirect } from "@sveltejs/kit";
 
     export let data;
 
@@ -18,18 +21,18 @@
     let errormessage: string = '';
 
     // Countdown timer before page redirects to home
-    const timerSeconds: number = 4000;
+    const timerSeconds: number = 3200;
 
     // URL to return to for verification
-    const returnUrl: string = 'https://buddies.simmons.studio/auth/verify'
+    const returnUrl: string = $appSettings.app.home_url+$appSettings.app.verification_url
 
     // "isLoading" type of boolean
     let _verifying: boolean = true;
     let _verifying2: boolean = true;
     let _isAuthenticated: boolean = false;
 
-    const userId = $page.url.searchParams.get('userId') ?? '0';
-    const secret = $page.url.searchParams.get('secret') ?? '0';
+    const userId = $page.url.searchParams.get('userId');
+    const secret = $page.url.searchParams.get('secret');
     const expire = $page.url.searchParams.get('expire');
 
     onMount(async ()=>{
@@ -37,18 +40,22 @@
         
         _verifying = true;
         try {
+            if(!$state.account)
+                await state.checkLoggedIn();
+
             if($state.account?.emailVerification === true){
                 toast.error('Your account is already verified');
                 errormessage = 'Your account is already verified 👌';
                 throw new Error('Account already verified');
             }
 
-            await sdk.account.updateVerification(userId,secret);
-            await state.checkLoggedIn();
-            _isAuthenticated = true;
-            errormessage = 'Your account is now verified! 😎';
-            toast.success('Your email has been verified');
-            _verifying = false;
+            if(userId && secret){
+                await sdk.account.updateVerification(userId,secret);
+                _isAuthenticated = true;
+                errormessage = 'Your account is now verified! 😎';
+                toast.success('Your email has been verified');
+                _verifying = false;
+            }
 
             setTimeout(()=>{},timerSeconds*1000);
         } catch (error: any) {
@@ -67,12 +74,22 @@
         _verifying2 = true;
         try {
             errormessage = '';
+            if($state.account?.emailVerification === true){
+                toast.error('Your account is already verified');
+                errormessage = 'Your account is already verified 👌';
+                _verifying = false;
+                _verifying2 = false;
+                throw new Error('Account already verified');
+            }
             await sdk.account.createVerification(returnUrl);
             errormessage = 'Check your email';
             _verifying = false;
             _verifying2 = false;
-        } catch (error) {
-            
+        } catch (error: any) {
+            toast.error(error.message);
+            _verifying = false;
+            _verifying2 = false;
+            throw redirect(302, '/')
         } 
     }
 
@@ -80,8 +97,8 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Verify Account</title>
-	<meta name="description" content="{data.appName} verification" />
+	<title>{$appSettings.app.name} | Verify Account</title>
+	<meta name="description" content="{$appSettings.app.name} verification" />
 </svelte:head>
 
 <!-- HTML body -->
@@ -100,7 +117,7 @@
         
         {#if !_verifying }<span in:scale={{ duration: 300, easing: cubicInOut}}>Account Status: <span class="font-medium { _isAuthenticated ? 'text-success-600' : 'text-error-600'}">{ $state.account?.emailVerification ? 'Verified' : 'Unverified' }</span></span>{/if}
 
-        <div class="mt-6 p-8 bg-surface-700 bg-opacity-50 text-center flex flex-col items-center">
+        <div class="min-w-[10rem] mt-6 p-8 bg-surface-700 bg-opacity-50 text-center flex flex-col items-center">
             {#if _verifying  }
                 <span class="animate-ping">...</span>
             {:else}

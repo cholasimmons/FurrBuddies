@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 	import { sdk } from '$lib/appwrite.js';
     import { form, field } from 'svelte-forms';
     import { required, email, pattern } from 'svelte-forms/validators';
@@ -39,7 +40,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Forgotten Password</title>
+	<title>{$appSettings.app.name} | Forgotten Password</title>
 	<meta name="description" content="Request for a password reset link" />
 </svelte:head>
 

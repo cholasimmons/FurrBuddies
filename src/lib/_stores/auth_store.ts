@@ -107,12 +107,12 @@ const createPets = () => {
       );
       
       update((state) => {
-        const updatedPets = state.pets.map((p) => {
-          if (p.$id === pet.$id){
-            return { ...p, ...pet };
+        const updatedPets:any = state.pets.map((mapPet) => {
+          if (mapPet.$id === pet.$id){
+            return { ...mapPet, ...pet };
           }
           
-          return p;
+          return updatedPets;
       });
 
       return { pets: updatedPets };
@@ -189,7 +189,10 @@ const createClinics = () => {
 // PET PHOTO STORAGE
 
 const createPetPhoto = () => {
-  const { subscribe, update, set } = writable([]);
+  const { subscribe, update, set } = writable({
+    files: null as File[]|null,
+    photos: null as URL|null
+  });
 
   return {
     subscribe,
@@ -202,9 +205,10 @@ const createPetPhoto = () => {
   
       try {
         const response: any = await sdk.storage.listFiles(server.bucket_buddies);
-        // console.log('Bucket ', response);
+        console.log('Bucket File: ', response);
         
-        set(response.files);
+        // set(response.files);
+        update(petbucketstate => ({...petbucketstate, files: response.files}))
       } catch (error) {
         console.error('Failed to fetch pet photos:', error);
       }
@@ -227,7 +231,7 @@ const createPetPhoto = () => {
             Permission.delete(role),
           ]
         );
-        // update((photos) => [...photos]);
+        // update((petbucketstate) => ({...petbucketstate, files: [...photoBucket]}));
         return photoBucket;
       } catch (error) {
         console.error('Failed to add pet photo:', error);
@@ -235,7 +239,9 @@ const createPetPhoto = () => {
       }
     },
     getPreview: async (id: string, size:number = 256) => {
-      const userID = get(state).account!.$id;
+      const userID = get(state).account?.$id;
+      if(!userID) return;
+
       const role = Role.user(userID);
       if(!role)return;
 
@@ -244,7 +250,9 @@ const createPetPhoto = () => {
           server.bucket_buddies,
           id, size, undefined, 'center', 75
         );
-        // console.log('Bucket response: ',photoPreview);
+        console.log('Photo preview: ',photoPreview.toString());
+        update(petbucketstate => ({...petbucketstate, photos: photoPreview}));
+
         return photoPreview;
       } catch (error) {
         console.error('Failed to retrieve preview photo:', error);
@@ -377,9 +385,11 @@ const createState = () => {
       state.init();
       petstate.init();
       mail.clear();
+      userbucketstate.clearPhoto();
       const session = await sdk.account.createEmailSession(email, password);
       // await sdk.account.get();
       const initials = sdk.avatars.getInitials();
+      userbucketstate.getPreview(session.userId);
       state.init(session, initials.href);
       // setPrefs(await ...sdk.account.getPrefs());
       setLoading(false);
@@ -390,6 +400,7 @@ const createState = () => {
       state.init();
       petstate.init();
       mail.clear();
+      userbucketstate.clearPhoto();
       setLoading(false);
     },
     updateUserPrefs: async (prefs: Models.Preferences) => {
@@ -400,8 +411,8 @@ const createState = () => {
       
       setLoading(true);
       const prfs = await sdk.account.getPrefs();
-      console.log('Current User Prefs: ',prfs);
-      console.log('New User Prefs: ',prefs);
+      // console.log('Current User Prefs: ',prfs);
+      // console.log('New User Prefs: ',prefs);
       const result = await sdk.account.updatePrefs({...prfs, ...prefs});
       state.init(result),
       setLoading(false);

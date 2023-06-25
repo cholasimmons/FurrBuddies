@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 	import { mail, state } from '$lib/_stores/auth_store.js';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 	import { truncateString } from '$lib/_utilities/text-transform.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -50,7 +51,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Messages</title>
+	<title>{$appSettings.app.name} | Messages</title>
 	<meta name="description" content="Your personalized inbox" />
 </svelte:head>
 
@@ -70,24 +71,20 @@
         
         <!-- Right Panel -->
 		{#if $state.account?.emailVerification }
-			<div class="{ $state.account ? 'flex items-center gap-2 ' : 'hidden'} ">
+			<div class="{ $state.account ? 'flex items-center' : 'hidden'} ">
 				<button class="btn-icon btn-icon-lg" type="button"><iconify-icon icon="mdi:filter"></iconify-icon></button>
-				<button class="btn-icon btn-icon-lg " type="button"><iconify-icon icon="mdi:grid"></iconify-icon></button>
 			</div>
 		{/if}
     </h3>
 
-
 	{#if _loading}
-		<section in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="text-center mt-16">
+		<section in:fade={{ duration: 300, delay: 250 }} out:fade={{ duration:200 }} class="text-center mt-16">
 			<div class="flex flex-col items-center justify-center gap-3 pt-12">
-				<iconify-icon icon="mdi:mail-outline" class="text-3xl"></iconify-icon>
+				<iconify-icon icon="mdi:mail-outline" class="text-3xl animate-bounce"></iconify-icon>
 				<div class="flex flex-col items-center">
 					<h3 class="title">Please hold on a moment...</h3>
 				</div>
-				
 			</div>
-			
 		</section>
 	{:else if $state.account && $state.account.emailVerification }
 	<!-- User logged in and verified - Display Mail -->
@@ -106,7 +103,7 @@
 		{:else}
 
 			<!-- Display each available message -->
-			<dl in:fade={{ duration:200, delay: 250 }} class="mt-5 list-dl">
+			<dl in:fade={{ duration:200, delay: 250 }} out:fade={{ duration:250 }} class="mt-5 list-dl">
 				{#each $mail as mail, index}
 					<a href="/mail/{mail.$id}">
 						<div in:fade={{ duration:200, delay: (index+1)*100 }} class="bg-surface-700 bg-opacity-30 hover:bg-surface-hover-token border-2 border-surface-300 dark:border-surface-700">
@@ -132,7 +129,7 @@
 	{:else}
 	<!-- User NOT logged in - Prompt to log in -->
 
-		<div in:fade={{ duration: 300 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
+		<div in:fade={{ duration: 300, delay: 250 }} out:fade={{ duration:200 }} class="flex flex-col items-center justify-center gap-3 pt-12">
 			<p class="text-lg">You're missing out!</p>
 			<button on:click={()=>goto('/auth/login')} class="shadow-[0_1rem_1rem_rgba(0,0,0,0.2)] hover:shadow-none btn btn-lg">
 				Log in

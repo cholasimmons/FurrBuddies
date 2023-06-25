@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 
     export let data;
 
@@ -27,7 +28,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | About Animals</title>
+	<title>{$appSettings.app.name} | About Animals</title>
 	<meta name="description" content="Some information about animals" />
 </svelte:head>
 

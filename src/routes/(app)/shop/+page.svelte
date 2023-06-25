@@ -3,6 +3,7 @@
 	import RightPage from '$lib/_components/RightPage.svelte';
 	import LoadingClock from '$lib/_components/icons/Loading_Clock.svelte';
 	import { state } from '$lib/_stores/auth_store.js';
+	import { appSettings } from '$lib/_stores/settings_store.js';
 
     export let data;
 
@@ -11,7 +12,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Messages</title>
+	<title>{$appSettings.app.name} | Messages</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
 

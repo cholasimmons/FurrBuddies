@@ -17,10 +17,20 @@
                     <img src={ clinicPhoto ? clinicPhoto : "/images/vet.jpg"} alt="" class="w-full h-full object-cover object-center"/>
                 </div>
             </header>
+            
             <footer class="card-footer pt-4">
-                <p class="p-0 m-0 text-lg">{ $state.account ? clinicName : '' }</p>
-                <span class="font-thin">{ clinicLocation }</span>
+                {#if $state.account && $state.account.emailVerification}
+                    <p class="p-0 m-0 text-lg">{ clinicName }</p>
+                    <span class="font-thin">{ clinicLocation }</span>
+                {:else if $state.account && !$state.account.emailVerification}
+                    <p class="p-0 m-0 text-lg">Your account is not verified</p>
+                    <a href="/" class="font-thin">Return to Home Screen</a>
+                {:else}
+                    <p class="p-0 m-0 text-lg">You are not logged in</p>
+                    <a href="/auth/login" class="font-thin">Log In</a>
+                {/if}
             </footer>
+            
         </div>
     {:else}
         <div class="text-left w-full flex h-36 mb-4">

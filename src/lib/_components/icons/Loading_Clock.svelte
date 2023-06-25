@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let styleClass: string|undefined = 'fill-black dark:fill-white';
+	export let styleClass: string|undefined = 'fill-slate-400';
 </script>
 
 <svg width="22" height="22" viewBox="0 0 24 24" class={styleClass}>
@@ -8,4 +8,4 @@
 <rect class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9" />
 </svg>
 
-<style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear 6s}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style>
+<style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style>

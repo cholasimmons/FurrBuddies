@@ -6,11 +6,9 @@ import { getModeUserPrefers, setModeCurrent, setModeUserPrefers } from "@skeleto
 export const prerender = false;
 export const ssr = false;
 
-export const load = async ({ url }) => {
-    const { pathname } = url;
-    const appName = "Furr Buddies";
+export const load = async ({ url: any }) => {
+    // const { pathname } = url;
     const padding = 6;
-    const version = '0.7.0';
 
-    return { pathname, appName, padding, version };
+    return { padding };
 }

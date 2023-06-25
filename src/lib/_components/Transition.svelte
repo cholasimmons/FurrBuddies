@@ -1,14 +1,13 @@
 <script lang="ts">
-    import { slide, fly, fade } from 'svelte/transition'
+    import { slide, fly, fade, scale } from 'svelte/transition'
   
     export let key: string
-    // export let meta: string
-    export let duration: number = 350
+    export let duration: number = 300
   </script>
   
   {#key key}
     <div
-      in:fly={{ duration, delay: duration+50, y:-4 }}
+      in:fade={{ duration, delay: duration+50 }}
       out:fly={{ duration, y:4 }}>
       <slot />
     </div>
@@ -18,6 +17,7 @@
     div {
       position: relative;
       inset: 0;
+      height: 100%;
     }
   </style>
   

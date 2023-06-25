@@ -18,7 +18,7 @@
     <div class="hidden md:block">
         <hr class="mx-auto ">
         <!-- If User isn't logged in -->
-        <span hidden={ !$state.account}>
+        <span hidden={ true }> <!-- !$state.account -->
             <a href="/auth/logout" class="{$page.url.pathname === '/auth/logout' ? 'chosen dark:text-primary-500' : ''}"><li>Sign Out</li></a>
         </span>
 

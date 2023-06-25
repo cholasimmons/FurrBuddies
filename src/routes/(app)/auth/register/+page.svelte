@@ -71,7 +71,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Sign Up</title>
+	<title>{$appSettings.app.name} | Sign Up</title>
 	<meta name="description" content="Sign up for a new account!" />
 </svelte:head>
 

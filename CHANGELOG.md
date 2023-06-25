@@ -1,3 +1,4 @@
+[Furr Buddies](https://buddies.simmons.studio)
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -5,35 +6,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
 
-## [`0.9.0`] - 2023-07-31
 
-### Added
-
-- Do not rely on this document right now (#444).
-- This is purely for test purposes
-- The next ```git push``` will have a working changelog
-
-### Fixed
-
-- ...
-
-### Deprecated
-
-- ...
-
-### Removed
-
-- Unused normalize.css file
-- Identical links assigned in each translation file
-- Duplicate index file for the english version
-
-### Security
-
-- ...
-
-## [`0.8.1`] - 2023-06-22
+## [`0.8.1`] - 2023-06-25
 
 ### Added
 
@@ -45,14 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smoother loading animation for Buddy's profile.
 - "Sort" button for data tables, to filter their data.
 - Added working hours to Vet business page
+- Clinic details page now shows only the available working hours, "from" and "to" in 24hrs format.
 
 ### Fixed
 
-- "Report a Bug" link in avatar menu (#1
-).
+- "Report a Bug" link in avatar menu (#1).
+
 - User Profile edit details form. Now allows a wider clickable area to upload an image.
 
+- Fixed Vet Application form, now needs integration with payment platform.
+
 ### Changed
+
+- Upgraded to Svelte 4.0
 
 - Switched to separate database for all things Veterinarian.
 
@@ -64,3 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/pets` has a new magnifying glass effect on hover of the buddies.
 - Buddies' default avatar when no image is available is the app's "FurrPrints" icon.
 - Using `@vincjo/datatables` for buddy grooming table.
+- Clinic Business Page tweaked to show more data
+
+### Security
+
+- Verification page ensure's User is logged in before accessing page and verification data is available before proceeding.

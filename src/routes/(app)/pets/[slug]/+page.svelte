@@ -25,6 +25,7 @@
     import ThFilter from '$lib/_components/datatable/ThFilter.svelte';
     import Th from '$lib/_components/datatable/Th.svelte';
     import { groomData, sourceData } from './data'
+	import { appSettings } from '$lib/_stores/settings_store';
 
     const handler = new DataHandler(groomData, { rowsPerPage: 10 })
     const rows = handler.getRows()
@@ -200,7 +201,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName} | Buddy</title>
+	<title>{$appSettings.app.name} | Buddy</title>
 	<meta name="description" content="View my Furr Buddy" />
 </svelte:head>
 

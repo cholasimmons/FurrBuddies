@@ -9,7 +9,7 @@
 
 <!-- HTML head -->
 <svelte:head>
-	<title>{data.appName}</title>
+	<title>{$appSettings.app.name}</title>
 	<meta name="description" content="{$appSettings.app.name} Terms & Conditions" />
 </svelte:head>
 
