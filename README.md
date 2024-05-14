@@ -4,9 +4,9 @@
 
 ## About this App
 
-Furr Buddies is a fully responsive cross-platform web app that focuses on the wellbeing of Pet's. It helps Pet Owners manage their Dogs, Cats, Birds, and any other Pet they may own.
+Furr Buddies is a fully responsive cross-platform web app that focuses on the wellbeing of Pets. It helps Pet Owners manage their Dogs, Cats, Birds, and any other domestic animals they may own.
 
-Before registering for a free account, Users have the ability to browse around the app and view segmented bits of information like seeing what Clinics are available.
+Before registering for a free account, Users have the ability to browse around the app and view certain information such as what Clinics or Playzones are available.
 
 Upon creating a new account and signing in, User's can search for available Veterinarians (Clinics) in their area and browse their business page for contact details, location, working hours and other useful data.
 
@@ -14,7 +14,7 @@ Once at the Clinic (physically), the Vet can scan a Pet's ID from the Pet Owner'
 
 ### Additionally
 
-Furr Buddies also offers a marketplace for Vendors to sell any Pet-related products right from the Furr Buddies platform. We call it... `Shop`. 😎
+Furr Buddies will also offer a marketplace for Vendors to sell any Pet-related products right from the Furr Buddies platform. We call it... `Shop`. 😎
 
 #
 ## Technologies
@@ -33,8 +33,10 @@ Clone this repo to your local workstation `https://github.com/cholasimmons/FurrB
 
 ```bash
 pnpm dev
+```
 
 # or start the server and open the app in a new browser tab
+```bash
 pnpm dev --open
 
 # starts the server on your local network for testing on other devices on the same network such as a mobile phone/tablet
